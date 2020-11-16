@@ -78,6 +78,8 @@ _install () {
 	if [ -z "${framework_option}" ]
 	then
 		framework_option='legacy,pal'
+	else
+		framework_option="$(echo "${framework_option}" | sed -e 's/orca/legacy/')"
 	fi
 
 	_extract
@@ -103,8 +105,8 @@ _help () {
 	${tab}uninstall
 
 	OPTION:
-	${tab}--framework=legacy,pal (default)
-	${tab}--framework=legacy
+	${tab}--framework=orca,pal (default)
+	${tab}--framework=orca
 	${tab}--framework=pal
 	EOF
 
