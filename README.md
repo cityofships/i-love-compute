@@ -53,11 +53,13 @@ It is known LuxRender an AMD R9 390X is twice faster on libcl-amdgcn ([proof](ht
   - older AMDGPU-PRO  
   closed, complete
 - Intel GPU
-  - Intel proprietary legacy SDK  
+  - Intel proprietary legacy SDK (SRB4, SRB4.1)  
   closed, complete
-  - Intel proprietary SDK  
+  - Intel proprietary classic SDK (SRB5)  
   closed, complete
-  - Intel open (Beignet?)  
+  - Intel open (NEO)  
+  open, complete
+  - Intel open (Beignet)  
   open, complete
 - Intel CPU
   - pocl  
@@ -78,11 +80,21 @@ It is known LuxRender an AMD R9 390X is twice faster on libcl-amdgcn ([proof](ht
 
 ### Links
 
-- libclc: https://libclc.llvm.org/
+- libclc:
+  - https://libclc.llvm.org/
 - ROCm:
   - https://github.com/RadeonOpenCompute/ROCm
 - AMDGPU-PRO:
   - https://www.amd.com/en/support
+- Various Intel OpenCL:
+  - https://software.intel.com/content/www/cn/zh/develop/articles/intel-sdk-for-opencl-applications-release-notes.html
+- Intel NEO OpenCL:
+  - https://github.com/intel/compute-runtime
+  - https://01.org/compute-runtime
+  - https://community.intel.com/t5/OpenCL/OpenCL-GPU-driver-NEO-is-now-available-in-open-source/td-p/1145461
+- Intel Beignet OpenCL:
+  - https://www.freedesktop.org/wiki/Software/Beignet/
+  - https://github.com/intel/beignet
 - Legacy Intel OpenCL:
   - https://software.intel.com/content/www/us/en/develop/articles/legacy-opencl-drivers.html
 - PoCL:
