@@ -28,7 +28,7 @@ Examples
 
 Note that all those software are known to be affected by bug [freedesktop.org/drm/amd#1193](https://gitlab.freedesktop.org/drm/amd/-/issues/1193#note_555037).
 
-It is known LuxRender on AMD R9 390X is twice faster on libcl-amdgcn ([proof](http://luxmark.info/node/8102)) than on AMD-APP Legacy (Orca) ([proof](http://luxmark.info/node/8103)) so people rendering things using this raytracer may prefer to use libclc-amdgcn, but it's known libclc-amdgcn lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL with that GPU.
+It is known LuxRender an AMD R9 390X is twice faster on libcl-amdgcn ([proof](http://luxmark.info/node/8102)) than on AMD-APP Legacy (Orca) ([proof](http://luxmark.info/node/8103)) so people rendering things using this raytracer may prefer to use libclc-amdgcn, but it's known libclc-amdgcn lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
 ### Frameworks
 
@@ -37,14 +37,14 @@ It is known LuxRender on AMD R9 390X is twice faster on libcl-amdgcn ([proof](ht
   open, incomplete, TeraScale2+
   - libclc amdgcn  
   open, incomplete, GCN, RDNA
-  - AMDGPU-PRO legacy  
+  - AMDGPU-PRO Orca (legacy)  
   closed, complete, GCN 1+
-  - AMDGPU-PRO  
+  - AMDGPU-PRO PAL  
   closed, complete, GCN 3+?, RDNA?
   - ROCm  
-  open, complete, select of GCN3+, RDNA?
-  - fglrx-era AMD APP  
-  closed and requires old kernel, complete, supports old GPUs
+  open, complete, select of GCN3+, RDNA, CDNA
+  - fglrx AMD APP  
+  closed and requires old kernel, complete, old GPUs, ony option for TeraScale 1
   - pocl with HSA  
   open, early state
 - AMD CPU
@@ -92,6 +92,8 @@ It is known LuxRender on AMD R9 390X is twice faster on libcl-amdgcn ([proof](ht
 
 ### Scripts and packages
 
+Script to install amdgpu-pro OpenCL on Ubuntu: [ubuntu-opencl-amdgpupro](scripts/ubuntu-opencl-amdgpupro)
+
 Script to install amdgpu-pro OpenCL on unsupported Ubuntu using supported Ubuntu packages: https://github.com/RadeonOpenCompute/ROCm/issues/484#issuecomment-554738964
 
 Script to install amdgpu-pro OpenCL on unsupported Mageia using supported Red-Hat packages: INCOMING
@@ -103,12 +105,13 @@ Arch linux AUR packages: https://wiki.archlinux.org/index.php/GPGPU
 Example of what can be achieved with a `Lenovo W541` laptop featuring an `Nvidia Quadro K1100M` GPU and an `Intel i7-4810MQ` CPU with `Intel HD 4600` integrated GPU:
 
 ```
-OpenCL:      1.2 (gpu: nvidia/cuda 390.138)
-OpenCL:      1.2 (gpu: intel/cl r3.1.58620)
-OpenCL:      1.2 (gpu: intel/beignet 1.3)
-OpenCL:      1.2 (cpu: pocl 1.4)
-OpenCL:      1.2 (cpu: intel/cl 1.2.0.330)
-OpenCL:      1.2 (cpu: amd/app 2236.5)
+OpenCL 1.2 GPU: nvidia/cuda 390.138
+OpenCL 1.2 GPU: intel/cl r3.1.58620
+OpenCL 1.2 GPU: intel/beignet 1.3
+
+OpenCL 1.2 CPU: pocl 1.4
+OpenCL 1.2 CPU: intel/cl 1.2.0.330
+OpenCL 1.2 CPU: amd/app 2236.5
 ```
 
 Having multiple OpenCL frameworks installed at the same time is useful because an implementation may be known to be faster for a given task but incomplete for another. It's also easier for testing.
@@ -121,4 +124,4 @@ Also, having multiple frameworks may help to improve compute performance by putt
 
 See how that is done on another topic (gaming) for graphical framework and hardware compatibility matrix: https://wiki.unvanquished.net/wiki/GPU_compatibility_matrix
 
-A similar thing would be good to have, and also to know who may own which hardware to easily reproduce reported issues.
+A similar thing would be good to have for OpenCL, and also to know who may own which hardware to easily reproduce reported issues.
