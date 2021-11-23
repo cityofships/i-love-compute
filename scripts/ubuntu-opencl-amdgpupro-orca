@@ -4,19 +4,30 @@
 
 set -e
 
-tab="$(printf '\t')"
+tab=$'\t'
 
 script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
 workspace_dir="workspace/${script_name}"
 
-tarball_file='amdgpu-pro-20.40-1147286-ubuntu-20.04.tar.xz'
-tarball_sum='9b064a3b02d2a1ec18fdd6c098b70f4a8c6f93e4bfdc4e9a032ca387bdf7223278622c19d5bd55e493555c5f734168c3f2768cb743f9e00dcf5f96cbc399c7b3'
+tarball_version='21.20-1271047'
+ubuntu_version='20.04'
+tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
+
+tarball_repo='https://drivers.amd.com/drivers/linux'
+tarball_file="amdgpu-pro-${tarball_version}-ubuntu-${ubuntu_version}.tar.xz"
 tarball_dir="$(basename "${tarball_file}" '.tar.xz')"
+
+deb_version='21.40.1.40501-1'
+deb_sum='2dc31efa27e8ecd940dc46d6b30d99cbf2381724102e08995a14021b29598e9d0b76abcd7f13f426b0659bfccd20672ddea9b8266e540ce6161ced4c50079f3b'
+
+deb_repo='https://repo.radeon.com/amdgpu-install/21.40.1/ubuntu/focal'
+deb_file="amdgpu-install_${deb_version}_all.deb"
 
 printSums () {
 	cat <<-EOF
 	${tarball_sum} ${tarball_file}
+	${deb_sum} ${deb_file}
 	EOF
 }
 
@@ -41,7 +52,11 @@ _download () {
 	echo "download ${tarball_file}"
 	wget --continue \
 		--header="Referer: https://www.amd.com" \
-		"https://drivers.amd.com/drivers/linux/${tarball_file}"
+		"${tarball_repo}/${tarball_file}"
+
+	echo "download ${deb_file}"
+	wget --continue \
+		"${deb_repo}/${deb_file}"
 }
 
 _extract () {
@@ -62,6 +77,7 @@ _clean () {
 	then
 		rm --verbose "${workspace_dir}/${tarball_file}"
 		rm -r --verbose "${workspace_dir}/${tarball_dir}"
+		rm --verbose "${workspace_dir}/${deb_file}"
 		rmdir --verbose "${workspace_dir}"
 	fi
 }
@@ -74,21 +90,20 @@ _uninstall () {
 }
 
 _install () {
-	local framework_option="${1}"
-	if [ -z "${framework_option}" ]
-	then
-		framework_option='legacy,pal'
-	else
-		framework_option="$(echo "${framework_option}" | sed -e 's/orca/legacy/')"
-	fi
-
 	_extract
 
 	_uninstall
 
-	cd "${tarball_dir}"
+	apt-get update
+	apt-get install -y 'gdebi-core'
 
-	echo 'Yes' | sudo ./'amdgpu-install' --no-dkms --headless --opencl="${framework_option}"
+	dpkg -i "${deb_file}"
+	sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
+
+	apt-get update
+	dpkg --purge 'opencl-orca-amdgpu-pro-icd' 'opencl-legacy-amdgpu-pro-icd'
+
+	gdebi -n "${tarball_dir}/opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb"
 }
 
 failure='false'
@@ -103,11 +118,6 @@ _help () {
 	${tab}clean
 	${tab}install
 	${tab}uninstall
-
-	OPTION:
-	${tab}--framework=orca,pal (default)
-	${tab}--framework=orca
-	${tab}--framework=pal
 	EOF
 
 	! "${failure}"
@@ -129,15 +139,6 @@ do
 			if [ "${action}" = 'error' ]
 			then
 				action="${1}"
-			else
-				_error
-			fi
-			;;
-		'--framework='*)
-			if [ "${action}" = 'install' ]
-			then
-				framework_option="${1:12}"
-				action="${action} ${framework_option}"
 			else
 				_error
 			fi
