@@ -1,4 +1,4 @@
-I ♥ compute
+I ♥ Compute
 ===========
 
 Task force to promote and make easy usage of OpenCL on Linux and beyond.
