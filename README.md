@@ -20,15 +20,15 @@ Examples
 
 ### Productivity software
 
-- Darktable, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCm (supposed) framework, but not on libCLC, see [freedesktop.org/mesa/mesa#130](https://gitlab.freedesktop.org/mesa/mesa/-/issues/130).
+- Darktable, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCm (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support).
 - Blender, verified support on AMDGPU-PRO legacy and non-legacy
 - LuxRender, verified support via LuxMark on libCLC r600 and GCN, AMDGPU-PRO legacy and non-legacy
 - GIMP
 - LibreOffice Calc
 
-Note that all those software are known to be affected by bug [freedesktop.org/drm/amd#1193](https://gitlab.freedesktop.org/drm/amd/-/issues/1193#note_555037).
+Note that all those software are known to be affected by bug [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2) (_having a GPU using the radeon driver alongside a GPU using the amdgpu driver makes OpenCL applications unable to run at all_).
 
-It is known LuxRender an AMD R9 390X is twice faster on libcl-amdgcn ([proof](http://luxmark.info/node/8102)) than on AMD-APP Legacy (Orca) ([proof](http://luxmark.info/node/8103)) so people rendering things using this raytracer may prefer to use libclc-amdgcn, but it's known libclc-amdgcn lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
+It is known LuxRender an AMD R9 390X is almost twice faster on libcl-amdgcn than on AMD-APP Legacy (Orca) or ROCm when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use libclc-amdgcn, but it's known libclc-amdgcn lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
 ### Frameworks
 
@@ -135,6 +135,6 @@ Also, having multiple frameworks may help to improve compute performance by putt
 
 ### Compatibility and performance matrix
 
-See how that is done on another topic (gaming) for graphical framework and hardware compatibility matrix: https://wiki.unvanquished.net/wiki/GPU_compatibility_matrix
+See how that is done on another topic (graphical rendering) for graphical framework and hardware compatibility matrix: https://wiki.unvanquished.net/wiki/GPU_compatibility_matrix
 
 A similar thing would be good to have for OpenCL, and also to know who may own which hardware to easily reproduce reported issues.
