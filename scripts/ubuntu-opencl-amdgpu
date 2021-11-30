@@ -17,7 +17,9 @@ workspace_dir="${workspace_parent_dir}/${script_name}"
 tarball_referer='https://www.amd.com'
 tarball_repo='https://drivers.amd.com/drivers/linux'
 
-clover_package_name='mesa-opencl-icd'
+amdgpupro_libopencl_package_name='ocl-icd-libopencl1-amdgpu-pro'
+
+clover_package_name_list='mesa-opencl-icd'
 
 orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
 orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
@@ -35,7 +37,8 @@ amdgpupro_deb_version='21.40.1.40501-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
 amdgpupro_deb_sum='2dc31efa27e8ecd940dc46d6b30d99cbf2381724102e08995a14021b29598e9d0b76abcd7f13f426b0659bfccd20672ddea9b8266e540ce6161ced4c50079f3b'
 
-rocm_package_name='rocm-opencl'
+rocm_package_name_list="${amdgpupro_libopencl_package_name} rocm-opencl"
+
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -196,11 +199,15 @@ _clean () {
 _purge () {
 	case "${1}" in
 		'clover')
-			dpkg --purge "${clover_package_name}"
+			for clover_package_name in \
+				$(echo "${clover_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				dpkg --purge "${clover_package_name}"
+			done
 			;;
 		'orca')
 			for orca_deb_file in \
-				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | sort -r)
+				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | tac)
 			do
 				orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
 				dpkg --purge "${orca_package_name}"
@@ -211,14 +218,18 @@ _purge () {
 			;;
 		'pal')
 			for pal_deb_file in \
-				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | sort -r)
+				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | tac)
 			do
 				pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
 				dpkg --purge "${pal_package_name}"
 			done
 			;;
 		'rocm')
-			dpkg --purge "${rocm_package_name}"
+			for rocm_package_name in \
+				$(echo "${rocm_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				dpkg --purge "${rocm_package_name}"
+			done
 			;;
 	esac
 }
@@ -274,9 +285,12 @@ _install () {
 	then
 		_purge clover
 
-		echo "Install ${clover_package_name} package."
+		for clover_package_name in ${clover_package_name_list}
+		do
+			echo "Install ${clover_package_name} package."
 
-		apt-get install --yes "${clover_package_name}"
+			apt-get install --yes "${clover_package_name}"
+		done
 	fi
 
 	if _is orca
@@ -327,9 +341,12 @@ _install () {
 		# Already correct (icd may be renamed):
 		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
-		echo "Install ${rocm_package_name} package."
+		for rocm_package_name in ${rocm_package_name_list}
+		do
+			echo "Install ${rocm_package_name} package."
 
-		apt-get install --yes "${rocm_package_name}"
+			apt-get install --yes "${rocm_package_name}"
+		done
 
 		# Already correct (icd may be renamed):
 		# libamdocl64.so
