@@ -253,6 +253,9 @@ _uninstall () {
 
 	amdgpupro_package_name="$(echo "${amdgpupro_deb_file}" | cut -f1 -d'_')"
 	dpkg --purge "${amdgpupro_package_name}"
+
+	# Read changes from /etc/ld.so.conf.d folder.
+	ldconfig
 }
 
 _install () {
@@ -352,6 +355,9 @@ _install () {
 		# libamdocl64.so
 		# /etc/OpenCL/vendors/amdocl64.icd
 	fi
+
+	# Read changes from /etc/ld.so.conf.d folder.
+	ldconfig
 }
 
 _help () {
