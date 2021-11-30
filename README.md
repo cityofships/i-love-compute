@@ -38,13 +38,13 @@ It is known LuxRender an AMD R9 390X is almost twice faster on libcl-amdgcn than
   - libclc amdgcn  
   open, incomplete, GCN, RDNA
   - AMDGPU-PRO Orca (legacy)  
-  closed, complete, GCN 1+
+  closed, complete, GCN1+
   - AMDGPU-PRO PAL  
-  closed, complete, GCN 3+?, RDNA?
+  closed, complete, GCN3+?, RDNA?
   - ROCm  
   open, complete, select of GCN3+, RDNA, CDNA
   - fglrx AMD APP  
-  closed and requires old kernel, complete, old GPUs, only option for TeraScale 1  ,
+  closed and requires old kernel, complete, old GPUs, only option for TeraScale1,  
   people are still [using it in 2020](https://gitlab.com/illwieckz/i-love-compute/-/issues/1#note_451460689)
   - pocl with HSA  
   open, early state
@@ -79,8 +79,11 @@ It is known LuxRender an AMD R9 390X is almost twice faster on libcl-amdgcn than
   - pocl with Nvidia  
   open requiring closed component, early-state
 
+
 ### Links
 
+- Mesa/Clover:
+  - https://gitlab.freedesktop.org/mesa/mesa
 - libclc:
   - https://libclc.llvm.org/
 - ROCm:
