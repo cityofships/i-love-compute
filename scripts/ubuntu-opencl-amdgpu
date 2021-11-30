@@ -433,6 +433,9 @@ case "${action}" in
 					is_pal='true'
 					is_rocm='true'
 					;;
+				'clover')
+					is_clover='true'
+					;;
 				'orca')
 					is_orca='true'
 					;;
