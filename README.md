@@ -105,7 +105,7 @@ It is known LuxRender an AMD R9 390X is almost twice faster on libcl-amdgcn than
 
 ### Scripts and packages
 
-Script to install amdgpu-pro OpenCL on Ubuntu: [ubuntu-opencl-amdgpupro](scripts/ubuntu-opencl-amdgpupro)
+Script to install amdgpu-pro OpenCL on Ubuntu: [ubuntu-opencl-amdgpu](scripts/ubuntu-opencl-amdgpu)
 
 Script to install amdgpu-pro OpenCL on unsupported Ubuntu using supported Ubuntu packages: https://github.com/RadeonOpenCompute/ROCm/issues/484#issuecomment-554738964
 

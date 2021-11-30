@@ -1,0 +1,432 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2020 Thomas “illwieckz“ Debesse
+
+# Exit in case of failure.
+set -e
+
+# Error on undefined variable.
+set -u
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+workspace_parent_dir='workspace'
+workspace_dir="${workspace_parent_dir}/${script_name}"
+
+tarball_referer='https://www.amd.com'
+tarball_repo='https://drivers.amd.com/drivers/linux'
+
+clover_package_name='mesa-opencl-icd'
+
+orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
+orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
+orca_deb_file_list='opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb'
+orca_tarball_dir="$(basename "${orca_tarball_file}" '.tar.xz')"
+
+pal_tarball_file="amdgpu-pro-20.40-1147286-ubuntu-20.04.tar.xz"
+pal_tarball_sum='9b064a3b02d2a1ec18fdd6c098b70f4a8c6f93e4bfdc4e9a032ca387bdf7223278622c19d5bd55e493555c5f734168c3f2768cb743f9e00dcf5f96cbc399c7b3'
+pal_deb_file_list='opencl-amdgpu-pro-comgr_20.40-1147286_amd64.deb opencl-amdgpu-pro-icd_20.40-1147286_amd64.deb'
+pal_tarball_dir="$(basename "${pal_tarball_file}" '.tar.xz')"
+
+amdgpupro_deb_repo='https://repo.radeon.com/amdgpu-install/21.40.1/ubuntu/focal'
+
+amdgpupro_deb_version='21.40.1.40501-1'
+amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
+amdgpupro_deb_sum='2dc31efa27e8ecd940dc46d6b30d99cbf2381724102e08995a14021b29598e9d0b76abcd7f13f426b0659bfccd20672ddea9b8266e540ce6161ced4c50079f3b'
+
+rocm_package_name='rocm-opencl'
+
+_error () {
+	printf 'ERROR: %s\n\n' "${1}" >&2
+
+	exit 1
+}
+
+is_clover='false'
+is_orca='false'
+is_pal='false'
+is_rocm='false'
+
+_is () {
+	case "${1}" in
+		'clover')
+			"${is_clover}"
+			;;
+	       	'orca')
+			"${is_orca}"
+			;;
+		'pal')
+			"${is_pal}"
+			;;
+		'rocm')
+			"${is_rocm}"
+			;;
+	esac
+}
+
+_checksum () {
+	_cd
+
+	case "${1}" in
+		'amdgpupro')
+			sum="${amdgpupro_deb_sum}"
+			file="${amdgpupro_deb_file}"
+			;;
+		'orca')
+			sum="${orca_tarball_sum}"
+			file="${orca_tarball_file}"
+			;;
+		'pal')
+			sum="${pal_tarball_sum}"
+			file="${pal_tarball_file}"
+			;;
+	esac
+
+	if [ -f "${file}" ]
+	then
+		if printf '%s %s\n' "${sum}" "${file}" \
+			| sha512sum -c '/dev/stdin'
+		then
+			return
+		fi
+	fi
+
+	false
+}
+
+_cd () {
+	cd "${script_dir}"
+
+	mkdir --parents --verbose "${workspace_dir}"
+
+	cd "${workspace_dir}"
+}
+
+_download () {
+	_cd
+
+	if _is orca || _is pal || _is rocm
+	then
+		if ! _checksum 'amdgpupro'
+		then
+			echo "Download ${amdgpupro_deb_file}."
+			wget --continue \
+				"${amdgpupro_deb_repo}/${amdgpupro_deb_file}"
+
+			_checksum 'amdgpupro'
+		fi
+	fi
+
+	if _is orca
+	then
+		if ! _checksum 'orca'
+		then
+			echo "Download ${orca_tarball_file}."
+
+			wget --continue \
+				--header="Referer: ${tarball_referer}" \
+				"${tarball_repo}/${orca_tarball_file}"
+
+			_checksum 'orca'
+		fi
+	fi
+
+	if _is pal
+	then
+		if ! _checksum 'pal'
+		then
+			echo "Download ${pal_tarball_file}."
+
+			wget --continue \
+				--header="Referer: ${tarball_referer}" \
+				"${tarball_repo}/${pal_tarball_file}"
+
+			_checksum 'pal'
+		fi
+	fi
+}
+
+_extract () {
+	_cd
+
+	_download
+
+	if _is orca
+	then
+		if ! [ -d "${orca_tarball_dir}" ]
+		then
+			echo "Extract ${orca_tarball_file}."
+
+			tar --no-same-permissions -xvJf "${orca_tarball_file}"
+		fi
+	fi
+
+	if _is pal
+	then
+		if ! [ -d "${pal_tarball_dir}" ]
+		then
+			echo "Extract ${pal_tarball_file}."
+			tar --no-same-permissions -xvJf "${pal_tarball_file}"
+		fi
+	fi
+}
+
+_clean () {
+	cd "${script_dir}"
+
+	if [ -d "${workspace_dir}" ]
+	then
+		rm --force --verbose "${workspace_dir}/${orca_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${orca_tarball_dir}"
+
+		rm --force --verbose "${workspace_dir}/${pal_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${pal_tarball_dir}"
+
+		rm --force --verbose "${workspace_dir}/${amdgpupro_deb_file}"
+		rmdir --verbose "${workspace_dir}"
+	fi
+
+	if [ -d "${workspace_parent_dir}" ]
+	then
+		rmdir --ignore-fail-on-non-empty --verbose "${workspace_parent_dir}"
+	fi
+}
+
+_purge () {
+	case "${1}" in
+		'clover')
+			dpkg --purge "${clover_package_name}"
+			;;
+		'orca')
+			for orca_deb_file in \
+				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | sort -r)
+			do
+				orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+				dpkg --purge "${orca_package_name}"
+			done
+
+			# Alternate name for opencl-orca-amdgpu-pro-icd package.
+			dpkg --purge 'opencl-legacy-amdgpu-pro-icd'
+			;;
+		'pal')
+			for pal_deb_file in \
+				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | sort -r)
+			do
+				pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
+				dpkg --purge "${pal_package_name}"
+			done
+			;;
+		'rocm')
+			dpkg --purge "${rocm_package_name}"
+			;;
+	esac
+}
+
+_uninstall () {
+	_purge clover
+	_purge orca
+	_purge pal
+	_purge rocm
+
+	dpkg-divert \
+		--rename \
+		--remove '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
+
+	rm --force --verbose '/etc/OpenCL/vendors/amdocl-pal64.icd'
+
+	if test -f '/usr/bin/amdgpu-install'
+	then
+		echo 'Yes' | '/usr/bin/amdgpu-install' --uninstall
+	fi
+
+	amdgpupro_package_name="$(echo "${amdgpupro_deb_file}" | cut -f1 -d'_')"
+	dpkg --purge "${amdgpupro_package_name}"
+}
+
+_install () {
+	_extract
+
+	if _is orca || _is pal
+	then
+		apt-get update
+
+		echo "Download gdebi-core package."
+		apt-get install -y 'gdebi-core'
+	fi
+
+	if _is orca || _is pal || _is rocm
+	then
+		echo "Install ${amdgpupro_deb_file} package."
+
+		dpkg -i "${amdgpupro_deb_file}"
+
+		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
+	fi
+
+
+	if _is clover || _is orca || _is pal || _is rocm
+	then
+		apt-get update
+	fi
+
+	if _is clover
+	then
+		_purge clover
+
+		echo "Install ${clover_package_name} package."
+
+		apt-get install --yes "${clover_package_name}"
+	fi
+
+	if _is orca
+	then
+		_purge orca
+
+		# Already correct:
+		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
+
+		local orca_deb_file
+		for orca_deb_file in ${orca_deb_file_list}
+		do
+			echo "Install ${orca_deb_file} package."
+			
+			gdebi --non-interactive "${orca_tarball_dir}/${orca_deb_file}"
+		done
+
+		# Already correct:
+		# libamdocl-rocm64.so
+		# /etc/OpenCL/vendors/amdocl-orca64.icd
+	fi
+	
+	if _is pal
+	then
+		_purge pal
+
+		dpkg-divert \
+			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
+			--rename '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
+
+		local pal_deb_file
+		for pal_deb_file in ${pal_deb_file_list}
+		do
+			echo "Install ${pal_deb_file} package."
+
+			gdebi --non-interactive "${pal_tarball_dir}/${pal_deb_file}"
+		done
+
+		rm --force --verbose '/etc/OpenCL/vendors/amdocl64.icd'
+
+		echo 'libamdocl-pal64.so' > '/etc/OpenCL/vendors/amdocl-pal64.icd'
+	fi
+
+	if _is rocm
+	then
+		_purge rocm
+
+		# Already correct (icd may be renamed):
+		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
+
+		echo "Install ${rocm_package_name} package."
+
+		apt-get install --yes "${rocm_package_name}"
+
+		# Already correct (icd may be renamed):
+		# libamdocl64.so
+		# /etc/OpenCL/vendors/amdocl64.icd
+	fi
+}
+
+_help () {
+	tab=$'\t'
+
+	cat <<-EOF
+	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs.
+
+	Usage: ${script_name} [OPTION] [ACTION] [NAMES]
+
+	Option:
+	${tab}-h, --help
+	${tab}${tab}Print this help.
+
+	Actions:
+	${tab}download
+	${tab}${tab}Download files if needed by NAME
+	${tab}extract
+	${tab}${tab}Download archives if needed by NAME
+	${tab}clean
+	${tab}${tab}Clean-up download and extracted files for NAME
+	${tab}install
+	${tab}${tab}Install NAME (default: clover)
+	${tab}uninstall
+	${tab}${tab}Uninstall all OpenCL drivers for AMD GPUs.
+
+	Names:
+	${tab}all
+	${tab}${tab}All OpenCL drivers for AMD GPUs
+	${tab}clover (default)
+	${tab}${tab}Mesa Clover (LLVM LibCLC r600 and amdgcn)
+	${tab}orca
+	${tab}${tab}AMD APP Orca
+	${tab}pal
+	${tab}${tab}AMD APP PAL
+	${tab}rocm
+	${tab}${tab}AMD APP ROCm
+	EOF
+	
+	exit
+}
+
+case "${1:-}" in
+	'download'|'extract'|'clean'|'install'|'uninstall')
+		action="${1}"
+		;;
+	'-h'|'--help'|'')
+		_help
+		;;
+	'-'*|'--'*)
+		_error 'Unknown option.'
+		;;
+	*)
+		_error 'Unknown action.'
+		;;
+esac
+
+shift
+
+case "${action}" in
+	'download'|'extract'|'clean'|'install')
+		if [ -z "${1:-}" ]
+		then
+			is_clover='true'
+		fi
+
+		while ! [ -z "${1:-}" ]
+		do
+			case "${1}" in
+				'all')
+					is_clover='true'
+					is_orca='true'
+					is_pal='true'
+					is_rocm='true'
+					;;
+				'orca')
+					is_orca='true'
+					;;
+				'pal')
+					is_pal='true'
+					;;
+				'rocm')
+					is_rocm='true'
+					;;
+				*)
+					_error 'Unkown name.'
+					;;
+			esac
+
+			shift
+		done
+		;;
+esac
+
+"_${action}"
