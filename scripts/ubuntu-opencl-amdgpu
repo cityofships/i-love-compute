@@ -301,6 +301,7 @@ _purge () {
 _uninstall () {
 	_purge clover
 	_purge orca
+	_purge stream
 	_purge pal
 	_purge rocm
 
