@@ -21,6 +21,12 @@ amdgpupro_libopencl_package_name='ocl-icd-libopencl1-amdgpu-pro'
 
 clover_package_name_list='mesa-opencl-icd'
 
+stream_tarball_file="radeon-crimson-15.12-15.302-151217a-297685e.zip"
+stream_tarball_sum='1658c3109e9dca2a1f0bd972e9042e7ccf17742e9c6110f04151334f342eb53d5a736b9cb63358a26d97562f1efb9e36c281bca85664e06f0cd11c275972f3af'
+stream_tarball_dir='fglrx-15.302'
+stream_script_file='amd-driver-installer-15.302-x86.x86_64.run'
+stream_install_dir='/opt/amd-stream'
+
 orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
 orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
 orca_deb_file_list='opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb'
@@ -39,7 +45,6 @@ amdgpupro_deb_sum='2dc31efa27e8ecd940dc46d6b30d99cbf2381724102e08995a14021b29598
 
 rocm_package_name_list="${amdgpupro_libopencl_package_name} rocm-opencl"
 
-
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
 
@@ -47,6 +52,7 @@ _error () {
 }
 
 is_clover='false'
+is_stream='false'
 is_orca='false'
 is_pal='false'
 is_rocm='false'
@@ -56,7 +62,10 @@ _is () {
 		'clover')
 			"${is_clover}"
 			;;
-	       	'orca')
+		'stream')
+			"${is_stream}"
+			;;
+		'orca')
 			"${is_orca}"
 			;;
 		'pal')
@@ -75,6 +84,10 @@ _checksum () {
 		'amdgpupro')
 			sum="${amdgpupro_deb_sum}"
 			file="${amdgpupro_deb_file}"
+			;;
+		'stream')
+			sum="${stream_tarball_sum}"
+			file="${stream_tarball_file}"
 			;;
 		'orca')
 			sum="${orca_tarball_sum}"
@@ -121,6 +134,20 @@ _download () {
 		fi
 	fi
 
+	if _is stream
+	then
+		if ! _checksum 'stream'
+		then
+			echo "Download ${stream_tarball_file}."
+
+			wget --continue \
+				--header="Referer: ${tarball_referer}" \
+				"${tarball_repo}/${stream_tarball_file}"
+
+			_checksum 'stream'
+		fi
+	fi
+
 	if _is orca
 	then
 		if ! _checksum 'orca'
@@ -155,6 +182,16 @@ _extract () {
 
 	_download
 
+	if _is stream
+	then
+		if ! [ -d "${stream_tarball_dir}" ]
+		then
+			echo "Extract ${stream_tarball_file}."
+
+			unzip "${stream_tarball_file}"
+		fi
+	fi
+
 	if _is orca
 	then
 		if ! [ -d "${orca_tarball_dir}" ]
@@ -170,6 +207,7 @@ _extract () {
 		if ! [ -d "${pal_tarball_dir}" ]
 		then
 			echo "Extract ${pal_tarball_file}."
+
 			tar --no-same-permissions -xvJf "${pal_tarball_file}"
 		fi
 	fi
@@ -180,6 +218,9 @@ _clean () {
 
 	if [ -d "${workspace_dir}" ]
 	then
+		rm --force --verbose "${workspace_dir}/${stream_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${stream_tarball_dir}"
+
 		rm --force --verbose "${workspace_dir}/${orca_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${orca_tarball_dir}"
 
@@ -204,6 +245,29 @@ _purge () {
 			do
 				dpkg --purge "${clover_package_name}"
 			done
+			;;
+		'stream')
+			rm --force --verbose \
+				"${stream_install_dir}/x86_64-linux-gnu/libamdocl64-stream.so"
+			rm --force --verbose \
+				"${stream_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+
+			if [ -d "${stream_install_dir}/x86_64-linux-gnu" ]
+			then
+				rmdir --ignore-fail-on-non-empty --verbose \
+					"${stream_install_dir}/x86_64-linux-gnu"
+			fi
+
+			if [ -d "${stream_install_dir}" ]
+			then
+				rmdir --ignore-fail-on-non-empty --verbose \
+					"${stream_install_dir}"
+			fi
+
+			rm --force --verbose \
+				'/etc/ld.so.conf.d/30-amd-stream.conf'
+			rm --force --verbose \
+				'/etc/OpenCL/vendors/amdocl-stream64.icd'
 			;;
 		'orca')
 			for orca_deb_file in \
@@ -278,7 +342,6 @@ _install () {
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
-
 	if _is clover || _is orca || _is pal || _is rocm
 	then
 		apt-get update
@@ -294,6 +357,37 @@ _install () {
 
 			apt-get install --yes "${clover_package_name}"
 		done
+	fi
+
+	if _is stream
+	then
+		_purge stream
+
+		local stream_extract_prefix="${stream_tarball_dir}/prefix"
+
+		if ! [ -d "${stream_extract_prefix}" ]
+		then
+			"${stream_tarball_dir}/${stream_script_file}" --extract "${stream_extract_prefix}"
+		fi
+
+		mkdir --parents --verbose "${stream_install_dir}"
+		mkdir --parents --verbose "${stream_install_dir}/x86_64-linux-gnu"
+
+		cp --archive --verbose \
+			"${stream_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
+			"${stream_install_dir}/x86_64-linux-gnu/libamdocl64-stream.so"
+
+		cp --archive --verbose \
+			"${stream_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
+			"${stream_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+
+		sed -e 's/libamdocl12cl64.so/libfglocl12cl64.so/g' \
+			-i "${stream_install_dir}/x86_64-linux-gnu/libamdocl64-stream.so"
+
+		echo 'libamdocl64-stream.so' > '/etc/OpenCL/vendors/amdocl-stream64.icd'
+
+		echo "${stream_install_dir}/x86_64-linux-gnu" \
+			> '/etc/ld.so.conf.d/30-amd-stream.conf'
 	fi
 
 	if _is orca
@@ -364,7 +458,7 @@ _help () {
 	tab=$'\t'
 
 	cat <<-EOF
-	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs.
+	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs and CPUs
 
 	Usage: ${script_name} [OPTION] [ACTION] [NAMES]
 
@@ -386,15 +480,17 @@ _help () {
 
 	Names:
 	${tab}all
-	${tab}${tab}All OpenCL drivers for AMD GPUs
+	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs
 	${tab}clover (default)
-	${tab}${tab}Mesa Clover (LLVM LibCLC r600 and amdgcn)
+	${tab}${tab}Mesa Clover for R600 and GCN GPUs
+	${tab}stream
+	${tab}${tab}AMD APP Stream from Radeon Crimson for CPUs
 	${tab}orca
-	${tab}${tab}AMD APP Orca
+	${tab}${tab}AMD APP Orca from AMDGPU-PRO for GCN1-3 GPUs
 	${tab}pal
-	${tab}${tab}AMD APP PAL
+	${tab}${tab}AMD APP PAL from AMDGPU-PRO for GCN4+ GPUs
 	${tab}rocm
-	${tab}${tab}AMD APP ROCm
+	${tab}${tab}AMD APP ROCm for Radeon Pro GPUs
 	EOF
 	
 	exit
@@ -429,12 +525,16 @@ case "${action}" in
 			case "${1}" in
 				'all')
 					is_clover='true'
+					is_stream='true'
 					is_orca='true'
 					is_pal='true'
 					is_rocm='true'
 					;;
 				'clover')
 					is_clover='true'
+					;;
+				'stream')
+					is_stream='true'
 					;;
 				'orca')
 					is_orca='true'
