@@ -86,7 +86,7 @@ It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN h
     * Last working version for Orca (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
   - AMDGPU-PRO PAL,  
   closed, complete, GCN5 (verified), probably RDNA (not verified).
-    * Last version for PAL (`2021-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified).
+    * Last version for PAL (`2020-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified).
   - ROCm,  
   open, incomplete (not for GUI applications, not verified), few GCN, RDNA, CDNA (not verified), may break the whole system with some hardware (verified).
   - fglrx AMD APP,  
