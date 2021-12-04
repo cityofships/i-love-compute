@@ -519,9 +519,25 @@ _install () {
 	ldconfig
 }
 
-_help () {
-	tab=$'\t'
+tab=$'\t'
 
+_mention () {
+	cat <<-EOF
+	Always backup this script for future uninstallation, future versions
+	of this script may not uninstall what was installed with this one.
+
+	Always uninstall before upgrading to an higher version of your the
+	distribution you use.
+
+	Support the effort to keep OpenCL working on Linux, if this script saved
+	your life, you can make a donation, see:
+
+	${tab}https://gitlab.com/illwieckz/i-love-compute#funding
+
+	EOF
+}
+
+_help () {
 	cat <<-EOF
 	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs and CPUs
 
@@ -556,8 +572,11 @@ _help () {
 	${tab}${tab}AMD APP PAL from AMDGPU-PRO for GCN4+ GPUs
 	${tab}rocm
 	${tab}${tab}AMD APP ROCm for Radeon Pro GPUs
+
 	EOF
 	
+	_mention
+
 	exit
 }
 
@@ -621,3 +640,7 @@ case "${action}" in
 esac
 
 "_${action}"
+
+printf '\n'
+
+_mention
