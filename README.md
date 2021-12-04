@@ -53,6 +53,12 @@ Arch linux AUR packages: https://wiki.archlinux.org/index.php/GPGPU
 Knowledge
 ---------
 
+
+### Issue reporting
+
+The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is used to keep track of issues accross projects, to track them when no official issue tracker is identified, or to track the upstream efforts in a way it can be easily linked to other issues.
+
+
 ### Productivity software
 
 - Darktable, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCm (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
