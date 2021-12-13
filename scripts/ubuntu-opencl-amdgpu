@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# Copyright 2020 Thomas “illwieckz“ Debesse
+# Copyright 2021 Thomas “illwieckz“ Debesse
 
 # Exit in case of failure.
 set -e
@@ -283,6 +283,7 @@ _clean () {
 		rm --force --recursive --verbose "${workspace_dir}/${pal_tarball_dir}"
 
 		rm --force --verbose "${workspace_dir}/${amdgpupro_deb_file}"
+
 		rmdir --verbose "${workspace_dir}"
 	fi
 
@@ -574,6 +575,13 @@ _help () {
 	${tab}${tab}AMD APP PAL from AMDGPU-PRO for GCN4+ GPUs
 	${tab}rocm
 	${tab}${tab}AMD APP ROCm for Radeon Pro GPUs
+
+	Examples:
+	${tab}${script_name} install all
+
+	${tab}${script_name} install stream orca pal
+
+	${tab}${script_name} uninstall
 
 	EOF
 	
