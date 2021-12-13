@@ -7,12 +7,12 @@ Task force to promote and make easy usage of OpenCL on Linux and beyond.
 
 Targets:
 
-- Identify all existing compute framework, starting with OpenCL and Linux
-- Compatibility matrix for hardwares and OpenCL frameworks
-- Compatibility matrix for softwares and OpenCL frameworks
-- Performance matrix for softwares and OpenCL frameworks
+- Identify all existing compute framework, focusing with OpenCL on Linux to begin with,
+- Compatibility matrix for hardwares and OpenCL frameworks,
+- Compatibility matrix for softwares and OpenCL frameworks,
+- Performance matrix for softwares and OpenCL frameworks,
 - Installation instructions, possibly scripts, repository links or packages
-- Track issues accross projects
+- Track issues accross projects,
 - Help to make possible to install multiple OpenCL frameworks and multiple version of OpenCL frameworks when possible.
 
 Knowledge about Vulkan compute or legacy Shader-based compute is welcome, same with other systems like BSD ones.
@@ -34,25 +34,42 @@ Commercial support and consultancy can be obtained from [rebuild.sh](https://reb
 Hardware donation
 -----------------
 
-Already sourced: AMD TeraScale 1-3 (AGP, PCI, PCIe), GCN1,2,3,5 (PCIe). Nvidia Kepler (PCIe), Tesla 2.0 (PCIe), Tesla 1.0 (PCI). Intel Gen7.
+Already sourced:
 
-Missing: AMD GCN4, RDNA1-2, CDNA1-2 hardware. ROCm supported hardware. Via Chrome. Most Nvidia and Intel hardware. For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>`.
+- AMD TeraScale 1 (AGP, PCI, PCIe),
+- AMD TeraScale 2 (PCIe),
+- AMD TeraScale 3 (PCIe),
+- AMD GCN1 (PCIe),
+- AMD GCN2 (PCIe),
+- AMD GCN3 (integrated),
+- AMD GCN5 (integrated),
+- Tesla 1.0 (PCI),
+- Tesla 2.0 (PCIe),
+- Nvidia Kepler (PCIe),
+- Intel Gen7 (integrated).
+
+Missing:
+
+- AMD GCN4 (Polaris),
+- AMD RDNA1 (Navi), CDNA1,
+- AMD RDNA2 (Big Navi), CDNA2,
+- AMD hardware supported by ROCr,
+- Via hardware (Chrome 520 and later),
+- Nvidia hardware that is not Tesla or Kepler,
+- Intel hardware that is not Gen7 (Haswell), Intel Xe.
+
+For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation.
 
 
 ### Scripts and packages
 
-Script to install amdgpu-pro OpenCL on Ubuntu: [ubuntu-opencl-amdgpu](scripts/ubuntu-opencl-amdgpu)
-
-This was based on many scripts written through the yearn [like this one](https://github.com/RadeonOpenCompute/ROCm/issues/484#issuecomment-554738964).
-
-Script to install amdgpu-pro OpenCL on unsupported Mageia using supported Red-Hat packages: INCOMING.
+Script to install amdgpu-pro OpenCL on Ubuntu: [ubuntu-opencl-amdgpu](scripts/ubuntu-opencl-amdgpu). This was based on many scripts [like this one](https://github.com/RadeonOpenCompute/ROCr/issues/484#issuecomment-554738964) written on various places through the years to make possible to use OpenCL with AMD GPUs. It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr, Clover (TeraScale, GCN+)
 
 Arch linux AUR packages: https://wiki.archlinux.org/index.php/GPGPU
 
 
 Knowledge
 ---------
-
 
 ### Issue reporting
 
@@ -61,7 +78,7 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 
 ### Productivity software
 
-- Darktable, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCm (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
+- Darktable, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCr (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
 - Blender, verified support on AMDGPU-PRO legacy and non-legacy,
 - LuxRender, verified support via LuxMark on Mesa TeraScale and GCN, AMDGPU-PRO legacy and non-legacy,
 - GIMP,
@@ -69,26 +86,37 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 
 Note that all those software are known to be affected by bug [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2) (_having a GPU using the radeon driver alongside a GPU using the amdgpu driver makes OpenCL applications unable to run at all_).
 
-It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or ROCm when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
+It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
+
+### AMD quirks
+
+The `GPU_DEVICE_ORDINAL` environment variable can be used to whitelist some GPUs with AMD ROCr, Orca and PAL. Unfortunately, it whitelits the card (and blacklists all others) for every AMD OpenCL Driver so one cannot blacklist a GPU in ROCr to prevent a kernel breakage and get it working with another driver like Orca, so it's not possible to keep ROCr on one GPU while blacklisting another GPU on ROCr to use it with something else like Orca. See [ROCr#1624](https://github.com/RadeonOpenCompute/ROCr/issues/1624).
+
+No one GPU driven by the `radeon` kernel driver must be present in the system to be able to use AMD Orca or PAL with others GPU driven by the `amdgpu` kernel driver. See [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2). Unfortunately, attempts to blacklist them using `GPU_DEVICE_ORDINAL` does not work.
+
+Orca requires an X11 server being up and running.
 
 ### Frameworks
 
+- Vulkan compatible GPU,
+  - clvk, based on Google clspv  
+  open, incomplete (verified).
 - ATI/AMD GPU,
-  - Mesa Clover, libclc r600,  
+  - Mesa Clover, LLVM libclc r600,  
   open, incomplete, TeraScale2-3 (verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (verified).
-  - Mesa Clover, libclc amdgcn,  
+    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified).
+  - Mesa Clover, LLVM libclc amdgcn,  
   open, incomplete, GCN1-5 (verified), RDNA (not verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (verified).
+    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), twice faster than Orca, PAL and ROCr with LuxRender.
   - AMDGPU-PRO Orca (legacy),  
   closed, complete, GCN1-3 (verified), probably GCN4 (not verified).
     * Last working version for Orca (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
   - AMDGPU-PRO PAL,  
   closed, complete, GCN5 (verified), probably RDNA (not verified).
-    * Last version for PAL (`2020-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified).
-  - ROCm,  
-  open, incomplete (not for GUI applications, not verified), few GCN, RDNA, CDNA (not verified), may break the whole system with some hardware (verified).
+    * Last version for PAL (`2020-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified), removed in favor of ROCr in Radeon Software AMDGPU-PRO without ROCr being actually an alternative.
+  - ROCr,  
+  open, incomplete (not for GUI applications, not verified), few GCN, RDNA, CDNA (not verified), may break the whole system with some hardware (verified), replaced PAL in Radeon Software AMDGPU-PRO without being an alternative, neither in purpose, neither in hardware support, neither in implementation, neither in fulfilment.
   - fglrx AMD APP,  
   closed and requires old kernel, complete, old GPUs, the only option for TeraScale,  
   people are still [using it in 2020](https://gitlab.com/illwieckz/i-love-compute/-/issues/1#note_451460689).  
@@ -100,7 +128,7 @@ It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN h
 - AMD CPU,
   - pocl,  
   open, not verified.
-  - older AMDGPU-PRO,  
+  - older AMDGPU-PRO or fglrx,  
   closed, complete, verified.
 - Intel GPU,
   - Intel proprietary legacy SDK (SRB4, SRB4.1),  
@@ -126,7 +154,7 @@ It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN h
   - Mesa Clover, libclc nouveau.  
   open, early state, not tested,
   - libclc ptx,  
-  open requirinh closed component, incomplete, noy tested.
+  open requiring closed component, incomplete, noy tested.
   - Nvidia,  
   closed, complete, verified.
   - pocl with Nvidia,  
@@ -138,12 +166,15 @@ It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN h
 
 ### Links
 
+- clvk, Google clspv  
+  - https://github.com/kpet/clvk
+  - https://github.com/google/clspv
 - Mesa/Clover, LLVM libclc:
   - https://gitlab.freedesktop.org/mesa/mesa
   - https://libclc.llvm.org
   - https://github.com/llvm/llvm-project/tree/main/libclc
   - https://www.x.org/wiki/RadeonFeature
-- ROCm:
+- AMD ROCr:
   - https://github.com/RadeonOpenCompute/ROCm
 - AMDGPU-PRO:
   - https://www.amd.com/en/support
