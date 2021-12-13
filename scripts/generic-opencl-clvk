@@ -1,0 +1,171 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2021 Thomas “illwieckz“ Debesse
+
+# Exit in case of failure.
+set -e
+
+# Error on undefined variable.
+set -u
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+workspace_parent_dir="${script_dir}/workspace"
+workspace_dir="${workspace_parent_dir}/${script_name}"
+
+clvk_source_repo='https://github.com/kpet/clvk.git'
+clvk_source_dir="${workspace_dir}/clvk"
+clvk_build_dir="${clvk_source_dir}/build"
+clvk_install_dir="${clvk_build_dir}/install"
+
+_error () {
+	printf 'ERROR: %s\n\n' "${1}" >&2
+
+	exit 1
+}
+
+_cd () {
+	cd "${script_dir}"
+
+	mkdir --parents --verbose "${workspace_dir}"
+
+	cd "${workspace_dir}"
+}
+
+_build () {
+	_cd
+
+	if ! [ -d "${clvk_source_dir}" ]
+	then
+		git clone \
+		"${clvk_source_repo}" \
+		"${clvk_source_dir}"
+	fi
+
+	cd "${clvk_source_dir}"
+
+	git pull
+
+	git submodule update --init --recursive
+
+	"${clvk_source_repo}/external/clspv/utils/fetch_sources.py"
+
+	cmake \
+		-S"${clvk_source_dir}" \
+		-B"${clvk_build_dir}" \
+		-D'CMAKE_INSTALL_PREFIX'="${clvk_install_dir}"
+
+	cmake \
+		--build "${clvk_build_dir}" \
+		--parallel "$(nproc)"
+
+	cmake \
+		--build "${clvk_build_dir}" \
+		--parallel "$(nproc)" \
+		-- install
+}
+
+_clean () {
+	cd "${script_dir}"
+
+	if [ -d "${workspace_dir}" ]
+	then
+		rm --force --recursive --verbose "${clvk_source_dir}"
+
+		rmdir --verbose "${workspace_dir}"
+	fi
+
+	if [ -d "${workspace_parent_dir}" ]
+	then
+		rmdir --ignore-fail-on-non-empty --verbose "${workspace_parent_dir}"
+	fi
+}
+
+_run () {
+	if ! [ -f "${clvk_install_dir}/libOpenCL.so" ]
+	then
+		_error 'clvk is not installed.'
+	fi
+
+	export LD_LIBRARY_PATH="${clvk_install_dir}:${LD_LIBRARY_PATH:-}"
+	export CLVK_CLSPV_BIN="${clvk_install_dir}/clspv"
+
+	"${@}"
+}
+
+tab=$'\t'
+
+_mention () {
+	cat <<-EOF
+	This tool is provided by the I love compute! initiative.
+
+	Always backup this script for future uninstallation, future versions
+	of this script may not uninstall what was installed with this one.
+
+	Always uninstall before upgrading to an higher version of the
+	distribution you use.
+
+	Support the effort to keep OpenCL working on Linux, if this script saved
+	your life, you can make a donation, see:
+
+	${tab}https://gitlab.com/illwieckz/i-love-compute#funding
+
+	EOF
+}
+
+_help () {
+	cat <<-EOF
+	${script_name}: Download and build clvk to run OpenCL over Vulkan devices
+
+	Usage: ${script_name} [OPTION] [ACTION] [COMMAND]
+
+	Option:
+	${tab}-h, --help
+	${tab}${tab}Print this help.
+
+	Actions:
+	${tab}build
+	${tab}${tab}Download and build clvk
+	${tab}clean
+	${tab}${tab}Clean-up download and built files for clvk
+	${tab}run
+	${tab}${tab}Run command with clvk
+
+	Commands:
+	${tab}Anything you want, for example clinfo
+
+	Examples:
+	${tab}${script_name} build
+
+	${tab}${script_name} run clinfo --list
+
+	${tab}AMD_VULKAN_ICD=AMDVLK ${script_name} run clinfo --list
+
+	${tab}AMD_VULKAN_ICD=RADV ${script_name} run clinfo --list
+
+	EOF
+	
+	_mention
+
+	exit
+}
+
+case "${1:-}" in
+	'build'|'clean'|'run')
+		action="${1}"
+		;;
+	'-h'|'--help'|'')
+		_help
+		;;
+	'-'*|'--'*)
+		_error 'Unknown option.'
+		;;
+	*)
+		_error 'Unknown action.'
+		;;
+esac
+
+shift
+
+"_${action}" "${@}"
