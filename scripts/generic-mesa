@@ -1,0 +1,510 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2021 Thomas “illwieckz“ Debesse
+
+# You may need to install cmake, meson and python3-mako.
+
+# Exit in case of failure.
+set -e
+
+# Error on undefined variable.
+set -u
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+workspace_parent_dir="${script_dir}/workspace"
+workspace_dir="${workspace_parent_dir}/${script_name}"
+install_dir="${workspace_dir}/install"
+
+_set_env () {
+	export PATH="${install_dir}/bin:${PATH:-}"
+
+	export LD_LIBRARY_PATH="${install_dir}/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
+	export LD_LIBRARY_PATH="${install_dir}/lib:${LD_LIBRARY_PATH:-}"
+
+	export PKG_CONFIG_PATH="${install_dir}/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH:-}"
+	export PKG_CONFIG_PATH="${install_dir}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+	export PKG_CONFIG_PATH="${install_dir}/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+	export CMAKE_PREFIX_PATH="${install_dir}:${CMAKE_PREFIX_PATH:-}"
+
+	export OPENCL_VENDOR_PATH="${install_dir}/etc/OpenCL/vendors"
+
+	export VK_ICD_FILENAMES="$(find "${install_dir}/share/vulkan/icd.d" -type f -name '*.json' | tr '\n' ':'):${VK_ICD_FILENAMES:-}"
+
+	# Doesn't work:
+	# export VK_DRIVERS_PATH="${install_dir}/share/vulkan/icd.d:${VK_DRIVERS_PATH:-}"
+}
+
+_error () {
+	printf 'ERROR: %s\n\n' "${1}" >&2
+
+	exit 1
+}
+
+job_count="$(nproc)"
+do_pull='true'
+
+_cd () {
+	cd "${script_dir}"
+
+	mkdir --parents --verbose "${workspace_dir}"
+
+	cd "${workspace_dir}"
+
+	pwd
+}
+
+_pull () {
+	if "${do_pull}"
+	then
+		git pull
+	fi
+}
+
+_clone () {
+	_cd
+
+	if [ -d 'llvm-project' ]
+	then
+		cd 'llvm-project'
+		pwd
+
+		_pull
+	else
+		git clone 'https://github.com/llvm/llvm-project.git'
+	fi
+
+	_cd
+
+	if [ -d 'SPIRV-LLVM-Translator' ]
+	then
+		cd 'SPIRV-LLVM-Translator'
+		pwd
+
+		_pull
+	else
+		git clone 'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
+	fi
+
+	_cd
+
+	if [ -d 'wayland-protocols' ]
+	then
+		cd 'wayland-protocols'
+		pwd
+
+		_pull
+	else
+		git clone 'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
+	fi
+
+	_cd
+
+	if [ -d 'libpciaccess' ]
+	then
+		cd 'libpciaccess'
+		pwd
+
+		_pull
+	else
+		git clone 'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
+	fi
+
+	_cd
+
+	if [ -d 'drm' ]
+	then
+		cd 'drm'
+		pwd
+
+		_pull
+	else
+		git clone 'https://gitlab.freedesktop.org/mesa/drm.git'
+	fi
+
+	_cd
+
+	if [ -d 'mesa' ]
+	then
+		cd 'mesa'
+		pwd
+
+		_pull
+	else
+		git clone 'https://gitlab.freedesktop.org/mesa/mesa.git'
+	fi
+}
+
+_meson_setup () {
+	if ! [ -d 'build' ]
+	then
+		meson setup \
+			"${@}"
+	else
+		meson setup \
+			--reconfigure \
+			"${@}"
+	fi
+}
+
+_build_llvm () {
+	_cd
+
+	cd 'llvm-project/llvm'
+	pwd
+
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
+		-D'LLVM_ENABLE_RTTI'='ON' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'install'
+}
+
+_build_clang () {
+	_cd
+
+	cd 'llvm-project/clang'
+	pwd
+
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'install'
+}
+
+_build_llvm_spirv () {
+	_cd
+
+	cd 'SPIRV-LLVM-Translator'
+	pwd
+
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'llvm-spirv'
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'install'
+
+	cp -av \
+		'build/tools/llvm-spirv/llvm-spirv' \
+		"${install_dir}/bin/llvm-spirv"
+}
+
+_build_libclc () {
+	_cd
+
+	cd 'llvm-project/libclc'
+	pwd
+
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'install'
+}
+
+_build_wayland_protocols () {
+	_cd
+
+	cd 'wayland-protocols'
+	pwd
+
+	_meson_setup \
+		'build' \
+		-D'prefix'="${install_dir}"
+
+	meson compile \
+		-C 'build' \
+		-j "${job_count}"
+
+	meson install \
+		-C 'build'
+}
+
+_build_libpciaccess () {
+	_cd
+
+	cd 'libpciaccess'
+	pwd
+
+	_meson_setup \
+		'build' \
+		-D'prefix'="${install_dir}"
+
+	meson compile \
+		-C 'build'
+		
+	meson install \
+		-C 'build'
+}
+
+_build_drm () {
+	_cd
+
+	cd 'drm'
+	pwd
+
+	_meson_setup \
+		'build' \
+		-D'prefix'="${install_dir}"
+
+	meson compile \
+		-C 'build' \
+		-j "${job_count}"
+		
+	meson install \
+		-C 'build'
+}
+
+_build_mesa () {
+	_cd
+
+	cd 'mesa'
+	pwd
+
+	_meson_setup \
+		'build' \
+		-D'prefix'="${install_dir}" \
+		-D'dri-drivers'='[]' \
+		-D'dri3'='enabled' \
+		-D'egl'='disabled' \
+		-D'gallium-drivers'='radeonsi,r600,nouveau,swrast' \
+		-D'gallium-nine'='false' \
+		-D'gallium-opencl'='icd' \
+		-D'gallium-va'='disabled' \
+		-D'gallium-vdpau'='disabled' \
+		-D'gallium-xa'='disabled' \
+		-D'gallium-xvmc'='disabled' \
+		-D'gbm'='disabled' \
+		-D'gles1'='disabled' \
+		-D'gles2'='disabled' \
+		-D'glx'='disabled' \
+		-D'llvm'='enabled' \
+		-D'lmsensors'='disabled' \
+		-D'opengl'='false' \
+		-D'vulkan-drivers'='amd,intel,swrast' \
+		-D'shared-llvm'='enabled'
+
+	meson compile \
+		-C 'build' \
+		-j "${job_count}"
+
+	meson install \
+		-C 'build'
+}
+
+_test () {
+	clinfo --list
+}
+
+_build () {
+	while ! [ -z "${1:-}" ]
+	do
+		case "${1:-}" in
+			'--no-pull')
+				do_pull='false'
+				shift
+				;;
+			'-j'|'--jobs')
+				shift
+				if [ -z "${1:-}" ]
+				then
+					_error 'Missing job count.'
+				fi
+
+				job_count="${1}"
+				shift
+				;;
+			'-h'|'--help'|'')
+				_help
+				;;
+			'-'*|'--'*)
+				_error 'Unknown build option.'
+				;;
+			*)
+				_error 'Unknown build parameter.'
+				;;
+		esac
+	done
+
+	_cd
+
+	_set_env
+
+	_clone
+
+	_build_llvm
+
+	_build_clang
+
+	_build_llvm_spirv
+
+	_build_libclc
+
+	_build_wayland_protocols
+
+	_build_libpciaccess
+
+	_build_drm
+
+	_build_mesa
+}
+
+_clean () {
+	cd "${script_dir}"
+
+	if [ -d "${workspace_dir}" ]
+	then
+		cd "${workspace_dir}"
+
+		rm --force --recursive --verbose 'llvm-project'
+		rm --force --recursive --verbose 'SPIRV-LLVM-Translator'
+		rm --force --recursive --verbose 'wayland-protocols'
+		rm --force --recursive --verbose 'libpciaccess'
+		rm --force --recursive --verbose 'drm'
+		rm --force --recursive --verbose 'mesa'
+
+		cd "${script_dir}"
+
+		rmdir --verbose "${workspace_dir}"
+	fi
+
+	if [ -d "${workspace_parent_dir}" ]
+	then
+		rmdir --ignore-fail-on-non-empty --verbose "${workspace_parent_dir}"
+	fi
+}
+
+_run () {
+	if ! [ -f "${install_dir}/etc/OpenCL/vendors/mesa.icd" ]
+	then
+		_error 'Clover is not built.'
+	fi
+
+	_set_env
+
+	"${@}"
+}
+
+tab=$'\t'
+
+_mention () {
+	cat <<-EOF
+	This tool is provided by the I love compute! initiative.
+
+	Always backup this script for future uninstallation, future versions
+	of this script may not uninstall what was installed with this one.
+
+	Always uninstall before upgrading to an higher version of the
+	distribution you use.
+
+	Support the effort to keep OpenCL working on Linux, if this script saved
+	your life, you can make a donation, see:
+
+	${tab}https://gitlab.com/illwieckz/i-love-compute#funding
+
+	EOF
+}
+
+_help () {
+	cat <<-EOF
+	${script_name}: Download and build Mesa to run OpenCL or Vulkan on supported devices.
+
+	Usage: ${script_name} [OPTION] [ACTION] [OPTION] [COMMAND]
+
+	Option:
+	${tab}-h, --help
+	${tab}${tab}Print this help.
+
+	Actions:
+	${tab}build
+	${tab}${tab}Download and build Mesa.
+	${tab}clean
+	${tab}${tab}Clean-up downloaded and built files for Mesa.
+	${tab}run
+	${tab}${tab}Run command with Mesa.
+
+	Build options:
+	${tab}--no-pull
+	${tab}${tab}Do not pull updates from source repositories when building.
+	${tab}-j N,--jobs N
+	${tab}${tab}Build with N parallel jobs (default: Availables core count).
+
+	Commands:
+	${tab}Anything you want, for example clinfo or vulkaninfo.
+
+	Examples:
+	${tab}${script_name} build
+
+	${tab}${script_name} run clinfo --list
+
+	${tab}${script_name} run vulkaninfo --summary
+
+	${tab}AMD_VULKAN_ICD=RADV ${script_name} run vulkaninfo --summary
+
+	EOF
+
+	_mention
+
+	exit
+}
+
+case "${1:-}" in
+	'build'|'clean'|'run')
+		action="${1}"
+		;;
+	'-h'|'--help'|'')
+		_help
+		;;
+	'-'*|'--'*)
+		_error 'Unknown option.'
+		;;
+	*)
+		_error 'Unknown action.'
+		;;
+esac
+
+shift
+
+"_${action}" "${@}"
