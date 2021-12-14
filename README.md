@@ -56,17 +56,42 @@ Missing:
 - AMD hardware supported by ROCr,
 - Via hardware (Chrome 520 and later),
 - Nvidia hardware that is not Tesla or Kepler,
-- Intel hardware that is not Gen7 (Haswell), Intel Xe.
+- Intel hardware that is not Gen7 (Haswell),
+- Non-integrated Intel hardware like Intel Xe.
 
 For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation.
 
 
-### Scripts and packages
+Scripts
+-------
 
-Script to install amdgpu-pro OpenCL on Ubuntu: [ubuntu-opencl-amdgpu](scripts/ubuntu-opencl-amdgpu). This was based on many scripts [like this one](https://github.com/RadeonOpenCompute/ROCr/issues/484#issuecomment-554738964) written on various places through the years to make possible to use OpenCL with AMD GPUs. It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr, Clover (TeraScale, GCN+)
+The user can do combinations: `./generic-clvk run ./generic-mesa run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan.
 
-Arch linux AUR packages: https://wiki.archlinux.org/index.php/GPGPU
+### [`ubuntu-amdgpu`](scripts/ubuntu-amdgpu)
 
+A script to install amdgpu-pro OpenCL on Ubuntu. This was based on many scripts [like this one](https://github.com/RadeonOpenCompute/ROCr/issues/484#issuecomment-554738964) written on various places through the years to make possible to use OpenCL with AMD GPUs.
+
+It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr, Clover (TeraScale, GCN+).
+
+- The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
+- The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
+
+### [`user-clvk`](scripts/user-clvk)
+A script to download, build clvk and run software using clvk.
+
+- The user can download, build and install clvk by doing `./generic-clvk build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built clvk by doing `./generic-clvk run [COMMAND]`.
+
+### [`user-mesa`](scripts/user-mesa)
+
+A script to download, build Mesa (and its dependencies including LLVM) and run software using Clover OpenCL or Vulkan.
+
+- The user can download, build and install Mesa Clover and Vulkan by doing `./generic-clvk build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./generic-mesa run [COMMAND]`.
+- The installation is done in user workspace.
+- Beware that linking LLVM may consumes hundreds of gigabytes of RAM! You may want to reduce the amount of linkage tasks by reducing the amount of jobs with `-j N`. A good value for `N` is `((Available RAM in GB) / 6) - 1` (it's not rare to see one link job eating 6GB of RAM). This will also reduce the amount of compilation tasks, but with the benefit of keeping linking step safe.
 
 Knowledge
 ---------
@@ -96,6 +121,7 @@ The `GPU_DEVICE_ORDINAL` environment variable can be used to whitelist some GPUs
 No one GPU driven by the `radeon` kernel driver must be present in the system to be able to use AMD Orca or PAL with others GPU driven by the `amdgpu` kernel driver. See [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2). Unfortunately, attempts to blacklist them using `GPU_DEVICE_ORDINAL` does not work.
 
 Orca requires an X11 server being up and running.
+
 
 ### Frameworks
 
@@ -194,6 +220,11 @@ Orca requires an X11 server being up and running.
 - PoCL:
   - http://portablecl.org
   - https://github.com/pocl/pocl
+
+
+### Other scripts
+
+It may be useful to look at some AUR packages to improve or extend existing scripts: https://wiki.archlinux.org/index.php/GPGPU
 
 
 ### Multiple frameworks
