@@ -542,7 +542,7 @@ _mention () {
 
 _help () {
 	cat <<-EOF
-	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs and CPUs
+	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs and CPUs.
 
 	Usage: ${script_name} [OPTION] [ACTION] [NAMES]
 
@@ -552,29 +552,29 @@ _help () {
 
 	Actions:
 	${tab}download
-	${tab}${tab}Download files if needed by NAME
+	${tab}${tab}Download files if needed by NAME.
 	${tab}extract
-	${tab}${tab}Download archives if needed by NAME
+	${tab}${tab}Download archives if needed by NAME.
 	${tab}clean
-	${tab}${tab}Clean-up download and extracted files for NAME
+	${tab}${tab}Clean-up download and extracted files for NAME.
 	${tab}install
-	${tab}${tab}Install NAME (default: clover)
+	${tab}${tab}Install NAME (default: clover).
 	${tab}uninstall
 	${tab}${tab}Uninstall all OpenCL drivers for AMD GPUs.
 
 	Names:
 	${tab}all
-	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs
+	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
 	${tab}clover (default)
-	${tab}${tab}Mesa Clover for Terascale2-3 and GCN+ GPUs
+	${tab}${tab}Mesa Clover for Terascale2-3 and GCN+ GPUs.
 	${tab}stream
-	${tab}${tab}AMD APP Stream from Radeon Crimson for CPUs
+	${tab}${tab}AMD APP Stream from Radeon Crimson for CPUs.
 	${tab}orca
-	${tab}${tab}AMD APP Orca from AMDGPU-PRO for GCN1-3 GPUs
+	${tab}${tab}AMD APP Orca from AMDGPU-PRO for GCN1-3 GPUs.
 	${tab}pal
-	${tab}${tab}AMD APP PAL from AMDGPU-PRO for GCN4+ GPUs
+	${tab}${tab}AMD APP PAL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}rocm
-	${tab}${tab}AMD APP ROCm for Radeon Pro GPUs
+	${tab}${tab}AMD APP ROCm for Radeon Pro GPUs.
 
 	Examples:
 	${tab}${script_name} install all
