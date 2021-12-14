@@ -8,14 +8,15 @@ Task force to promote and make easy usage of OpenCL on Linux and beyond.
 Targets:
 
 - Identify all existing compute framework, focusing with OpenCL on Linux to begin with,
-- Compatibility matrix for hardwares and OpenCL frameworks,
-- Compatibility matrix for softwares and OpenCL frameworks,
-- Performance matrix for softwares and OpenCL frameworks,
-- Installation instructions, possibly scripts, repository links or packages
 - Track issues accross projects,
-- Help to make possible to install multiple OpenCL frameworks and multiple version of OpenCL frameworks when possible.
+- Provide installation instructions, scripts, repository links or packages
+- Help to make possible to install multiple OpenCL frameworks and multiple version of OpenCL frameworks when possible,
+- Provide compatibility matrix for softwares and OpenCL frameworks,
+- Provide compatibility matrix for hardwares and OpenCL frameworks,
+- Provide performance matrix for softwares and OpenCL frameworks,
+- Gather generic knowldege about compute solutions.
 
-Knowledge about Vulkan compute or legacy Shader-based compute is welcome, same with other systems like BSD ones.
+Knowledge about Vulkan compute or legacy Shader-based compute is welcome, same for knowledge about other operating systems like BSD ones, Haiku and others.
 
 
 Funding
@@ -65,7 +66,11 @@ For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` 
 Scripts
 -------
 
-The user can do combinations: `./generic-clvk run ./generic-mesa run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan.
+The scripts provide a builtin help accessible with `-h` or `--help` option.
+
+The user can do combinations: `./user-clvk run ./user-mesa run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan.
+
+The scripts do some download, build and other operations in a `workspace` folder next to where the script file is stored.
 
 ### [`ubuntu-amdgpu`](scripts/ubuntu-amdgpu)
 
@@ -79,17 +84,17 @@ It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr, Clover (TeraSc
 ### [`user-clvk`](scripts/user-clvk)
 A script to download, build clvk and run software using clvk.
 
-- The user can download, build and install clvk by doing `./generic-clvk build`.
+- The user can download, build and install clvk by doing `./user-clvk build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built clvk by doing `./generic-clvk run [COMMAND]`.
+- The user can run `COMMAND` with built clvk by doing `./user-clvk run [COMMAND]`.
 
 ### [`user-mesa`](scripts/user-mesa)
 
 A script to download, build Mesa (and its dependencies including LLVM) and run software using Clover OpenCL or Vulkan.
 
-- The user can download, build and install Mesa Clover and Vulkan by doing `./generic-clvk build`.
+- The user can download, build and install Mesa Clover and Vulkan by doing `./user-mesa build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./generic-mesa run [COMMAND]`.
+- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
 - The installation is done in user workspace.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! You may want to reduce the amount of linkage tasks by reducing the amount of jobs with `-j N`. A good value for `N` is `((Available RAM in GB) / 6) - 1` (it's not rare to see one link job eating 6GB of RAM). This will also reduce the amount of compilation tasks, but with the benefit of keeping linking step safe.
 
@@ -103,11 +108,11 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 
 ### Productivity software
 
-- Darktable, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCr (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
-- Blender, verified support on AMDGPU-PRO legacy and non-legacy,
-- LuxRender, verified support via LuxMark on Mesa TeraScale and GCN, AMDGPU-PRO legacy and non-legacy,
-- GIMP,
-- LibreOffice Calc.
+- *Darktable*, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCr (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
+- *Blender*, verified support on AMDGPU-PRO legacy and non-legacy,
+- *LuxRender*, verified support via *LuxMark* on Mesa TeraScale and GCN, AMDGPU-PRO legacy and non-legacy,
+- *GIMP*,
+- *LibreOffice Calc*.
 
 Note that all those software are known to be affected by bug [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2) (_having a GPU using the radeon driver alongside a GPU using the amdgpu driver makes OpenCL applications unable to run at all_).
 
@@ -283,4 +288,4 @@ Contibute
 
 Create issues, make pull requests, contact _Thomas Debesse_ `<dev (ad) illwieckz.net>` for more details.
 
-Submitted content must be under MIT or CC 0 1.0 license.
+Content must be submitted under MIT or CC 0 1.0 license.
