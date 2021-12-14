@@ -49,7 +49,7 @@ _build () {
 
 	git submodule update --init --recursive
 
-	"${clvk_source_repo}/external/clspv/utils/fetch_sources.py"
+	"${clvk_source_dir}/external/clspv/utils/fetch_sources.py"
 
 	cmake \
 		-S"${clvk_source_dir}" \
