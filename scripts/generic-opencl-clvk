@@ -126,14 +126,14 @@ _help () {
 
 	Actions:
 	${tab}build
-	${tab}${tab}Download and build clvk
+	${tab}${tab}Download and build clvk.
 	${tab}clean
-	${tab}${tab}Clean-up download and built files for clvk
+	${tab}${tab}Clean-up downloaded and built files for clvk.
 	${tab}run
-	${tab}${tab}Run command with clvk
+	${tab}${tab}Run command with clvk.
 
 	Commands:
-	${tab}Anything you want, for example clinfo
+	${tab}Anything you want, for example clinfo.
 
 	Examples:
 	${tab}${script_name} build
