@@ -20,10 +20,10 @@ tarball_repo='https://drivers.amd.com/drivers/linux'
 amdgpupro_libopencl_package_name='ocl-icd-libopencl1-amdgpu-pro'
 
 clover_deb_url_list='
-http://fr.archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-dev_0.2.0+git20190827-4_all.deb
-http://fr.archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-amdgcn_0.2.0+git20190827-4_all.deb
-http://fr.archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-r600_0.2.0+git20190827-4_all.deb
-http://fr.archive.ubuntu.com/ubuntu/pool/universe/m/mesa/mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-dev_0.2.0+git20190827-4_all.deb
+http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-amdgcn_0.2.0+git20190827-4_all.deb
+http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-r600_0.2.0+git20190827-4_all.deb
+http://archive.ubuntu.com/ubuntu/pool/universe/m/mesa/mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
 '
 
 clover_deb_sum_list='
