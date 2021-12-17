@@ -133,8 +133,6 @@ _checksum () {
 			;;
 	esac
 
-	false
-
 	if [ -f "${file}" ]
 	then
 		if printf '%s %s\n' "${sum}" "${file}" \
