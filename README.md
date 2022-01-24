@@ -60,7 +60,7 @@ Missing:
 - Intel hardware that is not Gen7 (Haswell),
 - Non-integrated Intel hardware like Intel Xe.
 
-For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation.
+For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation. Hardware has to be shipped to France.
 
 
 Scripts
