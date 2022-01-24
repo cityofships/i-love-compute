@@ -1,13 +1,13 @@
-I ♥ Compute
-===========
+I ♥ Compute!
+============
 
-![I ♥ Compute](doc/i-love-compute.256.png)
+![I ♥ Compute!](doc/i-love-compute.256.png)
 
 Task force to promote and make easy usage of OpenCL on Linux and beyond.
 
 Targets:
 
-- Identify all existing compute framework, focusing with OpenCL on Linux to begin with,
+- Identify all existing compute frameworks, focusing with OpenCL on Linux to begin with,
 - Track issues accross projects,
 - Provide installation instructions, scripts, repository links or packages
 - Help to make possible to install multiple OpenCL frameworks and multiple version of OpenCL frameworks when possible,
@@ -24,12 +24,12 @@ Funding
 
 [![Donate on Patreon](https://img.shields.io/badge/donate-patreon-red?style=for-the-badge&logo=patreon)](https://www.patreon.com/bePatron?u=29259270) [![Donate on LiberaPay](https://img.shields.io/badge/donate-liberapay-yellow?style=for-the-badge&logo=liberapay)](https://liberapay.com/illwieckz/donate) [![Donate on Tipeee](https://img.shields.io/badge/donate-tipeee-e5555a?style=for-the-badge&logo=githubsponsors)](https://fr.tipeee.com/illwieckz/) [![Donate on Paypal](https://img.shields.io/badge/donate-paypal-blue?style=for-the-badge&logo=paypal)](https://www.paypal.me/illwieckz)
 
-If this project saved your life, you can make a donation on 
+If this project helped you or saved your life, you can make a donation on
 [Patreon](https://www.patreon.com/bePatron?u=29259270) ([profile](https://www.patreon.com/illwieckz)), [Liberapay](https://liberapay.com/illwieckz/donate) ([profile](https://liberapay.com/illwieckz/)), [Tipeee](https://fr.tipeee.com/illwieckz/) or [PayPal](https://www.paypal.me/illwieckz).
 
 A lot of time is spent to test drivers and software, track regressions, implement solutions, benchmark and gather knowledge. Sometime hardware has to be sourced to reproduce issues and verify support.
 
-Commercial support and consultancy can be obtained from [rebuild.sh](https://rebuild.sh/).
+Commercial support and consultancy can be obtained from [rebuild.sh](https://rebuild.sh).
 
 
 Hardware donation
@@ -44,8 +44,8 @@ Already sourced:
 - AMD GCN2 (PCIe),
 - AMD GCN3 (integrated),
 - AMD GCN5 (integrated),
-- Tesla 1.0 (PCI),
-- Tesla 2.0 (PCIe),
+- Nvidia Tesla 1.0 (PCI),
+- Nvidia Tesla 2.0 (PCIe),
 - Nvidia Kepler (PCIe),
 - Intel Gen7 (integrated).
 
@@ -112,12 +112,13 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 - *Blender*, verified support on AMDGPU-PRO legacy and non-legacy,
 - *LuxRender*, verified support via *LuxMark* on Mesa TeraScale and GCN, AMDGPU-PRO legacy and non-legacy,
 - *DaVinci Resolve*,
+- *Natron*,
 - *GIMP*,
 - *LibreOffice Calc*.
 
 Note that all those software are known to be affected by bug [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2) (_having a GPU using the radeon driver alongside a GPU using the amdgpu driver makes OpenCL applications unable to run at all_).
 
-It is known LuxRender an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
+It is known LuxRender on an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
 
 ### AMD quirks
