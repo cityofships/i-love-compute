@@ -111,6 +111,7 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 - *Darktable*, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCr (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
 - *Blender*, verified support on AMDGPU-PRO legacy and non-legacy,
 - *LuxRender*, verified support via *LuxMark* on Mesa TeraScale and GCN, AMDGPU-PRO legacy and non-legacy,
+- *DaVinci Resolve*,
 - *GIMP*,
 - *LibreOffice Calc*.
 
