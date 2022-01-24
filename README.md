@@ -22,10 +22,10 @@ Knowledge about Vulkan compute or legacy Shader-based compute is welcome, same f
 Funding
 -------
 
-[![Donate via Patreon](https://img.shields.io/badge/donate-patreon-red?style=for-the-badge&logo=patreon#inline)](https://www.patreon.com/bePatron?u=29259270) [![Donate via Liberapay](https://img.shields.io/badge/donate-liberapay-yellow?style=for-the-badge&logo=liberapay#inline)](https://liberapay.com/illwieckz/donate) [![Donate via PayPal](https://img.shields.io/badge/donate-paypal-blue?style=for-the-badge&logo=paypal#inline)](https://www.paypal.me/illwieckz)
+[![Donate on Patreon](https://img.shields.io/badge/donate-patreon-red?style=for-the-badge&logo=patreon)](https://www.patreon.com/bePatron?u=29259270) [![Donate on LiberaPay](https://img.shields.io/badge/donate-liberapay-yellow?style=for-the-badge&logo=liberapay)](https://liberapay.com/illwieckz/donate) [![Donate on Tipeee](https://img.shields.io/badge/donate-tipeee-e5555a?style=for-the-badge&logo=githubsponsors)](https://fr.tipeee.com/illwieckz/) [![Donate on Paypal](https://img.shields.io/badge/donate-paypal-blue?style=for-the-badge&logo=paypal)](https://www.paypal.me/illwieckz)
 
 If this project saved your life, you can make a donation on 
-[Patreon](https://www.patreon.com/bePatron?u=29259270) ([profile](https://www.patreon.com/illwieckz)), [Liberapay](https://liberapay.com/illwieckz/donate) ([profile](https://liberapay.com/illwieckz/)) or [PayPal](https://www.paypal.me/illwieckz).
+[Patreon](https://www.patreon.com/bePatron?u=29259270) ([profile](https://www.patreon.com/illwieckz)), [Liberapay](https://liberapay.com/illwieckz/donate) ([profile](https://liberapay.com/illwieckz/)), [Tipeee](https://fr.tipeee.com/illwieckz/) or [PayPal](https://www.paypal.me/illwieckz).
 
 A lot of time is spent to test drivers and software, track regressions, implement solutions, benchmark and gather knowledge. Sometime hardware has to be sourced to reproduce issues and verify support.
 
