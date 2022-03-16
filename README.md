@@ -29,7 +29,7 @@ If this project helped you or saved your life, you can make a donation on
 
 A lot of time is spent to test drivers and software, track regressions, implement solutions, benchmark and gather knowledge. Sometime hardware has to be sourced to reproduce issues and verify support.
 
-Commercial support and consultancy can be obtained from [rebuild.sh](https://rebuild.sh).
+Commercial support and consultancy can be obtained from [rebatir.fr](https://rebatir.fr).
 
 
 Hardware donation
