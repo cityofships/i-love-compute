@@ -27,6 +27,8 @@ _set_env () {
 	export PKG_CONFIG_PATH="${install_dir}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
 	export PKG_CONFIG_PATH="${install_dir}/share/pkgconfig:${PKG_CONFIG_PATH:-}"
 
+	export PYTHONUSERBASE="${install_dir}"
+
 	export CMAKE_PREFIX_PATH="${install_dir}:${CMAKE_PREFIX_PATH:-}"
 
 	export OPENCL_VENDOR_PATH="${install_dir}/etc/OpenCL/vendors"
@@ -64,6 +66,18 @@ _pull () {
 }
 
 _clone () {
+	_cd
+
+	if [ -d 'meson' ]
+	then
+		cd 'meson'
+		pwd
+
+		_pull
+	else
+		git clone 'https://github.com/mesonbuild/meson.git'
+	fi
+
 	_cd
 
 	if [ -d 'llvm-project' ]
@@ -147,6 +161,17 @@ _meson_setup () {
 			--reconfigure \
 			"${@}"
 	fi
+}
+
+_build_meson () {
+	_cd
+
+	cd 'meson'
+	pwd
+
+	python3 'setup.py' build
+
+	python3 'setup.py' install --user #--prefix="${install_dir}"
 }
 
 _build_llvm () {
@@ -274,7 +299,7 @@ _build_libpciaccess () {
 
 	meson compile \
 		-C 'build'
-		
+
 	meson install \
 		-C 'build'
 }
@@ -292,7 +317,7 @@ _build_drm () {
 	meson compile \
 		-C 'build' \
 		-j "${job_count}"
-		
+
 	meson install \
 		-C 'build'
 }
@@ -370,9 +395,11 @@ _build () {
 
 	_cd
 
+	_clone
+
 	_set_env
 
-	_clone
+	_build_meson
 
 	_build_llvm
 
