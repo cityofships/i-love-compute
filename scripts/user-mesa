@@ -32,6 +32,9 @@ _set_env () {
 
 	export PATH="${install_dir}/bin:${PATH:-}"
 
+	export LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LIBRARY_PATH:-}"
+	export LIBRARY_PATH="${install_dir}/lib:${LIBRARY_PATH:-}"
+
 	export LD_LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LD_LIBRARY_PATH:-}"
 	export LD_LIBRARY_PATH="${install_dir}/lib:${LD_LIBRARY_PATH:-}"
 
