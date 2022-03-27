@@ -445,11 +445,11 @@ _build () {
 		esac
 	done
 
+	_set_env
+
 	_cd | _prefix 'cd'
 
 	_clone | _prefix 'clone'
-
-	_set_env
 
 	_build_meson | _prefix 'build meson'
 
