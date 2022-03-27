@@ -123,6 +123,18 @@ _clone () {
 
 	_cd
 
+	if [ -d 'wayland' ]
+	then
+		cd 'wayland'
+		pwd
+
+		_pull
+	else
+		git clone 'https://gitlab.freedesktop.org/wayland/wayland.git'
+	fi
+
+	_cd
+
 	if [ -d 'wayland-protocols' ]
 	then
 		cd 'wayland-protocols'
@@ -290,6 +302,24 @@ _build_libclc () {
 		-- 'install'
 }
 
+_build_wayland () {
+	_cd
+
+	cd 'wayland'
+	pwd
+
+	_meson_setup \
+		'build' \
+		-D'prefix'="${install_dir}"
+
+	meson compile \
+		-C 'build' \
+		-j "${job_count}"
+
+	meson install \
+		-C 'build'
+}
+
 _build_wayland_protocols () {
 	_cd
 
@@ -430,6 +460,8 @@ _build () {
 
 	_build_libclc | _prefix 'build libclc'
 
+	_build_wayland | _prefix 'build wayland'
+
 	_build_wayland_protocols | _prefix 'build wayland-protocols'
 
 	_build_libpciaccess | _prefix 'build libpciaccess'
@@ -448,6 +480,7 @@ _clean () {
 
 		rm --force --recursive --verbose 'llvm-project'
 		rm --force --recursive --verbose 'SPIRV-LLVM-Translator'
+		rm --force --recursive --verbose 'wayland'
 		rm --force --recursive --verbose 'wayland-protocols'
 		rm --force --recursive --verbose 'libpciaccess'
 		rm --force --recursive --verbose 'drm'
