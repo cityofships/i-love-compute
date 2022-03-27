@@ -58,6 +58,10 @@ _error () {
 job_count="$(nproc)"
 do_pull='true'
 
+_prefix () {
+	sed -e 's/^/'"${1}"': /'
+}
+
 _cd () {
 	cd "${script_dir}"
 
@@ -237,6 +241,8 @@ _build_llvm_spirv () {
 	cmake \
 		-S'.' \
 		-B'build' \
+		-D'CMAKE_C_COMPILER'='clang' \
+		-D'CMAKE_CXX_COMPILER'='clang++' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
 
 	cmake \
@@ -403,29 +409,29 @@ _build () {
 		esac
 	done
 
-	_cd
+	_cd | _prefix 'cd'
 
-	_clone
+	_clone | _prefix 'clone'
 
 	_set_env
 
-	_build_meson
+	_build_meson | _prefix 'build meson'
 
-	_build_llvm
+	_build_llvm | _prefix 'build llvm'
 
-	_build_clang
+	_build_clang | _prefix 'build clang'
 
-	_build_llvm_spirv
+	_build_llvm_spirv | _prefix 'build llvm-spirv'
 
-	_build_libclc
+	_build_libclc | _prefix 'build libclc'
 
-	_build_wayland_protocols
+	_build_wayland_protocols | _prefix 'build wayland-protocols'
 
-	_build_libpciaccess
+	_build_libpciaccess | _prefix 'build libpciaccess'
 
-	_build_drm
+	_build_drm | _prefix 'build drm'
 
-	_build_mesa
+	_build_mesa | _prefix 'build mesa'
 }
 
 _clean () {
