@@ -593,7 +593,7 @@ _help () {
 
 	Run options:
 	${tab}--force
-	${tab}${tab}Run the command even if Clover isn't installed yet
+	${tab}${tab}Run the command even if Clover isn't installed yet.
 
 	Commands:
 	${tab}Anything you want, for example clinfo or vulkaninfo.
