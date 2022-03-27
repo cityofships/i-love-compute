@@ -112,6 +112,18 @@ _clone () {
 
 	_cd
 
+	if [ -d 'SPIRV-Headers' ]
+	then
+		cd 'SPIRV-Headers'
+		pwd
+
+		_pull
+	else
+		git clone 'git@github.com:KhronosGroup/SPIRV-Headers.git'
+	fi
+
+	_cd
+
 	if [ -d 'SPIRV-LLVM-Translator' ]
 	then
 		cd 'SPIRV-LLVM-Translator'
@@ -250,7 +262,28 @@ _build_clang () {
 		-- 'install'
 }
 
-_build_llvm_spirv () {
+_build_spirv_headers () {
+	_cd
+
+	cd 'SPIRV-Headers'
+	pwd
+
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'install'
+}
+
+_build_spirv_llvm_translator () {
 	_cd
 
 	cd 'SPIRV-LLVM-Translator'
@@ -457,7 +490,9 @@ _build () {
 
 	_build_clang | _prefix 'build clang'
 
-	_build_llvm_spirv | _prefix 'build llvm-spirv'
+	_build_spirv_headers | _prefix 'build spirv-headers'
+
+	_build_spirv_llvm_translator | _prefix 'build spirv-llvm-translator'
 
 	_build_libclc | _prefix 'build libclc'
 
