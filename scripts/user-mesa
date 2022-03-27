@@ -17,6 +17,16 @@ workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
 install_dir="${workspace_dir}/install"
 
+_find_vulkan_icd_files () {
+	if [ -d "${install_dir}/share/vulkan/icd.d" ]
+	then
+		find "${install_dir}/share/vulkan/icd.d" \
+			-type f \
+			-name '*.json' \
+			| tr '\n' ':'
+	fi
+}
+
 _set_env () {
 	export PATH="${install_dir}/bin:${PATH:-}"
 
@@ -33,7 +43,7 @@ _set_env () {
 
 	export OPENCL_VENDOR_PATH="${install_dir}/etc/OpenCL/vendors"
 
-	export VK_ICD_FILENAMES="$(find "${install_dir}/share/vulkan/icd.d" -type f -name '*.json' | tr '\n' ':'):${VK_ICD_FILENAMES:-}"
+	export VK_ICD_FILENAMES="$(_find_vulkan_icd_files):${VK_ICD_FILENAMES:-}"
 
 	# Doesn't work:
 	# export VK_DRIVERS_PATH="${install_dir}/share/vulkan/icd.d:${VK_DRIVERS_PATH:-}"
