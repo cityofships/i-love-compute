@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright 2021 Thomas “illwieckz“ Debesse
 
-# You may need to install cmake, meson and python3-mako.
+# You may need to install cmake, meson, python3-mako and doxygen.
 
 # Exit in case of failure.
 set -e
