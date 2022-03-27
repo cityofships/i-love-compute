@@ -481,7 +481,7 @@ _build () {
 	local mem_available_k="$(grep '^MemAvailable:' /proc/meminfo | awk '{ print $2 }')"
 	local mem_available_g="$((${mem_available_k} / 1024 / 1024))"
 	local mem_per_core="$((${mem_available_g} / ${job_count}))"
-	local min_mem_per_core='6'
+	local min_mem_per_core='8'
 
 	if [ "${mem_per_core}" -lt "${min_mem_per_core}" ]
 	then
