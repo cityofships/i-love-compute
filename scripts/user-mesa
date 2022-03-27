@@ -478,6 +478,25 @@ _build () {
 		esac
 	done
 
+	local mem_available_k="$(grep '^MemAvailable:' /proc/meminfo | awk '{ print $2 }')"
+	local mem_available_g="$((${mem_available_k} / 1024 / 1024))"
+	local mem_per_core="$((${mem_available_g} / ${job_count}))"
+	local min_mem_per_core='6'
+
+	if [ "${mem_per_core}" -lt "${min_mem_per_core}" ]
+	then
+		cat >&2 <<-EOF
+		WARNING: The computer has less than ${min_mem_per_core}G of available memory per CPU core.
+		You may run out of memory when linking LLVM.
+
+		If you are not sure about what you are doing,
+		abort with Control+C.
+
+		The build with continue in 10s.
+		EOF
+		sleep 10s
+	fi
+
 	_set_env
 
 	_cd | _prefix 'cd'
