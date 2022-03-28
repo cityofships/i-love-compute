@@ -280,6 +280,8 @@ _build_mesa () {
 		-D'gallium-vdpau'='disabled' \
 		-D'gallium-xa'='disabled' \
 		-D'gallium-xvmc'='disabled' \
+		-D'opencl-native'='true' \
+		-D'opencl-spirv'='true' \
 		-D'gbm'='disabled' \
 		-D'gles1'='disabled' \
 		-D'gles2'='disabled' \
