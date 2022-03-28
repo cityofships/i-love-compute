@@ -204,6 +204,8 @@ _cmake_setup () {
 		-B'build' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
 		"${@}"
+
+	echo '*' > 'build/.gitignore'
 }
 
 _cmake_compile_install () {
