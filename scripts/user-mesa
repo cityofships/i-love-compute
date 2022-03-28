@@ -352,8 +352,6 @@ _build () {
 
 	_set_env
 
-	_cd
-
 	_fetch
 
 	local i=0
