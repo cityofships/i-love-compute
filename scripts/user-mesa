@@ -26,7 +26,7 @@ packages=(
 	'Meson'
 		'meson'
 		'https://github.com/mesonbuild/meson.git'
-		'meson'
+		'generic_python'
 	'LLVM project'
 		'llvm-project'
 		'https://github.com/llvm/llvm-project.git'
@@ -38,11 +38,11 @@ packages=(
 	'Clang'
 		'llvm-project/clang'
 		'-'
-		'clang'
+		'generic_cmake'
 	'SPIRV Headers'
 		'SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
-		'spirv_headers'
+		'generic_cmake'
 	'SPIRV LLVM Translator'
 		'SPIRV-LLVM-Translator'
 		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
@@ -50,23 +50,23 @@ packages=(
 	'libclc'
 		'llvm-project/libclc'
 		'-'
-		'libclc'
+		'generic_cmake'
 	'Wayland'
 		'wayland'
 		'https://gitlab.freedesktop.org/wayland/wayland.git'
-		'wayland'
+		'generic_meson'
 	'Wayland protocols'
 		'wayland-protocols'
 		'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
-		'wayland_protocols'
+		'generic_meson'
 	'libpciaccess'
 		'libpciaccess'
 		'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
-		'libpciaccess'
+		'generic_meson'
 	'DRM'
 		'drm'
 		'https://gitlab.freedesktop.org/mesa/drm.git'
-		'drm'
+		'generic_meson'
 	'Mesa'
 		'mesa'
 		'https://gitlab.freedesktop.org/mesa/mesa.git'
@@ -168,12 +168,12 @@ _fetch () {
 				pwd
 
 				_pull
-			} | _prefix "pull ${name}"
+			} | _prefix "Pull ${name}"
 		else
 			{
 				echo "$(pwd)/${directory}"
 				git clone "${repository}"
-			} | _prefix "clone ${name}"
+			} | _prefix "Clone ${name}"
 		fi
 	done
 }
@@ -190,10 +190,48 @@ _meson_setup () {
 	fi
 }
 
-_build_meson () {
+_build_generic_python () {
 	python3 'setup.py' build
 
 	python3 'setup.py' install --user #--prefix="${install_dir}"
+}
+
+_build_generic_cmake_compile_install () {
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}"
+
+	cmake \
+		--build 'build' \
+		--parallel "${job_count}" \
+		-- 'install'
+}
+
+_build_generic_cmake () {
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
+
+	_build_generic_cmake_compile_install
+}
+
+
+_build_generic_meson_compile_install () {
+	meson compile \
+		-C 'build' \
+		-j "${job_count}"
+
+	meson install \
+		-C 'build'
+}
+
+_build_generic_meson () {
+	_meson_setup \
+		'build' \
+		-D'prefix'="${install_dir}"
+
+	_build_generic_meson_compile_install
 }
 
 _build_llvm () {
@@ -204,46 +242,7 @@ _build_llvm () {
 		-D'LLVM_ENABLE_RTTI'='ON' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
 
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}" \
-		-- 'install'
-}
-
-_build_clang () {
-	cmake \
-		-S'.' \
-		-B'build' \
-		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}" \
-		-- 'install'
-}
-
-_build_spirv_headers () {
-	cmake \
-		-S'.' \
-		-B'build' \
-		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}" \
-		-- 'install'
+	_build_generic_cmake_compile_install
 }
 
 _build_spirv_llvm_translator () {
@@ -252,90 +251,16 @@ _build_spirv_llvm_translator () {
 		-B'build' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
 
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}"
+	_build_generic_cmake_compile_install
 
 	cmake \
 		--build 'build' \
 		--parallel "${job_count}" \
 		-- 'llvm-spirv'
 
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}" \
-		-- 'install'
-
 	cp -av \
 		'build/tools/llvm-spirv/llvm-spirv' \
 		"${install_dir}/bin/llvm-spirv"
-}
-
-_build_libclc () {
-	cmake \
-		-S'.' \
-		-B'build' \
-		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}"
-
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}" \
-		-- 'install'
-}
-
-_build_wayland () {
-	_meson_setup \
-		'build' \
-		-D'prefix'="${install_dir}"
-
-	meson compile \
-		-C 'build' \
-		-j "${job_count}"
-
-	meson install \
-		-C 'build'
-}
-
-_build_wayland_protocols () {
-	_meson_setup \
-		'build' \
-		-D'prefix'="${install_dir}"
-
-	meson compile \
-		-C 'build' \
-		-j "${job_count}"
-
-	meson install \
-		-C 'build'
-}
-
-_build_libpciaccess () {
-	_meson_setup \
-		'build' \
-		-D'prefix'="${install_dir}"
-
-	meson compile \
-		-C 'build'
-
-	meson install \
-		-C 'build'
-}
-
-_build_drm () {
-	_meson_setup \
-		'build' \
-		-D'prefix'="${install_dir}"
-
-	meson compile \
-		-C 'build' \
-		-j "${job_count}"
-
-	meson install \
-		-C 'build'
 }
 
 _build_mesa () {
@@ -362,12 +287,7 @@ _build_mesa () {
 		-D'vulkan-drivers'='amd,intel,swrast' \
 		-D'shared-llvm'='enabled'
 
-	meson compile \
-		-C 'build' \
-		-j "${job_count}"
-
-	meson install \
-		-C 'build'
+	_build_generic_meson_compile_install
 }
 
 _test () {
@@ -456,9 +376,9 @@ _build () {
 			cd "${directory}"
 			pwd
 
-
+			echo "${slug}"
 			"_build_${slug}"
-		} | _prefix "build ${name}"
+		} | _prefix "Build ${name}"
 	done
 }
 
@@ -491,7 +411,7 @@ _clean () {
 
 				echo "$(pwd)/${directory}"
 				rm -force --recursive --verbose "${directory}"
-			} | _prefix "clean ${name}"
+			} | _prefix "Clean ${name}"
 		done
 
 		cd "${script_dir}"
