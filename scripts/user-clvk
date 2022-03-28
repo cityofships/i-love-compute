@@ -4,6 +4,7 @@
 
 # Exit in case of failure.
 set -e
+set -o pipefail
 
 # Error on undefined variable.
 set -u
