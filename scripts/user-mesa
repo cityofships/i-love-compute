@@ -442,27 +442,41 @@ _build () {
 
 	_clone | _prefix 'clone'
 
-	_build_meson | _prefix 'build meson'
+	packages=(
+		'Meson'
+			'meson'
+		'LLVM'
+			'llvm'
+		'Clang'
+			'clang'
+		'SPIRV Headers'
+			'spirv_headers'
+		'SPIRV LLVM Translator'
+			'spirv_llvm_translator'
+		'libclc'
+			'libclc'
+		'Wayland'
+			'wayland'
+		'Wayland protocols'
+			'wayland_protocols'
+		'libpciaccess'
+			'libpciaccess'
+		'DRM'
+			'drm'
+		'Mesa'
+			'mesa'
+	)
 
-	_build_llvm | _prefix 'build llvm'
+	local i=0
+	while [ ${i} -lt "${#packages[@]}" ]
+	do 
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local slug="${packages[${i}]}"
+		i="$((${i} + 1))"
 
-	_build_clang | _prefix 'build clang'
-
-	_build_spirv_headers | _prefix 'build spirv-headers'
-
-	_build_spirv_llvm_translator | _prefix 'build spirv-llvm-translator'
-
-	_build_libclc | _prefix 'build libclc'
-
-	_build_wayland | _prefix 'build wayland'
-
-	_build_wayland_protocols | _prefix 'build wayland-protocols'
-
-	_build_libpciaccess | _prefix 'build libpciaccess'
-
-	_build_drm | _prefix 'build drm'
-
-	_build_mesa | _prefix 'build mesa'
+		"_build_${slug}" | _prefix "build ${name}"
+	done
 }
 
 _clean () {
