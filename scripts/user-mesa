@@ -484,7 +484,7 @@ _help () {
 	Build options:
 	${tab}--no-pull
 	${tab}${tab}Do not pull updates from source repositories when building.
-	${tab}-j N,--jobs N
+	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs (default: Availables core count).
 
 	Run options:
