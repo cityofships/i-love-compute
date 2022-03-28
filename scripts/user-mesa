@@ -18,6 +18,36 @@ workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
 install_dir="${workspace_dir}/install"
 
+repositories=(
+	'Meson'
+		'meson'
+		'https://github.com/mesonbuild/meson.git'
+	'LLVM project'
+		'llvm-project'
+		'https://github.com/llvm/llvm-project.git'
+	'SPIRV Headers'
+		'SPIRV-Headers'
+		'https://github.com/KhronosGroup/SPIRV-Headers.git'
+	'SPIRV LLVM Translator'
+		'SPIRV-LLVM-Translator'
+		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
+	'Wayland'
+		'wayland'
+		'https://gitlab.freedesktop.org/wayland/wayland.git'
+	'Wayland protocols'
+		'wayland-protocols'
+		'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
+	'libpciaccess'
+		'libpciaccess'
+		'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
+	'DRM'
+		'drm'
+		'https://gitlab.freedesktop.org/mesa/drm.git'
+	'Mesa'
+		'mesa'
+		'https://gitlab.freedesktop.org/mesa/mesa.git'
+)
+
 _find_vulkan_icd_files () {
 	if [ -d "${install_dir}/share/vulkan/icd.d" ]
 	then
@@ -77,8 +107,6 @@ _cd () {
 	mkdir --parents --verbose "${workspace_dir}"
 
 	cd "${workspace_dir}"
-
-	pwd
 }
 
 _pull () {
@@ -88,31 +116,12 @@ _pull () {
 	fi
 }
 
-_clone () {
-	local repositories=(
-		'meson'
-			'https://github.com/mesonbuild/meson.git'
-		'llvm-project'
-			'https://github.com/llvm/llvm-project.git'
-		'SPIRV-Headers'
-			'https://github.com/KhronosGroup/SPIRV-Headers.git'
-		'SPIRV-LLVM-Translator'
-			'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
-		'wayland'
-			'https://gitlab.freedesktop.org/wayland/wayland.git'
-		'wayland-protocols'
-			'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
-		'libpciaccess'
-			'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
-		'drm'
-			'https://gitlab.freedesktop.org/mesa/drm.git'
-		'mesa'
-			'https://gitlab.freedesktop.org/mesa/mesa.git'
-	)
-
+_fetch () {
 	local i=0
 	while [ ${i} -lt "${#repositories[@]}" ]
-	do 
+	do
+		local name="${repositories[${i}]}"
+		i="$((${i} + 1))"
 		local directory="${repositories[${i}]}"
 		i="$((${i} + 1))"
 		local repository="${repositories[${i}]}"
@@ -122,12 +131,17 @@ _clone () {
 
 		if [ -d "${directory}" ]
 		then
-			cd "${directory}"
-			pwd
+			{
+				cd "${directory}"
+				pwd
 
-			_pull
+				_pull
+			} | _prefix "pull ${name}"
 		else
-			git clone "${repository}"
+			{
+				echo "$(pwd)/${directory}"
+				git clone "${repository}"
+			} | _prefix "clone ${name}"
 		fi
 	done
 }
@@ -438,9 +452,9 @@ _build () {
 
 	_set_env
 
-	_cd | _prefix 'cd'
+	_cd
 
-	_clone | _prefix 'clone'
+	_fetch
 
 	packages=(
 		'Meson'
@@ -486,13 +500,23 @@ _clean () {
 	then
 		cd "${workspace_dir}"
 
-		rm --force --recursive --verbose 'llvm-project'
-		rm --force --recursive --verbose 'SPIRV-LLVM-Translator'
-		rm --force --recursive --verbose 'wayland'
-		rm --force --recursive --verbose 'wayland-protocols'
-		rm --force --recursive --verbose 'libpciaccess'
-		rm --force --recursive --verbose 'drm'
-		rm --force --recursive --verbose 'mesa'
+		local i=0
+		while [ ${i} -lt "${#repositories[@]}" ]
+		do 
+			local name="${repositories[${i}]}"
+			i="$((${i} + 1))"
+			local directory="${repositories[${i}]}"
+			i="$((${i} + 1))"
+			# repository
+			i="$((${i} + 1))"
+
+			{
+				_cd
+
+				echo "$(pwd)/${directory}"
+				rm -force --recursive --verbose "${directory}"
+			} | _prefix "clean ${name}"
+		done
 
 		cd "${script_dir}"
 
