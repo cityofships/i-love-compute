@@ -18,34 +18,59 @@ workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
 install_dir="${workspace_dir}/install"
 
-repositories=(
+packages=(
+	# package name
+	#	directory name
+	#	repository url
+	#	build slug
 	'Meson'
 		'meson'
 		'https://github.com/mesonbuild/meson.git'
+		'meson'
 	'LLVM project'
 		'llvm-project'
 		'https://github.com/llvm/llvm-project.git'
+		'-'
+	'LLVM'
+		'llvm-project/llvm'
+		'-'
+		'llvm'
+	'Clang'
+		'llvm-project/clang'
+		'-'
+		'clang'
 	'SPIRV Headers'
 		'SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
+		'spirv_headers'
 	'SPIRV LLVM Translator'
 		'SPIRV-LLVM-Translator'
 		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
+		'spirv_llvm_translator'
+	'libclc'
+		'llvm-project/libclc'
+		'-'
+		'libclc'
 	'Wayland'
 		'wayland'
 		'https://gitlab.freedesktop.org/wayland/wayland.git'
+		'wayland'
 	'Wayland protocols'
 		'wayland-protocols'
 		'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
+		'wayland_protocols'
 	'libpciaccess'
 		'libpciaccess'
 		'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
+		'libpciaccess'
 	'DRM'
 		'drm'
 		'https://gitlab.freedesktop.org/mesa/drm.git'
+		'drm'
 	'Mesa'
 		'mesa'
 		'https://gitlab.freedesktop.org/mesa/mesa.git'
+		'mesa'
 )
 
 _find_vulkan_icd_files () {
@@ -118,14 +143,21 @@ _pull () {
 
 _fetch () {
 	local i=0
-	while [ ${i} -lt "${#repositories[@]}" ]
+	while [ ${i} -lt "${#packages[@]}" ]
 	do
-		local name="${repositories[${i}]}"
+		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
-		local directory="${repositories[${i}]}"
+		local directory="${packages[${i}]}"
 		i="$((${i} + 1))"
-		local repository="${repositories[${i}]}"
+		local repository="${packages[${i}]}"
 		i="$((${i} + 1))"
+		# slug
+		i="$((${i} + 1))"
+
+		if [ "${repository}" = '-' ]
+		then
+			continue
+		fi
 
 		_cd
 
@@ -159,22 +191,12 @@ _meson_setup () {
 }
 
 _build_meson () {
-	_cd
-
-	cd 'meson'
-	pwd
-
 	python3 'setup.py' build
 
 	python3 'setup.py' install --user #--prefix="${install_dir}"
 }
 
 _build_llvm () {
-	_cd
-
-	cd 'llvm-project/llvm'
-	pwd
-
 	cmake \
 		-S'.' \
 		-B'build' \
@@ -193,11 +215,6 @@ _build_llvm () {
 }
 
 _build_clang () {
-	_cd
-
-	cd 'llvm-project/clang'
-	pwd
-
 	cmake \
 		-S'.' \
 		-B'build' \
@@ -214,11 +231,6 @@ _build_clang () {
 }
 
 _build_spirv_headers () {
-	_cd
-
-	cd 'SPIRV-Headers'
-	pwd
-
 	cmake \
 		-S'.' \
 		-B'build' \
@@ -235,11 +247,6 @@ _build_spirv_headers () {
 }
 
 _build_spirv_llvm_translator () {
-	_cd
-
-	cd 'SPIRV-LLVM-Translator'
-	pwd
-
 	cmake \
 		-S'.' \
 		-B'build' \
@@ -265,11 +272,6 @@ _build_spirv_llvm_translator () {
 }
 
 _build_libclc () {
-	_cd
-
-	cd 'llvm-project/libclc'
-	pwd
-
 	cmake \
 		-S'.' \
 		-B'build' \
@@ -286,11 +288,6 @@ _build_libclc () {
 }
 
 _build_wayland () {
-	_cd
-
-	cd 'wayland'
-	pwd
-
 	_meson_setup \
 		'build' \
 		-D'prefix'="${install_dir}"
@@ -304,11 +301,6 @@ _build_wayland () {
 }
 
 _build_wayland_protocols () {
-	_cd
-
-	cd 'wayland-protocols'
-	pwd
-
 	_meson_setup \
 		'build' \
 		-D'prefix'="${install_dir}"
@@ -322,11 +314,6 @@ _build_wayland_protocols () {
 }
 
 _build_libpciaccess () {
-	_cd
-
-	cd 'libpciaccess'
-	pwd
-
 	_meson_setup \
 		'build' \
 		-D'prefix'="${install_dir}"
@@ -339,11 +326,6 @@ _build_libpciaccess () {
 }
 
 _build_drm () {
-	_cd
-
-	cd 'drm'
-	pwd
-
 	_meson_setup \
 		'build' \
 		-D'prefix'="${install_dir}"
@@ -357,11 +339,6 @@ _build_drm () {
 }
 
 _build_mesa () {
-	_cd
-
-	cd 'mesa'
-	pwd
-
 	_meson_setup \
 		'build' \
 		-D'prefix'="${install_dir}" \
@@ -456,40 +433,32 @@ _build () {
 
 	_fetch
 
-	packages=(
-		'Meson'
-			'meson'
-		'LLVM'
-			'llvm'
-		'Clang'
-			'clang'
-		'SPIRV Headers'
-			'spirv_headers'
-		'SPIRV LLVM Translator'
-			'spirv_llvm_translator'
-		'libclc'
-			'libclc'
-		'Wayland'
-			'wayland'
-		'Wayland protocols'
-			'wayland_protocols'
-		'libpciaccess'
-			'libpciaccess'
-		'DRM'
-			'drm'
-		'Mesa'
-			'mesa'
-	)
-
 	local i=0
 	while [ ${i} -lt "${#packages[@]}" ]
 	do 
 		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# repository
+		i="$((${i} + 1))"
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
 
-		"_build_${slug}" | _prefix "build ${name}"
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
+
+		{
+			_cd
+
+			cd "${directory}"
+			pwd
+
+
+			"_build_${slug}"
+		} | _prefix "build ${name}"
 	done
 }
 
@@ -501,14 +470,21 @@ _clean () {
 		cd "${workspace_dir}"
 
 		local i=0
-		while [ ${i} -lt "${#repositories[@]}" ]
+		while [ ${i} -lt "${#packages[@]}" ]
 		do 
-			local name="${repositories[${i}]}"
+			local name="${packages[${i}]}"
 			i="$((${i} + 1))"
-			local directory="${repositories[${i}]}"
+			local directory="${packages[${i}]}"
 			i="$((${i} + 1))"
-			# repository
+			local repository="${packages[${i}]}"
 			i="$((${i} + 1))"
+			# slug
+			i="$((${i} + 1))"
+
+			if [ "${repository}" = '-' ]
+			then
+				continue
+			fi
 
 			{
 				_cd
