@@ -208,15 +208,17 @@ _cmake_setup () {
 	echo '*' > 'build/.gitignore'
 }
 
-_cmake_compile_install () {
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}"
-
+_cmake_target () {
 	cmake \
 		--build 'build' \
 		--parallel "${job_count}" \
-		-- 'install'
+		-- "${@}"
+}
+
+_cmake_compile_install () {
+	_cmake_target
+
+	_cmake_target install
 }
 
 _meson_compile_install () {
@@ -259,10 +261,7 @@ _build_llvm () {
 _build_spirv_llvm_translator () {
 	_build_generic_cmake
 
-	cmake \
-		--build 'build' \
-		--parallel "${job_count}" \
-		-- 'llvm-spirv'
+	_cmake_target 'llvm-spirv'
 
 	cp -av \
 		'build/tools/llvm-spirv/llvm-spirv' \
