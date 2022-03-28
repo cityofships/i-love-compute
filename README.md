@@ -68,7 +68,7 @@ Scripts
 
 The scripts provide a builtin help accessible with `-h` or `--help` option.
 
-The user can do combinations: `./user-clvk run ./user-mesa run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan.
+The user can do combinations: `./user-mesa run ./user-clvk run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan.
 
 The scripts do some download, build and other operations in a `workspace` folder next to where the script file is stored.
 
@@ -96,7 +96,8 @@ A script to download, build Mesa (and its dependencies including LLVM) and run s
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
 - The installation is done in user workspace.
-- Beware that linking LLVM may consumes hundreds of gigabytes of RAM! You may want to reduce the amount of linkage tasks by reducing the amount of jobs with `-j N`. A good value for `N` is `((Available RAM in GB) / 6) - 1` (it's not rare to see one link job eating 6GB of RAM). This will also reduce the amount of compilation tasks, but with the benefit of keeping linking step safe.
+- Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
+
 
 Knowledge
 ---------
