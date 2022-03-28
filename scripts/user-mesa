@@ -186,23 +186,27 @@ _meson_setup () {
 	if ! [ -f 'build/compile_commands.json' ]
 	then
 		meson setup \
+			'build' \
+			-D'prefix'="${install_dir}"
 			"${@}"
 	else
 		meson setup \
 			--reconfigure \
+			'build' \
+			-D'prefix'="${install_dir}" \
 			"${@}"
 	fi
 }
 
-_build_generic_python () {
-	python3 'setup.py' build
-
-	# PYTHONUSERBASE already takes care of it:
-	# --prefix="${install_dir}"
-	python3 'setup.py' install --user
+_cmake_setup () {
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		"${@}"
 }
 
-_build_generic_cmake_compile_install () {
+_cmake_compile_install () {
 	cmake \
 		--build 'build' \
 		--parallel "${job_count}"
@@ -213,17 +217,7 @@ _build_generic_cmake_compile_install () {
 		-- 'install'
 }
 
-_build_generic_cmake () {
-	cmake \
-		-S'.' \
-		-B'build' \
-		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
-
-	_build_generic_cmake_compile_install
-}
-
-
-_build_generic_meson_compile_install () {
+_meson_compile_install () {
 	meson compile \
 		-C 'build' \
 		-j "${job_count}"
@@ -232,32 +226,36 @@ _build_generic_meson_compile_install () {
 		-C 'build'
 }
 
-_build_generic_meson () {
-	_meson_setup \
-		'build' \
-		-D'prefix'="${install_dir}"
+_build_generic_python () {
+	python3 'setup.py' build
 
-	_build_generic_meson_compile_install
+	# PYTHONUSERBASE already takes care of it:
+	# --prefix="${install_dir}"
+	python3 'setup.py' install --user
+}
+
+_build_generic_cmake () {
+	_cmake_setup
+
+	_cmake_compile_install
+}
+
+_build_generic_meson () {
+	_meson_setup
+
+	_meson_compile_install
 }
 
 _build_llvm () {
-	cmake \
-		-S'.' \
-		-B'build' \
+	_cmake_setup \
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON' \
-		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
 
-	_build_generic_cmake_compile_install
+	_cmake_compile_install
 }
 
 _build_spirv_llvm_translator () {
-	cmake \
-		-S'.' \
-		-B'build' \
-		-D'CMAKE_INSTALL_PREFIX'="${install_dir}"
-
-	_build_generic_cmake_compile_install
+	_build_generic_cmake
 
 	cmake \
 		--build 'build' \
@@ -271,8 +269,6 @@ _build_spirv_llvm_translator () {
 
 _build_mesa () {
 	_meson_setup \
-		'build' \
-		-D'prefix'="${install_dir}" \
 		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
 		-D'egl'='disabled' \
@@ -293,7 +289,7 @@ _build_mesa () {
 		-D'vulkan-drivers'='amd,intel,swrast' \
 		-D'shared-llvm'='enabled'
 
-	_build_generic_meson_compile_install
+	_meson_compile_install
 }
 
 _test () {
