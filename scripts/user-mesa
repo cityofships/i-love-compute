@@ -123,7 +123,7 @@ _error () {
 	exit 1
 }
 
-job_count="$(nproc)"
+usable_job_count=1
 do_pull='true'
 
 _prefix () {
@@ -211,7 +211,7 @@ _cmake_setup () {
 _cmake_target () {
 	cmake \
 		--build 'build' \
-		--parallel "${job_count}" \
+		--parallel "${usable_job_count}" \
 		-- "${@}"
 }
 
@@ -224,7 +224,7 @@ _cmake_compile_install () {
 _meson_compile_install () {
 	meson compile \
 		-C 'build' \
-		-j "${job_count}"
+		-j "${usable_job_count}"
 
 	meson install \
 		-C 'build'
@@ -298,11 +298,18 @@ _test () {
 }
 
 _build () {
+	local job_count="$(nproc)"
+	local do_force='false'
+
 	while ! [ -z "${1:-}" ]
 	do
 		case "${1:-}" in
 			'--no-pull')
 				do_pull='false'
+				shift
+				;;
+			'--force')
+				do_force='true'
 				shift
 				;;
 			'-j'|'--jobs')
@@ -331,24 +338,28 @@ _build () {
 		esac
 	done
 
+	local llvm_job_count="${job_count}"
 	local mem_available_k="$(grep '^MemAvailable:' /proc/meminfo | awk '{ print $2 }')"
 	local mem_available_g="$((${mem_available_k} / 1024 / 1024))"
 	local mem_per_core="$((${mem_available_g} / ${job_count}))"
-	local min_mem_per_core='8'
+	local min_llvm_mem_per_core='8'
 
-	if [ "${mem_per_core}" -lt "${min_mem_per_core}" ]
+	if [ "${mem_per_core}" -lt "${min_llvm_mem_per_core}" ]
 	then
-		cat >&2 <<-EOF
-		WARNING: The computer has less than ${min_mem_per_core}G of available memory per CPU core.
-		You may run out of memory when linking LLVM.
+		if ! "${do_force}"
+		then
+			llvm_job_count="$((${mem_available_g} / ${min_llvm_mem_per_core}))"
 
-		If you are not sure about what you are doing,
-		abort with Control+C.
+			cat >&2 <<-EOF
+			WARNING: The computer has less than ${min_llvm_mem_per_core}G of available memory per CPU core.
+			LLVM will be compiled will ${llvm_job_count} jobs instead of ${job_count} to prevent the computer
+			to run out of memory when linking LLVM.
 
-		The build with continue in 10s.
-		EOF
+			Use --force to force using ${job_count} jobs when compiling LLVM.
+			EOF
 
-		sleep 10s
+			sleep 5s
+		fi
 	fi
 
 	_set_env
@@ -370,6 +381,13 @@ _build () {
 		if [ "${slug}" = '-' ]
 		then
 			continue
+		fi
+
+		if [ "${name}" = 'LLVM' ]
+		then
+			usable_job_count="${llvm_job_count}"
+		else
+			usable_job_count="${job_count}"
 		fi
 
 		{
@@ -486,6 +504,8 @@ _help () {
 	${tab}${tab}Do not pull updates from source repositories when building.
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs (default: Availables core count).
+	${tab}--force
+	${tab}${tab}Force using as much parallel jobs even when there may not be enough memory.
 
 	Run options:
 	${tab}--force
