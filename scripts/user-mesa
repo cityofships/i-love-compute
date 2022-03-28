@@ -89,113 +89,47 @@ _pull () {
 }
 
 _clone () {
-	_cd
+	local repositories=(
+		'meson'
+			'https://github.com/mesonbuild/meson.git'
+		'llvm-project'
+			'https://github.com/llvm/llvm-project.git'
+		'SPIRV-Headers'
+			'git@github.com:KhronosGroup/SPIRV-Headers.git'
+		'SPIRV-LLVM-Translator'
+			'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
+		'wayland'
+			'https://gitlab.freedesktop.org/wayland/wayland.git'
+		'wayland-protocols'
+			'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
+		'libpciaccess'
+			'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
+		'drm'
+			'https://gitlab.freedesktop.org/mesa/drm.git'
+		'mesa'
+			'https://gitlab.freedesktop.org/mesa/mesa.git'
+	)
 
-	if [ -d 'meson' ]
-	then
-		cd 'meson'
-		pwd
+	local i=0
+	while [ ${i} -lt "${#repositories[@]}" ]
+	do 
+		local directory="${repositories[${i}]}"
+		i="$((${i} + 1))"
+		local repository="${repositories[${i}]}"
+		i="$((${i} + 1))"
 
-		_pull
-	else
-		git clone 'https://github.com/mesonbuild/meson.git'
-	fi
+		_cd
 
-	_cd
+		if [ -d "${directory}" ]
+		then
+			cd "${directory}"
+			pwd
 
-	if [ -d 'llvm-project' ]
-	then
-		cd 'llvm-project'
-		pwd
-
-		_pull
-	else
-		git clone 'https://github.com/llvm/llvm-project.git'
-	fi
-
-	_cd
-
-	if [ -d 'SPIRV-Headers' ]
-	then
-		cd 'SPIRV-Headers'
-		pwd
-
-		_pull
-	else
-		git clone 'git@github.com:KhronosGroup/SPIRV-Headers.git'
-	fi
-
-	_cd
-
-	if [ -d 'SPIRV-LLVM-Translator' ]
-	then
-		cd 'SPIRV-LLVM-Translator'
-		pwd
-
-		_pull
-	else
-		git clone 'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
-	fi
-
-	_cd
-
-	if [ -d 'wayland' ]
-	then
-		cd 'wayland'
-		pwd
-
-		_pull
-	else
-		git clone 'https://gitlab.freedesktop.org/wayland/wayland.git'
-	fi
-
-	_cd
-
-	if [ -d 'wayland-protocols' ]
-	then
-		cd 'wayland-protocols'
-		pwd
-
-		_pull
-	else
-		git clone 'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
-	fi
-
-	_cd
-
-	if [ -d 'libpciaccess' ]
-	then
-		cd 'libpciaccess'
-		pwd
-
-		_pull
-	else
-		git clone 'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
-	fi
-
-	_cd
-
-	if [ -d 'drm' ]
-	then
-		cd 'drm'
-		pwd
-
-		_pull
-	else
-		git clone 'https://gitlab.freedesktop.org/mesa/drm.git'
-	fi
-
-	_cd
-
-	if [ -d 'mesa' ]
-	then
-		cd 'mesa'
-		pwd
-
-		_pull
-	else
-		git clone 'https://gitlab.freedesktop.org/mesa/mesa.git'
-	fi
+			_pull
+		else
+			git clone "${repository}"
+		fi
+	done
 }
 
 _meson_setup () {
