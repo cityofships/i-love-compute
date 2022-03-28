@@ -95,7 +95,7 @@ _clone () {
 		'llvm-project'
 			'https://github.com/llvm/llvm-project.git'
 		'SPIRV-Headers'
-			'git@github.com:KhronosGroup/SPIRV-Headers.git'
+			'https://github.com/KhronosGroup/SPIRV-Headers.git'
 		'SPIRV-LLVM-Translator'
 			'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
 		'wayland'
