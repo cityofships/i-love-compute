@@ -147,7 +147,7 @@ _pull () {
 
 _fetch () {
 	local i=0
-	while [ ${i} -lt "${#packages[@]}" ]
+	while [ "${i}" -lt "${#packages[@]}" ]
 	do
 		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
@@ -367,7 +367,7 @@ _build () {
 	_fetch
 
 	local i=0
-	while [ ${i} -lt "${#packages[@]}" ]
+	while [ "${i}" -lt "${#packages[@]}" ]
 	do 
 		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
@@ -410,7 +410,7 @@ _clean () {
 		cd "${workspace_dir}"
 
 		local i=0
-		while [ ${i} -lt "${#packages[@]}" ]
+		while [ "${i}" -lt "${#packages[@]}" ]
 		do 
 			local name="${packages[${i}]}"
 			i="$((${i} + 1))"
