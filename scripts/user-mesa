@@ -467,6 +467,10 @@ _build () {
 				job_count="${1}"
 				shift
 				;;
+			'-j'*)
+				job_count="${1:2}"
+				shift
+				;;
 			'-h'|'--help'|'')
 				_help
 				;;
