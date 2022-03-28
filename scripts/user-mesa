@@ -187,7 +187,7 @@ _meson_setup () {
 	then
 		meson setup \
 			'build' \
-			-D'prefix'="${install_dir}"
+			-D'prefix'="${install_dir}" \
 			"${@}"
 	else
 		meson setup \
