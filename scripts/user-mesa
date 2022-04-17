@@ -682,7 +682,7 @@ _help () {
 	${tab}--enable=[FEATURES]
 	${tab}${tab}Build feature (comma separated list), default: opencl,vulkan
 	${tab}--disable=[FEATURES]
-	${tab}${tab}Do not build feature (comma separated list), default: ${known_feature_list// /,}
+	${tab}${tab}Do not build feature (comma separated list), default: opengl,gles,nine,va,vdpau,xa,xvmc
 
 	Run options:
 	${tab}--force
