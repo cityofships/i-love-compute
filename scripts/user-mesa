@@ -99,7 +99,7 @@ _set_env () {
 	local machine="$(uname -m)"
 
 	# CMake only reads them the very first time
-	# and set them to absolute path, meaning a new
+	# and sets them to absolute path, meaning a new
 	# compiler with same name will not be detected
 	# and will not replace the previous one.
 	export CC='clang'
