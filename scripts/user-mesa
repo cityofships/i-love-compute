@@ -629,6 +629,11 @@ _run () {
 
 	_set_env
 
+	if [ -z "${1:-}" ]
+	then
+		_error 'Missing command.'
+	fi
+	
 	"${@}"
 
 	exit

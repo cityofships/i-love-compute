@@ -92,6 +92,11 @@ _run () {
 	export LD_LIBRARY_PATH="${clvk_install_dir}:${LD_LIBRARY_PATH:-}"
 	export CLVK_CLSPV_BIN="${clvk_install_dir}/clspv"
 
+	if [ -z "${1:-}" ]
+	then
+		_error 'Missing command.'
+	fi
+	
 	"${@}"
 
 	exit
