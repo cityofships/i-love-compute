@@ -297,15 +297,16 @@ _build_mesa () {
 	mesa_gallium_xvmc='disabled'
 	mesa_opencl_native='false'
 	mesa_opencl_spirv='false'
-	mesa_gallium_drivers='[]'
-	mesa_vulkan_drivers='[]'
+	mesa_gallium_drivers=''
+	mesa_vulkan_drivers=''
 
 	gallium_opencl_drivers='radeonsi,r600,nouveau'
+	gallium_vulkan_drivers='swrast'
 	gallium_graphics_drivers='radeonsi,r300,r600,nouveau,swrast,i915,iris,zink,crocus'
 
 	if "${feature_opencl}"
 	then
-		mesa_gallium_drivers="${gallium_opencl_drivers}"
+		mesa_gallium_drivers+=",${gallium_opencl_drivers}"
 		mesa_gallium_opencl='icd'
 		mesa_opencl_native='true'
 		mesa_opencl_spirv='true'
@@ -313,13 +314,15 @@ _build_mesa () {
 
 	if "${feature_vulkan}"
 	then
+		# swrast vulkan requires gallium swrast
+		mesa_gallium_drivers+=",${gallium_vulkan_drivers}"
 		mesa_vulkan_drivers='amd,intel,swrast'
 		mesa_egl='enabled'
 	fi
 
 	if "${feature_opengl}"
 	then
-		mesa_gallium_drivers="${gallium_graphics_drivers}"
+		mesa_gallium_drivers+=",${gallium_graphics_drivers}"
 		mesa_glvnd='true'
 		mesa_opengl='true'
 		mesa_glx='dri'
@@ -329,7 +332,7 @@ _build_mesa () {
 
 	if "${feature_gles}"
 	then
-		mesa_gallium_drivers="${gallium_graphics_drivers}"
+		mesa_gallium_drivers+=",${gallium_graphics_drivers}"
 		mesa_gles1='enabled'
 		mesa_gles2='enabled'
 		mesa_egl='enabled'
@@ -337,7 +340,7 @@ _build_mesa () {
 
 	if "${feature_nine}"
 	then
-		mesa_gallium_drivers="${gallium_graphics_drivers}"
+		mesa_gallium_drivers+=",${gallium_graphics_drivers}"
 		mesa_gallium_nine='true'
 		mesa_egl='enabled'
 	fi
@@ -366,6 +369,14 @@ _build_mesa () {
 	then
 		mesa_gbm='enabled'
 	fi
+
+	mesa_gallium_drivers="$(echo "${mesa_gallium_drivers//,/$'\n'}" | sort -u | egrep -v '^$')"
+	mesa_gallium_drivers="${mesa_gallium_drivers//$'\n'/,}"
+	mesa_gallium_drivers="${mesa_gallium_drivers:-[]}"
+
+	mesa_vulkan_drivers="$(echo "${mesa_vulkan_drivers//,/$'\n'}" | sort -u | egrep -v '^$')"
+	mesa_vulkan_drivers="${mesa_vulkan_drivers//$'\n'/,}"
+	mesa_vulkan_drivers="${mesa_vulkan_drivers:-[]}"
 
 	# See also:
 	# gallium-drivers: virgl
