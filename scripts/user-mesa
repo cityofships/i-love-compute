@@ -368,6 +368,8 @@ _build_mesa () {
 	if [ "${mesa_egl}" = 'enabled' ]
 	then
 		mesa_gbm='enabled'
+		# EGL requires shared-glapi
+		mesa_opengl='true'
 	fi
 
 	mesa_gallium_drivers="$(echo "${mesa_gallium_drivers//,/$'\n'}" | sort -u | egrep -v '^$')"
@@ -378,6 +380,7 @@ _build_mesa () {
 	mesa_vulkan_drivers="${mesa_vulkan_drivers//$'\n'/,}"
 	mesa_vulkan_drivers="${mesa_vulkan_drivers:-[]}"
 
+	set -x
 	# See also:
 	# gallium-drivers: virgl
 	# vulkan-drivers: virtio-experimental
@@ -386,7 +389,6 @@ _build_mesa () {
 	# egl-native-platform
 	# static-libclc
 	# shader-cache
-	# shared-glapi
 	_meson_setup \
 		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
