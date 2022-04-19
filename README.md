@@ -37,8 +37,8 @@ Hardware donation
 
 Already sourced:
 
-- AMD TeraScale 1 (AGP, PCI, PCIe),
-- AMD TeraScale 2 (PCIe),
+- AMD TeraScale 1 (PCIe, PCI, AGP),
+- AMD TeraScale 2 (PCIe, PCI),
 - AMD TeraScale 3 (PCIe),
 - AMD GCN1 (PCIe),
 - AMD GCN2 (PCIe),
