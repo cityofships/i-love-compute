@@ -48,7 +48,7 @@ packages=(
 		'llvm-project/clang'
 		'-'
 		'-'
-		'generic_cmake'
+		'clang'
 	'SPIRV Headers'
 		'SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
@@ -273,6 +273,13 @@ _build_llvm () {
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON'
+
+	_cmake_compile_install
+}
+
+_build_clang () {
+	_cmake_setup \
+		-D'LLVM_LINK_LLVM_DYLIB'='ON'
 
 	_cmake_compile_install
 }
