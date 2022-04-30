@@ -156,7 +156,7 @@ _build () {
 
 	local i=0
 	while [ "${i}" -lt "${#packages[@]}" ]
-	do 
+	do
 		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
 		local directory="${packages[${i}]}"
@@ -201,7 +201,7 @@ _clean () {
 
 		local i=0
 		while [ "${i}" -lt "${#packages[@]}" ]
-		do 
+		do
 			local name="${packages[${i}]}"
 			i="$((${i} + 1))"
 			local directory="${packages[${i}]}"

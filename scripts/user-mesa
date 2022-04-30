@@ -573,7 +573,7 @@ _build () {
 		if eval '${feature_'"${feature_name}"'}'
 		then
 			enabled_feature_list+="${enabled_feature_list:+,}${feature_name}"
-		else 
+		else
 			disabled_feature_list+="${disabled_feature_list:+,}${feature_name}"
 		fi
 	done
@@ -587,7 +587,7 @@ _build () {
 
 	local i=0
 	while [ "${i}" -lt "${#packages[@]}" ]
-	do 
+	do
 		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
 		local directory="${packages[${i}]}"
@@ -632,7 +632,7 @@ _clean () {
 
 		local i=0
 		while [ "${i}" -lt "${#packages[@]}" ]
-		do 
+		do
 			local name="${packages[${i}]}"
 			i="$((${i} + 1))"
 			local directory="${packages[${i}]}"
