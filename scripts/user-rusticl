@@ -271,13 +271,18 @@ _build_generic_meson () {
 _build_llvm () {
 	_cmake_setup \
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
-		-D'LLVM_ENABLE_RTTI'='ON' \
+		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_ENABLE_RTTI'='ON'
 
 	_cmake_compile_install
 }
 
 _build_spirv_llvm_translator () {
-	_build_generic_cmake
+	_cmake_setup \
+		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_SPIRV_BUILD_EXTERNAL'='ON'
+
+	_cmake_compile_install
 
 	_cmake_target 'llvm-spirv'
 
