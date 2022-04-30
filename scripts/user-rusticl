@@ -288,6 +288,7 @@ _build_spirv_llvm_translator () {
 
 _build_mesa () {
 	_meson_setup \
+		-D'c_args=-Wno-error=incompatible-pointer-types-discards-qualifiers' \
 		-D'rust_std'='2021' \
 		-D'gallium-rusticl'='true' \
 		-D'opencl-spirv'='true' \
