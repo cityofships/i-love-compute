@@ -178,15 +178,8 @@ _fetch () {
 
 		_cd
 
-		if [ -d "${directory}" ]
+		if ! [ -d "${directory}" ]
 		then
-			{
-				cd "${directory}"
-				pwd
-
-				_pull
-			} | _prefix "Pull ${name}"
-		else
 			{
 				echo "$(pwd)/${directory}"
 				if [ "${branch}" = '-' ]
@@ -197,6 +190,13 @@ _fetch () {
 				fi
 			} | _prefix "Clone ${name}"
 		fi
+
+		{
+			cd "${directory}"
+			pwd
+
+			_pull
+		} | _prefix "Pull ${name}"
 	done
 }
 
