@@ -170,7 +170,7 @@ _cd () {
 _pull () {
 	if "${do_pull}"
 	then
-		git pull
+		git pull || true
 	fi
 }
 
