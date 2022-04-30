@@ -9,21 +9,46 @@ set -o pipefail
 # Error on undefined variable.
 set -u
 
+project_name='clvk'
+required_file='/libOpenCL.so'
+
 script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
 
 workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
+install_dir="${workspace_dir}/install"
 
-clvk_source_repo='https://github.com/kpet/clvk.git'
-clvk_source_dir="${workspace_dir}/clvk"
-clvk_build_dir="${clvk_source_dir}/build"
-clvk_install_dir="${clvk_build_dir}/install"
+packages=(
+	# package name
+	#	directory name
+	#	repository url
+	#	branch name
+	#	build slug
+	'clvk'
+		'clvk'
+		'https://github.com/kpet/clvk.git'
+		'-'
+		'clvk'
+)
+
+_set_env () {
+	export PATH="${install_dir}:${PATH:-}"
+
+	export LD_LIBRARY_PATH="${install_dir}:${LD_LIBRARY_PATH:-}"
+}
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
 
 	exit 1
+}
+
+usable_job_count=1
+do_pull='true'
+
+_prefix () {
+	sed -e 's/^/'"${1}"': /'
 }
 
 _cd () {
@@ -34,37 +59,137 @@ _cd () {
 	cd "${workspace_dir}"
 }
 
-_build () {
-	_cd
-
-	if ! [ -d "${clvk_source_dir}" ]
+_pull () {
+	if "${do_pull}"
 	then
-		git clone \
-		"${clvk_source_repo}" \
-		"${clvk_source_dir}"
+		git pull || true
+		git submodule update --init --recursive
 	fi
+}
 
-	cd "${clvk_source_dir}"
+_fetch () {
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local repository="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local branch="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# slug
+		i="$((${i} + 1))"
 
-	git pull
+		if [ "${repository}" = '-' ]
+		then
+			continue
+		fi
 
-	git submodule update --init --recursive
+		_cd
 
+		if ! [ -d "${directory}" ]
+		then
+			{
+				echo "$(pwd)/${directory}"
+				if [ "${branch}" = '-' ]
+				then
+					git clone "${repository}"
+				else
+					git clone --branch "${branch}" "${repository}"
+				fi
+			} | _prefix "Clone ${name}"
+		fi
+
+		{
+			cd "${directory}"
+			pwd
+
+			_pull
+		} | _prefix "Pull ${name}"
+	done
+}
+
+_cmake_setup () {
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		"${@}"
+
+	echo '*' > 'build/.gitignore'
+}
+
+_cmake_target () {
+	cmake \
+		--build 'build' \
+		--parallel "${usable_job_count}" \
+		-- "${@}"
+}
+
+_cmake_compile_install () {
+	_cmake_target
+
+	_cmake_target install
+}
+
+_build_generic_cmake () {
+	_cmake_setup
+
+	_cmake_compile_install
+}
+
+_build_clvk () {
 	"${clvk_source_dir}/external/clspv/utils/fetch_sources.py"
 
-	cmake \
-		-S"${clvk_source_dir}" \
-		-B"${clvk_build_dir}" \
-		-D'CMAKE_INSTALL_PREFIX'="${clvk_install_dir}"
+	_build_generic_cmake
+}
 
-	cmake \
-		--build "${clvk_build_dir}" \
-		--parallel "$(nproc)"
+_build () {
+	local job_count="$(nproc)"
+	local llvm_job_count="${job_count}"
 
-	cmake \
-		--build "${clvk_build_dir}" \
-		--parallel "$(nproc)" \
-		-- install
+	_set_env
+
+	_fetch
+
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do 
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# repository
+		i="$((${i} + 1))"
+		# branch
+		i="$((${i} + 1))"
+		local slug="${packages[${i}]}"
+		i="$((${i} + 1))"
+
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
+
+		if [ "${name}" = 'LLVM' ]
+		then
+			usable_job_count="${llvm_job_count}"
+		else
+			usable_job_count="${job_count}"
+		fi
+
+		{
+			_cd
+
+			cd "${directory}"
+			pwd
+
+			echo "${slug}"
+			"_build_${slug}"
+		} | _prefix "Build ${name}"
+	done
 }
 
 _clean () {
@@ -72,7 +197,36 @@ _clean () {
 
 	if [ -d "${workspace_dir}" ]
 	then
-		rm --force --recursive --verbose "${clvk_source_dir}"
+		cd "${workspace_dir}"
+
+		local i=0
+		while [ "${i}" -lt "${#packages[@]}" ]
+		do 
+			local name="${packages[${i}]}"
+			i="$((${i} + 1))"
+			local directory="${packages[${i}]}"
+			i="$((${i} + 1))"
+			local repository="${packages[${i}]}"
+			i="$((${i} + 1))"
+			# branch
+			i="$((${i} + 1))"
+			# slug
+			i="$((${i} + 1))"
+
+			if [ "${repository}" = '-' ]
+			then
+				continue
+			fi
+
+			{
+				_cd
+
+				echo "$(pwd)/${directory}"
+				rm -force --recursive --verbose "${directory}"
+			} | _prefix "Clean ${name}"
+		done
+
+		cd "${script_dir}"
 
 		rmdir --verbose "${workspace_dir}"
 	fi
@@ -84,13 +238,15 @@ _clean () {
 }
 
 _run () {
-	if ! [ -f "${clvk_install_dir}/libOpenCL.so" ]
+	if [ "${1:-}" = '--force' ]
 	then
-		_error 'clvk is not installed.'
+		shift
+	elif ! [ -f "${install_dir}${required_file}" ]
+	then
+		_error "${project_name} is not built."
 	fi
 
-	export LD_LIBRARY_PATH="${clvk_install_dir}:${LD_LIBRARY_PATH:-}"
-	export CLVK_CLSPV_BIN="${clvk_install_dir}/clspv"
+	_set_env
 
 	if [ -z "${1:-}" ]
 	then
@@ -124,9 +280,9 @@ _mention () {
 
 _help () {
 	cat <<-EOF
-	${script_name}: Download and build clvk to run OpenCL over Vulkan devices
+	${script_name}: Download and build ${project_name} to run OpenCL over Vulkan devices
 
-	Usage: ${script_name} [OPTION] [ACTION] [COMMAND]
+	Usage: ${script_name} [OPTION] [ACTION] [OPTION] [COMMAND]
 
 	Option:
 	${tab}-h, --help
@@ -134,11 +290,15 @@ _help () {
 
 	Actions:
 	${tab}build
-	${tab}${tab}Download and build clvk.
+	${tab}${tab}Download and build ${project_name}.
 	${tab}clean
-	${tab}${tab}Clean-up downloaded and built files for clvk.
+	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
 	${tab}run
-	${tab}${tab}Run command with clvk.
+	${tab}${tab}Run command with ${project_name}.
+
+	Run options:
+	${tab}--force
+	${tab}${tab}Run the command even if ${project_name} isn't installed yet.
 
 	Commands:
 	${tab}Anything you want, for example clinfo.
@@ -153,7 +313,7 @@ _help () {
 	${tab}AMD_VULKAN_ICD=RADV ${script_name} run clinfo --list
 
 	EOF
-	
+
 	_mention
 
 	exit
