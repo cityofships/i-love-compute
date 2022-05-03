@@ -1,0 +1,802 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2022 Thomas “illwieckz“ Debesse
+
+# You may need to install:
+## gcc7:
+# libgmp-dev libmpfr-dev libmpc-dev
+# gcc-10
+## oiio:
+# libilmbase-dev libopenexr-dev libtiff-dev libpython2.7-dev
+## luxcore and luxmark:
+# libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb-dev
+
+# GCC10 is needed to build GCC7 (GCC11 and later can't build GCC7).
+# GCC7 is needed to build Qt4 (GCC8 and later can't build Qt4).
+
+# Exit in case of failure.
+set -e
+set -o pipefail
+
+# Error on undefined variable.
+set -u
+
+project_name='LuxMark v3.1'
+required_file='/bin/luxmark'
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+workspace_parent_dir="${script_dir}/workspace"
+workspace_dir="${workspace_parent_dir}/${script_name}"
+install_dir="${workspace_dir}/install"
+
+packages=(
+	# package name
+	#	directory name
+	#	repository or archive url
+	#	branch or archive name
+	#	build slug
+	'GCC 7.5.0'
+		'gcc-7.5.0'
+		'https://bigsearcher.com/mirrors/gcc/releases/gcc-7.5.0/gcc-7.5.0.tar.xz'
+		'gcc-7.5.0.tar.xz'
+		'gcc750'
+	'Qt4'
+		'qt-everywhere-opensource-src-4.8.7'
+		'https://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz'
+		'qt-everywhere-opensource-src-4.8.7.tar.gz'
+		'qt4'
+	'OpenImageIO'
+		'oiio'
+		'https://github.com/OpenImageIO/oiio.git'
+		# We must build before 47c33add2463989d0a23a0b27adc57f273304cbc
+		'Release-1.6.3dev'
+		'oiio'
+	'Embree'
+		'embree'
+		'https://github.com/embree/embree.git'
+		'v2.17.7'
+		'embree'
+	'OpenCL-Headers'
+		'OpenCL-Headers'
+		'https://github.com/KhronosGroup/OpenCL-Headers.git'
+		# Validated up to 3568763309367bc7d7088a1d3f82f2d32c76a7f8
+		'v2022.01.04'
+		'generic_cmake'
+	'OpenCL-ICD-Loader'
+		'OpenCL-ICD-Loader'
+		'https://github.com/KhronosGroup/OpenCL-ICD-Loader.git'
+		# Validated up to aec3952654832211636fc4af613710f80e203b0a
+		'v2022.01.04'
+		'generic_cmake'
+	'OpenCL-CLHPP'
+		'OpenCL-CLHPP'
+		'https://github.com/KhronosGroup/OpenCL-CLHPP.git'
+		# We must build before 432b551429b362a877ed9b647b7114022b332be0
+		'v2.0.11'
+		'clhpp'
+	'LuxCore'
+		'LuxCore'
+		'https://github.com/LuxCoreRender/LuxCore.git'
+		'luxmark_v3.1'
+		'luxcore'
+	'LuxMark'
+		'LuxMark'
+		'https://github.com/LuxCoreRender/LuxMark.git'
+		'luxmark_v3.1'
+		'luxmark'
+	'scenes'
+		'scenes'
+		'https://github.com/LuxCoreRender/LuxMark/releases/download/luxmark_v3.1/scenes-v3.1.zip'
+		'scenes-v3.1.zip'
+		'scenes'
+)
+
+_set_env () {
+	local machine="$(uname -m)"
+
+	export PATH="${install_dir}/bin:${PATH:-}"
+
+	export LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LIBRARY_PATH:-}"
+	export LIBRARY_PATH="${install_dir}/lib:${LIBRARY_PATH:-}"
+
+	export LD_LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LD_LIBRARY_PATH:-}"
+	export LD_LIBRARY_PATH="${install_dir}/lib:${LD_LIBRARY_PATH:-}"
+
+	# Needed by OpenCL-ICD-Loader
+	export C_INCLUDE_PATH="${install_dir}/include:${C_INCLUDE_PATH:-}"
+	export CPLUS_INCLUDE_PATH="${install_dir}/include:${CPLUS_INCLUDE_PATH:-}"
+	# See also DYLD_LIBRARY_PATH (that can break as well)
+
+	export PKG_CONFIG_PATH="${install_dir}/lib/${machine}-linux-gnu/pkgconfig:${PKG_CONFIG_PATH:-}"
+	export PKG_CONFIG_PATH="${install_dir}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+	export PKG_CONFIG_PATH="${install_dir}/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+	export CMAKE_PREFIX_PATH="${install_dir}:${CMAKE_PREFIX_PATH:-}"
+}
+
+_error () {
+	printf 'ERROR: %s\n\n' "${1}" >&2
+
+	exit 1
+}
+
+usable_job_count=1
+do_pull='true'
+
+_prefix () {
+	sed -e 's/^/'"${1}"': /'
+}
+
+_cd () {
+	cd "${script_dir}"
+
+	mkdir --parents --verbose "${workspace_dir}"
+
+	cd "${workspace_dir}"
+}
+
+_pull () {
+	if "${do_pull}"
+	then
+		git pull || true
+		git submodule update --init --recursive
+	fi
+}
+
+_write_patches () {
+	_cd
+
+	cat > qt4-type-conversion.patch <<\EOF
+diff --git a/src/plugins/accessible/widgets/itemviews.cpp b/src/plugins/accessible/widgets/itemviews.cpp
+index 14c9279..fcb02b0 100644
+--- a/src/plugins/accessible/widgets/itemviews.cpp
++++ b/src/plugins/accessible/widgets/itemviews.cpp
+@@ -393,7 +393,7 @@ bool QAccessibleTable2::unselectColumn(int column)
+     QModelIndex index = view()->model()->index(0, column, view()->rootIndex());
+     if (!index.isValid() || view()->selectionMode() & QAbstractItemView::NoSelection)
+         return false;
+-    view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
++    view()->selectionModel()->select(index, static_cast<QItemSelectionModel::SelectionFlag>( QItemSelectionModel::Columns & QItemSelectionModel::Deselect ));
+     return true;
+ }
+EOF
+
+	cat > luxcore-no-samples.patch <<\EOF
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7fe48a051..9c668e1f3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -128,15 +128,15 @@ add_subdirectory(src/luxcore)
+ #
+ ################################################################################
+
+-if(NOT APPLE OR OSX_BUILD_DEMOS)
+-	add_subdirectory(samples/benchsimple)
+-	add_subdirectory(samples/luxcoredemo)
+-	add_subdirectory(samples/luxcorescenedemo)
+-	add_subdirectory(samples/luxcoreimplserializationdemo)
+-endif()
+-if(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
+-	add_subdirectory(samples/smallluxgpu4)
+-endif(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
++# if(NOT APPLE OR OSX_BUILD_DEMOS)
++# 	add_subdirectory(samples/benchsimple)
++# 	add_subdirectory(samples/luxcoredemo)
++# 	add_subdirectory(samples/luxcorescenedemo)
++# 	add_subdirectory(samples/luxcoreimplserializationdemo)
++# endif()
++# if(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
++# 	add_subdirectory(samples/smallluxgpu4)
++# endif(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
+
+
+ ################################################################################
+EOF
+
+	cat > luxcore-no-pyluxcore.patch <<\EOF
+diff --git a/src/luxcore/CMakeLists.txt b/src/luxcore/CMakeLists.txt
+index 2a7ebc453..69bef27c9 100644
+--- a/src/luxcore/CMakeLists.txt
++++ b/src/luxcore/CMakeLists.txt
+@@ -133,24 +133,24 @@ link_directories (${SLG_LIB_DIR} ${LuxRays_LIB_DIR})
+ #
+ ################################################################################
+
+-set(PYLUXCORE_SRCS
+-	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcore.cpp
+-	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcoreforblender.cpp
+-)
+-
+-add_library(pyluxcore MODULE ${PYLUXCORE_SRCS})
+-add_definitions(${VISIBILITY_FLAGS})
+-if(APPLE)
+-	target_link_libraries(pyluxcore -Wl,-undefined -Wl,dynamic_lookup luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
+-    SET_TARGET_PROPERTIES(pyluxcore PROPERTIES XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING NO) # exclude pylux from strip, not possible
+-else()
+-	target_link_libraries(pyluxcore luxcore smallluxgpu luxrays ${OPENEXR_LIBRARIES} ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
+-endif()
+-
+-set_target_properties(pyluxcore PROPERTIES PREFIX "")
+-if(MSVC)
+-	set_target_properties(pyluxcore PROPERTIES SUFFIX ".pyd")
+-endif(MSVC)
++# set(PYLUXCORE_SRCS
++# 	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcore.cpp
++# 	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcoreforblender.cpp
++# )
++#
++# add_library(pyluxcore MODULE ${PYLUXCORE_SRCS})
++# add_definitions(${VISIBILITY_FLAGS})
++# if(APPLE)
++# 	target_link_libraries(pyluxcore -Wl,-undefined -Wl,dynamic_lookup luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
++#     SET_TARGET_PROPERTIES(pyluxcore PROPERTIES XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING NO) # exclude pylux from strip, not possible
++# else()
++# 	target_link_libraries(pyluxcore luxcore smallluxgpu luxrays ${OPENEXR_LIBRARIES} ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
++# endif()
++#
++# set_target_properties(pyluxcore PROPERTIES PREFIX "")
++# if(MSVC)
++# 	set_target_properties(pyluxcore PROPERTIES SUFFIX ".pyd")
++# endif(MSVC)
+
+ ################################################################################
+ #
+EOF
+}
+
+_fetch () {
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local repository="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local branch="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# slug
+		i="$((${i} + 1))"
+
+		if [ "${repository}" = '-' ]
+		then
+			continue
+		fi
+
+		_cd
+
+		if [[ "${repository}" == *'.tar.gz' ]]
+		then
+			wget -c "${repository}"
+			if ! [ -d "${directory}" ]
+			then
+				tar -xzvf "${branch}"
+			fi
+			continue
+		elif [[ "${repository}" == *'.tar.xz' ]]
+		then
+			wget -c "${repository}"
+			if ! [ -d "${directory}" ]
+			then
+				tar -xJvf "${branch}"
+			fi
+			continue
+		elif [[ "${repository}" == *'.zip' ]]
+		then
+			wget -c "${repository}"
+			if ! [ -d "${directory}" ]
+			then
+				unzip "${branch}"
+			fi
+			continue
+		fi
+
+		if ! [ -d "${directory}" ]
+		then
+			{
+				echo "$(pwd)/${directory}"
+				if [ "${branch}" = '-' ]
+				then
+					git clone "${repository}"
+				else
+					git clone --branch "${branch}" "${repository}"
+				fi
+			} | _prefix "Clone ${name}"
+		fi
+
+		{
+			cd "${directory}"
+			pwd
+
+			_pull
+		} | _prefix "Pull ${name}"
+	done
+}
+
+_cmake_setup () {
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		"${@}"
+
+	echo '*' > 'build/.gitignore'
+}
+
+_cmake_target () {
+	cmake \
+		--build 'build' \
+		--parallel "${usable_job_count}" \
+		-- "${@}"
+}
+
+_cmake_compile_install () {
+	_cmake_target
+
+	_cmake_target install
+}
+
+_build_generic_configure () {
+	./configure \
+		--prefix="${install_dir}" \
+		"${@}"
+
+	make -j"${usable_job_count}"
+
+	make install
+}
+
+_build_generic_cmake () {
+	_cmake_setup
+
+	_cmake_compile_install
+}
+
+_build_gcc750 () {
+	if [ -f 'done' ]
+	then
+		return
+	fi
+
+	(
+		set -e
+		set -o pipefail
+		set -u
+
+		# *** LIBRARY_PATH shouldn't contain the current directory when
+		# *** building gcc. Please change the environment variable
+		# *** and run configure again.
+		LIBRARY_PATH=''
+
+		# ../.././gcc/statistics.h:25:2: error: #error GATHER_STATISTICS must be defined
+		#    25 | #error GATHER_STATISTICS must be defined
+		C_INCLUDE_PATH=''
+		CPLUS_INCLUDE_PATH=''
+
+		# GCC11 cannot build GCC7:
+		# ../../.././libsanitizer/sanitizer_common/sanitizer_internal_defs.h:261:72: error: size of array «assertion_failed__1150» is negative
+		#     typedef char IMPL_PASTE(assertion_failed_##_, line)[2*(int)(pred)-1]
+		export CC=gcc-10
+		export CXX=g++-10
+
+		_build_generic_configure \
+			--program-suffix='-7' \
+			--with-gcc-major-version-only \
+			--disable-libsanitizer
+
+		unset CC
+		unset CXX
+		unset LIBRARY_PATH
+		unset C_INCLUDE_PATH
+		unset CPLUS_INCLUDE_PATH
+	)
+
+	touch 'done'
+}
+
+_build_qt4 () {
+	if [ -f 'done' ]
+	then
+		return
+	fi
+
+	if ! [ -f 'patched' ]
+	then
+		# itemviews.cpp: In member function ‘virtual bool QAccessibleTable2::unselectColumn(int)’:
+		# itemviews.cpp:396:105: error: conversion from ‘int’ to ‘QItemSelectionModel::SelectionFlags {aka QFlags<QItemSelectionModel::SelectionFlag>}’ is ambiguous
+		#      view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
+		#                                                                                                          ^
+		patch -p1 < '../qt4-type-conversion.patch'
+
+		touch 'patched'
+	fi
+
+	(
+		set -e
+		set -o pipefail
+		set -u
+		export CC="${install_dir}/bin/gcc-7"
+		export CXX="${install_dir}/bin/g++-7"
+		# It still uses system's GCC for some steps
+		# including configure steps.
+		mkdir -pv 'path'
+		ln -sfv "${install_dir}/bin/gcc-7" 'path/gcc'
+		ln -sfv "${install_dir}/bin/g++-7" 'path/g++'
+		export PATH="$(pwd)/path:${PATH}"
+
+		# Disable javascript because:
+		# ../3rdparty/javascriptcore/JavaScriptCore/wtf/HashTable.h:272:89: error: call of overloaded ‘swap(std::pair<QTWTF::RefPtr<QTJSC::UStringImpl>, QTJSC::SymbolTableEntry>&, std::pair<QTWTF::RefPtr<QTJSC::UStringImpl>, QTJSC::SymbolTableEntry>&)’ is ambiguous
+		#      template<typename T> struct Mover<T, true> { static void move(T& from, T& to) { swap(from, to); } };
+		#                                                                                      ~~~~^~~~~~~~~~
+
+		# For some unknown reason it doesn't
+		# return 0 on success.
+		yes | ./configure --prefix="${install_dir}" \
+			-opensource \
+			-no-openssl \
+			-no-qt3support \
+			-no-gtkstyle \
+			-no-cups \
+			-no-multimedia \
+			-no-audio-backend \
+			-no-phonon \
+			-no-webkit \
+			-no-javascript-jit \
+			-no-script \
+			-no-scripttools \
+			-no-svg \
+			-no-gif \
+			-no-libtiff \
+			-no-libpng \
+			-no-libmng \
+			-no-libjpeg \
+			-no-xvideo \
+			-no-sql-mysql \
+			-no-sql-sqlite \
+			-no-sql-sqlite2 \
+		|| true
+
+		make -j"${usable_job_count}"
+
+		make install
+
+		unset CC
+		unset CXX
+		unset CFLAGS
+		unset CXXFLAGS
+	)
+
+	touch 'done'
+}
+
+_build_oiio () {
+	# Newer versions
+	#	if [ -f 'src/build-scripts/build_pybind11.bash' ]
+	#	then
+	#		'src/build-scripts/build_pybind11.bash'
+	#	fi
+
+	if ! [ -f 'patched' ]
+	then
+		sed -e 's/GPSTAG_/gpstag_/g' \
+			-i 'src/libOpenImageIO/exif.cpp'
+
+		find -type f \
+			-name '*.cpp' \
+			-exec \
+				sed -e 's/\([ ,(]\)_1/\1boost::placeholders::_1/g' \
+					-i {} \;
+
+		touch 'patched'
+	fi
+
+	_cmake_setup \
+		-D'USE_LIBRAW'='OFF' \
+		-D'CMAKE_CXX_FLAGS'='-Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
+		# For more recent compilers:
+		# -D'CMAKE_CXX_FLAGS'='-Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
+
+	_cmake_compile_install
+}
+
+_build_embree () {
+	_cmake_setup \
+		-D'EMBREE_ISPC_SUPPORT'='OFF'
+
+	_cmake_compile_install
+}
+
+_build_clhpp () {
+	_cmake_setup \
+		-D'OPENCL_INCLUDE_DIR'="${install_dir}/include" \
+		-D'OPENCL_LIB_DIR'="${install_dir}/lib" \
+		-D'BUILD_EXAMPLES'='OFF' \
+		-D'BUILD_TESTS'='OFF'
+
+	_cmake_compile_install
+}
+
+_build_luxcore () {
+	if ! [ -f 'patched' ]
+	then
+		patch -p1 < '../luxcore-no-samples.patch'
+		patch -p1 < '../luxcore-no-pyluxcore.patch'
+
+		touch 'patched'
+	fi
+
+	# LuxCore can't be built with GCC11,
+	# It is known to build with GCC10,
+	# but we built GCC7 anyway.
+	_cmake_setup \
+		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/g++-7"
+
+	_cmake_target
+
+	# No install target.
+	#	_cmake_compile_install
+
+	mkdir -pv "${install_dir}/include"
+	cp -av 'include/.' "${install_dir}/include/."
+
+	mkdir -pv "${install_dir}/lib"
+	cp -av 'build/lib/.' "${install_dir}/lib/."
+}
+
+_build_luxmark () {
+	_cmake_setup \
+		-D'LuxRays_HOME'="${install_dir}"
+
+	_cmake_target
+
+	# No install target.
+	#	_cmake_compile_install
+
+	mkdir -pv "${install_dir}/opt/luxmark"
+	cp -av 'build/bin/luxmark' "${install_dir}/opt/luxmark/luxmark"
+
+	cat > "${install_dir}/bin/luxmark" <<\EOF
+#! /usr/bin/env bash
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+cd "${script_dir}/../opt/luxmark"
+./luxmark "${@}"
+EOF
+	chmod +x "${install_dir}/bin/luxmark"
+}
+
+_build_scenes () {
+	mkdir -pv "${install_dir}/opt/luxmark/scenes"
+	cp -av . "${install_dir}/opt/luxmark/scenes/."
+}
+
+_build () {
+	local job_count="$(nproc)"
+
+	while ! [ -z "${1:-}" ]
+	do
+		case "${1:-}" in
+			'--no-pull')
+				do_pull='false'
+				shift
+				;;
+			'-j'|'--jobs')
+				shift
+				if [ -z "${1:-}" ]
+				then
+					_error 'Missing job count.'
+				fi
+
+				job_count="${1}"
+				shift
+				;;
+			'-j'*)
+				job_count="${1:2}"
+				shift
+				;;
+			'-h'|'--help'|'')
+				_help
+				;;
+			'-'*|'--'*)
+				_error 'Unknown build option.'
+				;;
+			*)
+				_error 'Unknown build parameter.'
+				;;
+		esac
+	done
+
+	_set_env
+
+	_write_patches
+
+	_fetch
+
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# repository
+		i="$((${i} + 1))"
+		# branch
+		i="$((${i} + 1))"
+		local slug="${packages[${i}]}"
+		i="$((${i} + 1))"
+
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
+
+		usable_job_count="${job_count}"
+
+		{
+			_cd
+
+			cd "${directory}"
+			pwd
+
+			echo "${slug}"
+			"_build_${slug}"
+		} | _prefix "Build ${name}"
+	done
+}
+
+_clean () {
+	cd "${script_dir}"
+
+	if [ -d "${workspace_dir}" ]
+	then
+		cd "${workspace_dir}"
+
+		local i=0
+		while [ "${i}" -lt "${#packages[@]}" ]
+		do
+			local name="${packages[${i}]}"
+			i="$((${i} + 1))"
+			local directory="${packages[${i}]}"
+			i="$((${i} + 1))"
+			local repository="${packages[${i}]}"
+			i="$((${i} + 1))"
+			# branch
+			i="$((${i} + 1))"
+			# slug
+			i="$((${i} + 1))"
+
+			if [ "${repository}" = '-' ]
+			then
+				continue
+			fi
+
+			{
+				_cd
+
+				echo "$(pwd)/${directory}"
+				rm -force --recursive --verbose "${directory}"
+			} | _prefix "Clean ${name}"
+		done
+
+		cd "${script_dir}"
+
+		rmdir --verbose "${workspace_dir}"
+	fi
+
+	if [ -d "${workspace_parent_dir}" ]
+	then
+		rmdir --ignore-fail-on-non-empty --verbose "${workspace_parent_dir}"
+	fi
+}
+
+_run () {
+	if [ "${1:-}" = '--force' ]
+	then
+		shift
+	elif ! [ -f "${install_dir}${required_file}" ]
+	then
+		_error "${project_name} is not built."
+	fi
+
+	_set_env
+
+	if [ -z "${1:-}" ]
+	then
+		"${install_dir}${required_file}"
+	fi
+	
+	"${@}"
+
+	exit
+}
+
+tab=$'\t'
+
+_mention () {
+	cat >&2 <<-EOF
+	This tool is provided by the I love compute! initiative.
+
+	Always backup this script for future uninstallation, future versions
+	of this script may not uninstall what was installed with this one.
+
+	Always uninstall before upgrading to an higher version of the
+	distribution you use.
+
+	Support the effort to keep OpenCL working on Linux, if this script saved
+	your life, you can make a donation, see:
+
+	${tab}https://gitlab.com/illwieckz/i-love-compute#funding
+
+	EOF
+}
+
+_help () {
+	cat <<-EOF
+	${script_name}: Download and build ${project_name}.
+
+	Usage: ${script_name} [OPTION] [ACTION] [OPTION] [COMMAND]
+
+	Option:
+	${tab}-h, --help
+	${tab}${tab}Print this help.
+
+	Actions:
+	${tab}build
+	${tab}${tab}Download and build ${project_name}.
+	${tab}clean
+	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
+	${tab}run
+	${tab}${tab}Run ${project_name} or another command.
+
+	Build options:
+	${tab}--no-pull
+	${tab}${tab}Do not pull updates from source repositories when building.
+	${tab}-jN,--jobs N
+	${tab}${tab}Build with N parallel jobs (default: Availables core count).
+
+	Run options:
+	${tab}--force
+	${tab}${tab}Run the command even if ${project_name} isn't installed yet.
+
+	Commands:
+	${tab}Anything you want to run in the${project_name} environment.
+
+	Examples:
+	${tab}${script_name} build
+
+	${tab}${script_name} run
+
+	${tab}${script_name} run bash
+
+	EOF
+
+	_mention
+
+	exit
+}
+
+case "${1:-}" in
+	'build'|'clean'|'run')
+		action="${1}"
+		;;
+	'-h'|'--help'|'')
+		_help
+		;;
+	'-'*|'--'*)
+		_error 'Unknown option.'
+		;;
+	*)
+		_error 'Unknown action.'
+		;;
+esac
+
+shift
+
+"_${action}" "${@}"
+
+printf '\n'
+
+_mention
