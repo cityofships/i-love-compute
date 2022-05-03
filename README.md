@@ -68,7 +68,7 @@ Scripts
 
 The scripts provide a builtin help accessible with `-h` or `--help` option.
 
-The user can do combinations: `./user-mesa run ./user-clvk run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan.
+The user can do combinations: `./user-mesa run ./user-clvk run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan, or `./user-mesa run ./user-luxmark3 run luxmark --mode=PAUSE` to run LuxMark 3.1 over Mesa Clover.
 
 The scripts do some download, build and other operations in a `workspace` folder next to where the script file is stored.
 
@@ -76,7 +76,7 @@ The scripts do some download, build and other operations in a `workspace` folder
 
 A script to install amdgpu-pro OpenCL on Ubuntu. This was based on many scripts [like this one](https://github.com/RadeonOpenCompute/ROCr/issues/484#issuecomment-554738964) written on various places through the years to make possible to use OpenCL with AMD GPUs.
 
-It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr, Clover (TeraScale, GCN+).
+It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (TeraScale, GCN+).
 
 - The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
 - The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
@@ -95,8 +95,27 @@ A script to download, build Mesa (and its dependencies including LLVM) and run s
 - The user can download, build and install Mesa Clover and Vulkan by doing `./user-mesa build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
-- The installation is done in user workspace.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
+
+### [`user-rusticl`](scripts/user-rusticl)
+
+A script to download, build Mesa work-in-progress rusticl (and its dependencies including LLVM) and run software using it.
+
+- The user can download, build and install Mesa work-in-progress rusticl by doing `./user-rusticl build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-rusticl run [COMMAND]`.
+- The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
+- Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
+- The rusticl platform is built from the [work-in-progress merge request at Mesa](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439), this script will be removed once rusticl is merged to the Mesa `main` branch (then the `user-mesa` script will be used to build rusticl).
+
+### [`user-luxmark3`](scripts/user-luxmark3)
+
+A script to download, build and run LuxMark 3.1.
+
+- The user can download build and install LuxMark 3.1 by doing `./user-luxmark3 build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run LuxMark by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
+- Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7.
 
 
 Knowledge
@@ -119,7 +138,7 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 
 Note that all those software are known to be affected by bug [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2) (_having a GPU using the radeon driver alongside a GPU using the amdgpu driver makes OpenCL applications unable to run at all_).
 
-It is known LuxRender on an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
+It is known LuxRender on an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or PAL or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
 
 ### AMD quirks
@@ -129,6 +148,13 @@ The `GPU_DEVICE_ORDINAL` environment variable can be used to whitelist some GPUs
 No one GPU driven by the `radeon` kernel driver must be present in the system to be able to use AMD Orca or PAL with others GPU driven by the `amdgpu` kernel driver. See [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2). Unfortunately, attempts to blacklist them using `GPU_DEVICE_ORDINAL` does not work.
 
 Orca requires an X11 server being up and running.
+
+
+### Interesting projects to look at
+
+- [rusticl](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439) is a work-in-progress Mesa project by Karol Herbst for a new OpenCL implementation.
+
+- [CLara](https://gitlab.com/illwieckz/clara) is a project by Björn König for a framework to access OpenCL devies over the network. The project is unfortunately stalled since year 2010 and is still in alpha state. If you're an OpenCL wizard and can see the interest of such project, you're welcome to improve it!
 
 
 ### Frameworks
@@ -142,7 +168,7 @@ Orca requires an X11 server being up and running.
     * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified).
   - Mesa Clover, LLVM libclc amdgcn,  
   open, incomplete, GCN1-5 (verified), RDNA (not verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), twice faster than Orca, PAL and ROCr with LuxRender.
+    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), LuxRender is twice faster on Clover than on Orca, PAL and ROCr.
   - AMDGPU-PRO Orca (legacy),  
   closed, complete, GCN1-3 (verified), probably GCN4 (not verified).
     * Last working version for Orca (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
@@ -157,6 +183,8 @@ Orca requires an X11 server being up and running.
     * Last version for GCN (`2015-12-18`, discontinued): [AMD Radeon Software Crimson 15.12-15.302-151217a-297685e](https://www.amd.com/fr/support/graphics/amd-radeon-r9-series/amd-radeon-r9-300-series/amd-radeon-r9-390x) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified).
     * Last version for TeraScale2 to 3 (`2015-09-15`discontinued): [AMD Catalyst 15.9-15.201.1151](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-5000-series/ati-radeon-hd-5970) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified).
     * Last version for TeraScale1 (`2013-01-21`, discontinued): [AMD Catalyst 13.1](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-4000-series/ati-radeon-hd-4890), requires Ubuntu 12.04 (not verified), only option for TeraScale 1 like Radeon HD 4890 PCIe and Radeon HD 4670 AGP (not verified).
+  - mesa3d-comp-bridge,  
+    open on closed code, unmaintained, was meant to run Mesa Clover over Mesa APP OpenCL compiler.
   - pocl with HSA,  
   open, early state, not tested.
 - AMD CPU,
@@ -208,10 +236,14 @@ Orca requires an X11 server being up and running.
   - https://libclc.llvm.org
   - https://github.com/llvm/llvm-project/tree/main/libclc
   - https://www.x.org/wiki/RadeonFeature
+- Mesa/rusticl:
+  - https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439
 - AMD ROCr:
   - https://github.com/RadeonOpenCompute/ROCm
 - AMDGPU-PRO:
   - https://www.amd.com/en/support
+- mesa3d-comp-bridge:
+  - https://github.com/matszpk/mesa3d-comp-bridge
 - Various Intel OpenCL:
   - https://software.intel.com/content/www/cn/zh/develop/articles/intel-sdk-for-opencl-applications-release-notes.html
 - Intel NEO OpenCL:
