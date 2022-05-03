@@ -428,6 +428,10 @@ _build_qt4 () {
 		#      template<typename T> struct Mover<T, true> { static void move(T& from, T& to) { swap(from, to); } };
 		#                                                                                      ~~~~^~~~~~~~~~
 
+		# Build PNG as LuxMark displays some PNG
+		# file in the about window. It can
+		# be safely disabled anyway and LuxMark
+		# will run without displaying the image.
 		# For some unknown reason it doesn't
 		# return 0 on success.
 		yes | ./configure --prefix="${install_dir}" \
@@ -446,13 +450,13 @@ _build_qt4 () {
 			-no-svg \
 			-no-gif \
 			-no-libtiff \
-			-no-libpng \
 			-no-libmng \
 			-no-libjpeg \
 			-no-xvideo \
 			-no-sql-mysql \
 			-no-sql-sqlite \
 			-no-sql-sqlite2 \
+			-system-libpng \
 		|| true
 
 		make -j"${usable_job_count}"
