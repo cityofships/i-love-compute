@@ -1,0 +1,186 @@
+diff --git a/src/luxmarkapp.cpp b/src/luxmarkapp.cpp
+index 50a0fbc..922482c 100644
+--- a/src/luxmarkapp.cpp
++++ b/src/luxmarkapp.cpp
+@@ -141,6 +141,12 @@ void  LuxMarkApp::SetOpenCLCompilerOpts(const OCLCompilerOpts opt, const bool en
+ 		case FAST_RELAXED_MATH:
+ 			oclOptFastRelaxedMath = enable;
+ 			break;
++		case FINITE_MATH_ONLY:
++			oclOptFiniteMathOnly = enable;
++			break;
++		case UNSAFE_MATH_OPTIMIZATIONS:
++			oclOptUnsafeMathOptimizations = enable;
++			break;
+ 		case MAD_ENABLED:
+ 			oclOptMadEnabled = enable;
+ 			break;
+@@ -235,6 +241,16 @@ void LuxMarkApp::EngineInitThreadImpl(LuxMarkApp *app) {
+ 				oclCompilerOpts += " ";
+ 			oclCompilerOpts += "-cl-fast-relaxed-math";
+ 		}
++		if (app->oclOptFiniteMathOnly) {
++			if (oclCompilerOpts != "")
++				oclCompilerOpts += " ";
++			oclCompilerOpts += "-cl-finite-math-only";
++		}
++		if (app->oclOptUnsafeMathOptimizations) {
++			if (oclCompilerOpts != "")
++				oclCompilerOpts += " ";
++			oclCompilerOpts += "-cl-unsafe-math-optimizations";
++		}
+ 		if (app->oclOptMadEnabled) {
+ 			if (oclCompilerOpts != "")
+ 				oclCompilerOpts += " ";
+diff --git a/src/luxmarkapp.h b/src/luxmarkapp.h
+index 78c9ab4..fb562c2 100644
+--- a/src/luxmarkapp.h
++++ b/src/luxmarkapp.h
+@@ -77,7 +77,7 @@ private:
+ 	const char *sceneName;
+ 	bool singleRun, singleRunExtInfo;
+ 	
+-	bool oclOptFastRelaxedMath, oclOptMadEnabled, oclOptStrictAliasing, oclOptNoSignedZeros;
++	bool oclOptFastRelaxedMath, oclOptFiniteMathOnly, oclOptUnsafeMathOptimizations, oclOptMadEnabled, oclOptStrictAliasing, oclOptNoSignedZeros;
+ 
+ 	HardwareTreeModel *hardwareTreeModel;
+ 
+diff --git a/src/luxmarkdefs.h b/src/luxmarkdefs.h
+index 87d7649..445170e 100644
+--- a/src/luxmarkdefs.h
++++ b/src/luxmarkdefs.h
+@@ -58,6 +58,8 @@ enum LuxMarkAppMode {
+ 
+ enum OCLCompilerOpts {
+ 	FAST_RELAXED_MATH,
++	FINITE_MATH_ONLY,
++	UNSAFE_MATH_OPTIMIZATIONS,
+ 	MAD_ENABLED,
+ 	STRICT_ALIASING,
+ 	NO_SIGNED_ZEROS
+diff --git a/src/mainwindow.cpp b/src/mainwindow.cpp
+index 92edb4d..8e4d75c 100644
+--- a/src/mainwindow.cpp
++++ b/src/mainwindow.cpp
+@@ -229,6 +229,18 @@ void MainWindow::setOCLOpts_cl_fast_relaxed_math(bool enable) {
+ 	((LuxMarkApp *)qApp)->SetOpenCLCompilerOpts(FAST_RELAXED_MATH, enable);
+ }
+ 
++void MainWindow::setOCLOpts_cl_finite_math_only(bool enable) {
++	LM_LOG("Toggle OpenCL compiler option: -cl-finite-math-only");
++	((LuxMarkApp *)qApp)->SetMode(PAUSE);
++	((LuxMarkApp *)qApp)->SetOpenCLCompilerOpts(FINITE_MATH_ONLY, enable);
++}
++
++void MainWindow::setOCLOpts_cl_unsafe_math_optimizations(bool enable) {
++	LM_LOG("Toggle OpenCL compiler option: -cl-unsafe-math-optimizations");
++	((LuxMarkApp *)qApp)->SetMode(PAUSE);
++	((LuxMarkApp *)qApp)->SetOpenCLCompilerOpts(UNSAFE_MATH_OPTIMIZATIONS, enable);
++}
++
+ void MainWindow::setOCLOpts_cl_mad_enable(bool enable) {
+ 	LM_LOG("Toggle OpenCL compiler option: -cl-mad-enabled");
+ 	((LuxMarkApp *)qApp)->SetMode(PAUSE);
+diff --git a/src/mainwindow.h b/src/mainwindow.h
+index e15fe72..fb0b455 100644
+--- a/src/mainwindow.h
++++ b/src/mainwindow.h
+@@ -105,6 +105,8 @@ private slots:
+ 	void setMode_PAUSE();
+ 	
+ 	void setOCLOpts_cl_fast_relaxed_math(bool enable);
++	void setOCLOpts_cl_finite_math_only(bool enable);
++	void setOCLOpts_cl_unsafe_math_optimizations(bool enable);
+ 	void setOCLOpts_cl_mad_enable(bool enable);
+ 	void setOCLOpts_cl_strict_aliasing(bool enable);
+ 	void setOCLOpts_cl_no_signed_zeros(bool enable);
+diff --git a/src/mainwindow.ui b/src/mainwindow.ui
+index 463c360..f55f6b6 100644
+--- a/src/mainwindow.ui
++++ b/src/mainwindow.ui
+@@ -157,6 +157,8 @@
+      <string>OpenCL Compiler Options</string>
+     </property>
+     <addaction name="action_cl_fast_relaxed_math"/>
++    <addaction name="action_cl_finite_math_only"/>
++    <addaction name="action_cl_unsafe_math_optimizations"/>
+     <addaction name="action_cl_mad_enable"/>
+     <addaction name="action_cl_no_signed_zeros"/>
+     <addaction name="action_cl_strict_aliasing"/>
+@@ -302,6 +304,28 @@
+     <string>-cl-fast-relaxed-math</string>
+    </property>
+   </action>
++  <action name="action_cl_finite_math_only">
++   <property name="checkable">
++    <bool>true</bool>
++   </property>
++   <property name="checked">
++    <bool>false</bool>
++   </property>
++   <property name="text">
++    <string>-cl-finite-math-only</string>
++   </property>
++  </action>
++  <action name="action_cl_unsafe_math_optimizations">
++   <property name="checkable">
++    <bool>true</bool>
++   </property>
++   <property name="checked">
++    <bool>false</bool>
++   </property>
++   <property name="text">
++    <string>-cl-unsafe-math-optimizations</string>
++   </property>
++  </action>
+   <action name="action_cl_mad_enable">
+    <property name="checkable">
+     <bool>true</bool>
+@@ -596,6 +620,38 @@
+     </hint>
+    </hints>
+   </connection>
++  <connection>
++   <sender>action_cl_finite_math_only</sender>
++   <signal>triggered(bool)</signal>
++   <receiver>MainWindow</receiver>
++   <slot>setOCLOpts_cl_finite_math_only(bool)</slot>
++   <hints>
++    <hint type="sourcelabel">
++     <x>-1</x>
++     <y>-1</y>
++    </hint>
++    <hint type="destinationlabel">
++     <x>511</x>
++     <y>383</y>
++    </hint>
++   </hints>
++  </connection>
++  <connection>
++   <sender>action_cl_unsafe_math_optimizations</sender>
++   <signal>triggered(bool)</signal>
++   <receiver>MainWindow</receiver>
++   <slot>setOCLOpts_cl_unsafe_math_optimizations(bool)</slot>
++   <hints>
++    <hint type="sourcelabel">
++     <x>-1</x>
++     <y>-1</y>
++    </hint>
++    <hint type="destinationlabel">
++     <x>511</x>
++     <y>383</y>
++    </hint>
++   </hints>
++  </connection>
+   <connection>
+    <sender>action_cl_mad_enable</sender>
+    <signal>triggered(bool)</signal>
+@@ -664,6 +720,8 @@
+   <slot>setMode_STRESSTEST_OCL_CPU()</slot>
+   <slot>setMode_DEMO_LUXVR()</slot>
+   <slot>setOCLOpts_cl_fast_relaxed_math(bool)</slot>
++  <slot>setOCLOpts_cl_finite_math_only</slot>
++  <slot>setOCLOpts_cl_unsafe_math_optimizations</slot>
+   <slot>setOCLOpts_cl_mad_enable(bool)</slot>
+   <slot>setOCLOpts_cl_strict_aliasing(bool)</slot>
+   <slot>setOCLOpts_cl_no_signed_zeros(bool)</slot>
