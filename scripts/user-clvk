@@ -148,7 +148,39 @@ _build_clvk () {
 
 _build () {
 	local job_count="$(nproc)"
-	local llvm_job_count="${job_count}"
+
+	while ! [ -z "${1:-}" ]
+	do
+		case "${1:-}" in
+			'--no-pull')
+				do_pull='false'
+				shift
+				;;
+			'-j'|'--jobs')
+				shift
+				if [ -z "${1:-}" ]
+				then
+					_error 'Missing job count.'
+				fi
+
+				job_count="${1}"
+				shift
+				;;
+			'-j'*)
+				job_count="${1:2}"
+				shift
+				;;
+			'-h'|'--help'|'')
+				_help
+				;;
+			'-'*|'--'*)
+				_error 'Unknown build option.'
+				;;
+			*)
+				_error 'Unknown build parameter.'
+				;;
+		esac
+	done
 
 	_set_env
 
@@ -173,12 +205,7 @@ _build () {
 			continue
 		fi
 
-		if [ "${name}" = 'LLVM' ]
-		then
-			usable_job_count="${llvm_job_count}"
-		else
-			usable_job_count="${job_count}"
-		fi
+		usable_job_count="${job_count}"
 
 		{
 			_cd
