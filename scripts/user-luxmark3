@@ -41,7 +41,7 @@ packages=(
 		'gcc-7.5.0'
 		'https://bigsearcher.com/mirrors/gcc/releases/gcc-7.5.0/gcc-7.5.0.tar.xz'
 		'gcc-7.5.0.tar.xz'
-		'gcc750'
+		'gcc7'
 	'Qt 4.8.7'
 		'qt-everywhere-opensource-src-4.8.7'
 		'https://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz'
@@ -355,7 +355,7 @@ _build_generic_cmake () {
 	_cmake_compile_install
 }
 
-_build_gcc750 () {
+_build_gcc7 () {
 	if [ -f 'done' ]
 	then
 		return
@@ -371,17 +371,19 @@ _build_gcc750 () {
 		# *** and run configure again.
 		LIBRARY_PATH=''
 
+		# Those other variables must be unset:
 		# ../.././gcc/statistics.h:25:2: error: #error GATHER_STATISTICS must be defined
 		#    25 | #error GATHER_STATISTICS must be defined
 		C_INCLUDE_PATH=''
 		CPLUS_INCLUDE_PATH=''
 
 		# GCC11 cannot build GCC7:
+		export CC="gcc-10"
+		export CXX="g++-10"
+
+		# Disable libsanitizer because:
 		# ../../.././libsanitizer/sanitizer_common/sanitizer_internal_defs.h:261:72: error: size of array «assertion_failed__1150» is negative
 		#     typedef char IMPL_PASTE(assertion_failed_##_, line)[2*(int)(pred)-1]
-		export CC=gcc-10
-		export CXX=g++-10
-
 		_build_generic_configure \
 			--program-suffix='-7' \
 			--with-gcc-major-version-only \
@@ -768,6 +770,8 @@ _help () {
 	${tab}${script_name} build
 
 	${tab}${script_name} run
+
+	${tab}${script_name} run luxmark --mode=PAUSE
 
 	${tab}${script_name} run bash
 
