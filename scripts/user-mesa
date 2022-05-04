@@ -296,8 +296,11 @@ _build_llvm () {
 }
 
 _build_clang () {
+	# Disable opaque pointers for now,
+	# See https://gitlab.freedesktop.org/mesa/mesa/-/issues/6342
 	_cmake_setup \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON'
+		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'CLANG_ENABLE_OPAQUE_POINTERS'='OFF'
 
 	_cmake_compile_install
 }
