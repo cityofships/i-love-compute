@@ -304,7 +304,8 @@ _build_clang () {
 
 _build_spirv_llvm_translator () {
 	_cmake_setup \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON'
+		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
 
 	_cmake_compile_install
 
