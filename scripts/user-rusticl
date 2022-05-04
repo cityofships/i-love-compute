@@ -269,7 +269,10 @@ _build_generic_meson () {
 }
 
 _build_llvm () {
+	# Explicit build type is now mandatory,
+	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
 	_cmake_setup \
+		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON'
@@ -278,9 +281,12 @@ _build_llvm () {
 }
 
 _build_clang () {
+	# Explicit build type is now mandatory,
+	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
 	# Disable opaque pointers for now,
 	# See https://gitlab.freedesktop.org/mesa/mesa/-/issues/6342
 	_cmake_setup \
+		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
 		-D'CLANG_ENABLE_OPAQUE_POINTERS'='OFF'
 
