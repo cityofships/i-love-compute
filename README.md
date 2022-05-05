@@ -139,6 +139,7 @@ Software currently providing OpenCL support:
 - *[GIMP](https://www.gimp.org/)*, some list of OpenCL-enabled effects are listed [there](https://opencl.org/projects/gegl-opencl-in-gimp/),
 - *[LibreOffice Calc](https://www.libreoffice.org/) (`localc`)*, see [this page about how to enable it](https://help.libreoffice.org/7.3/en-US/text/shared/optionen/opencl.html),
 - *[Natron](https://natrongithub.github.io/)*,
+- *[OBS Studio](https://obsproject.com/)*,
 - *[DaVinci Resolve](https://www.blackmagicdesign.com/fr/products/davinciresolve/)*.
 
 
