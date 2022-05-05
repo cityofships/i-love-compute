@@ -138,7 +138,7 @@ Software currently providing OpenCL support:
 - *[LuxCoreRender](https://luxcorerender.org/)*, verified support via *[LuxMark](http://luxmark.info)* on AMDGPU-PRO legacy and non-legacy, old LuxRender (the one used by LuxMark 3.1) worked on Mesa Clover with both TeraScale and GCN.
 - *[GIMP](https://www.gimp.org/)*, some list of OpenCL-enabled effects are listed [there](https://opencl.org/projects/gegl-opencl-in-gimp/),
 - *[LibreOffice Calc](https://www.libreoffice.org/) (`localc`)*, see [this page about how to enable it](https://help.libreoffice.org/7.3/en-US/text/shared/optionen/opencl.html),
-- *[Natron](https://natrongithub.github.io/)*,
+- *[Natron](https://natrongithub.github.io/)* has some OpenCL plugins, see also *[openfx-arena](https://github.com/NatronGitHub/openfx-arena)*,
 - *[OBS Studio](https://obsproject.com/)*,
 - *[DaVinci Resolve](https://www.blackmagicdesign.com/fr/products/davinciresolve/)*.
 
