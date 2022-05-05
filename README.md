@@ -128,17 +128,44 @@ The [issue tracker](https://gitlab.com/illwieckz/i-love-compute/-/issues) is use
 
 ### Productivity software
 
-- *Darktable*, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCr (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
-- *Blender*, verified support on AMDGPU-PRO legacy and non-legacy,
-- *LuxRender*, verified support via *LuxMark* on Mesa TeraScale and GCN, AMDGPU-PRO legacy and non-legacy,
-- *DaVinci Resolve*,
-- *Natron*,
-- *GIMP*,
-- *LibreOffice Calc*.
+See also [wikipedia.org:List of OpenCL applications](https://en.wikipedia.org/wiki/List_of_OpenCL_applications).
 
 Note that all those software are known to be affected by bug [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2) (_having a GPU using the radeon driver alongside a GPU using the amdgpu driver makes OpenCL applications unable to run at all_).
 
+Software currently providing OpenCL support:
+
+- *[Darktable](https://www.darktable.org/)*, requires image support, works with Intel proprietary (verified) and open (supposedly) framework, Nvidia proprietary (verified) framework, AMD legacy proprietary (verified) and open ROCr (supposed) framework, but not on Clover/libCLC, see [#1](https://gitlab.com/illwieckz/i-love-compute/-/issues/1) (missing image support),
+- *[LuxCoreRender](https://luxcorerender.org/)*, verified support via *[LuxMark](http://luxmark.info)* on AMDGPU-PRO legacy and non-legacy, old LuxRender (the one used by LuxMark 3.1) worked on Mesa Clover with both TeraScale and GCN.
+- *[GIMP](https://www.gimp.org/)*, some list of OpenCL-enabled effects are listed [there](https://opencl.org/projects/gegl-opencl-in-gimp/),
+- *[LibreOffice Calc](https://www.libreoffice.org/) (`localc`)*, see [this page about how to enable it](https://help.libreoffice.org/7.3/en-US/text/shared/optionen/opencl.html),
+- *[Natron](https://natrongithub.github.io/)*,
+- *[DaVinci Resolve](https://www.blackmagicdesign.com/fr/products/davinciresolve/)*.
+
+
 It is known LuxRender on an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or PAL or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
+
+Software formerly providing OpenCL support:
+
+- *[Blender](https://www.blender.org)* (old versions), verified support on AMDGPU-PRO legacy and non-legacy, OpenCL has been [deprecated](https://code.blender.org/2021/04/cycles-x/) and then removed in newer versions,
+
+
+### Benchmarks
+
+See also [wikipedia.org:List of OpenCL applications](https://en.wikipedia.org/wiki/List_of_OpenCL_applications).
+
+Benchmarks currently providing OpenCL support:
+
+- *[LuxMark](http://luxmark.info)*, see [`user-luxmark3`](scripts/user-luxmark3) for a script to rebuild the version 3.1,
+- *[GeekBench](https://www.geekbench.com)*,
+- *[ViennaCLBench](http://viennaclbench.sourceforge.net)*,
+- *[clpeak](https://github.com/krrishnarraj/clpeak/network)*,
+- *[cl-mem](https://github.com/nerdralph/cl-mem)*, see [viennaclbench-dev#14](https://github.com/viennacl/viennaclbench-dev/pull/14) for compilations fixes,
+- *[uCLbench](https://opencl.org/coding/tools/uclbench/)*,
+- *[Scalable HeterOgeneous Computing (SHOC)](https://github.com/vetter/shoc)*,
+- *[Parboil benchmarks](http://impact.crhc.illinois.edu/Parboil/parboil.aspx)*,
+- *[OpenCL Toys](http://davibu.interfree.it/index.html)*, including *MandelGPU*, *MandelbulbGPU*, *SmallptGPU*, *SmallptGPU2*, *JuliaGPU*, and *SmallLuxGPU*.
+
+The Phoronix Test Suite also provides multiple ready-to-use [OpenCL Benchmarks](https://openbenchmarking.org/suite/pts/opencl) including LuxMark, JuliaGPU, MandelGPU, SmallptGPU, SHOC, Paroboil, Rodinia, etc.
 
 
 ### AMD quirks
