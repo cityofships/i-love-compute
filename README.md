@@ -142,12 +142,11 @@ Software currently providing OpenCL support:
 - *[OBS Studio](https://obsproject.com/)*,
 - *[DaVinci Resolve](https://www.blackmagicdesign.com/fr/products/davinciresolve/)*.
 
-
 It is known LuxRender on an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or PAL or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
 Software formerly providing OpenCL support:
 
-- *[Blender](https://www.blender.org)* (old versions), verified support on AMDGPU-PRO legacy and non-legacy, OpenCL has been [deprecated](https://code.blender.org/2021/04/cycles-x/) and then removed in newer versions,
+- *[Blender](https://www.blender.org)* (old versions), verified support on AMDGPU-PRO legacy and non-legacy, OpenCL has been [deprecated](https://code.blender.org/2021/04/cycles-x/) and then removed in newer versions. Anyway, [Blender 2.83 LTS](https://www.blender.org/download/lts/2-83/) is supported until June 2022 and [Blender 2.93 LTS](https://www.blender.org/download/lts/2-93/) is supported until June 2023.
 
 
 ### Benchmarks
@@ -171,7 +170,7 @@ The Phoronix Test Suite also provides multiple ready-to-use [OpenCL Benchmarks](
 
 ### AMD quirks
 
-The `GPU_DEVICE_ORDINAL` environment variable can be used to whitelist some GPUs with AMD ROCr, Orca and PAL. Unfortunately, it whitelits the card (and blacklists all others) for every AMD OpenCL Driver so one cannot blacklist a GPU in ROCr to prevent a kernel breakage and get it working with another driver like Orca, so it's not possible to keep ROCr on one GPU while blacklisting another GPU on ROCr to use it with something else like Orca. See [ROCr#1624](https://github.com/RadeonOpenCompute/ROCr/issues/1624).
+The `GPU_DEVICE_ORDINAL` environment variable can be used to whitelist some GPUs with AMD ROCr, Orca and PAL. Unfortunately, it whitelists the card (and blacklists all others) for every AMD OpenCL Driver so one cannot blacklist a GPU in ROCr to prevent a kernel breakage and get it working with another driver like Orca, so it's not possible to keep ROCr on one GPU while blacklisting another GPU on ROCr to use it with something else like Orca. See [ROCr#1624](https://github.com/RadeonOpenCompute/ROCr/issues/1624).
 
 No one GPU driven by the `radeon` kernel driver must be present in the system to be able to use AMD Orca or PAL with others GPU driven by the `amdgpu` kernel driver. See [#2](https://gitlab.com/illwieckz/i-love-compute/-/issues/2). Unfortunately, attempts to blacklist them using `GPU_DEVICE_ORDINAL` does not work.
 
@@ -341,14 +340,18 @@ Also, having multiple frameworks may help to improve compute performance by putt
 
 ### Compatibility and performance matrix
 
+This is still to be done.
+
 See how that is done on another topic (graphical rendering) for graphical framework and hardware compatibility matrix: https://wiki.unvanquished.net/wiki/GPU_compatibility_matrix
 
 A similar thing would be good to have for OpenCL, and also to know who may own which hardware to easily reproduce reported issues.
 
 
-Contibute
----------
+Contribute
+----------
 
 Create issues, make pull requests, contact _Thomas Debesse_ `<dev (ad) illwieckz.net>` for more details.
+
+You can also donate hardware, see [Hardware donations](#hardware-donations).
 
 Content must be submitted under MIT or CC 0 1.0 license.
