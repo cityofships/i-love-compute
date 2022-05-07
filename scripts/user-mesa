@@ -115,13 +115,6 @@ _find_vulkan_icd_files () {
 _set_env () {
 	local machine="$(uname -m)"
 
-	# CMake only reads them the very first time
-	# and sets them to absolute path, meaning a new
-	# compiler with same name will not be detected
-	# and will not replace the previous one.
-	export CC='clang'
-	export CXX='clang++'
-
 	export PATH="${install_dir}/bin:${PATH:-}"
 
 	export LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LIBRARY_PATH:-}"
@@ -289,6 +282,8 @@ _build_generic_meson () {
 _build_llvm () {
 	# Explicit build type is now mandatory,
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
+	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
+	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
@@ -303,6 +298,7 @@ _build_clang () {
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
 	# Disable opaque pointers for now,
 	# See https://gitlab.freedesktop.org/mesa/mesa/-/issues/6342
+	# It is currently built only for building llvm-spirv.
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
@@ -313,6 +309,7 @@ _build_clang () {
 
 _build_spirv_llvm_translator () {
 	_cmake_setup \
+		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/clang++" \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
 
@@ -424,14 +421,16 @@ _build_mesa () {
 
 	set -x
 	# See also:
-	# gallium-drivers: virgl
-	# vulkan-drivers: virtio-experimental
-	# vulkan-beta (Vulkan beta extensions)
-	# intel-clc (Intel ray queries)
-	# egl-native-platform
-	# static-libclc
-	# shader-cache
+	#  gallium-drivers: virgl
+	#  vulkan-drivers: virtio-experimental
+	#  vulkan-beta (Vulkan beta extensions)
+	#  intel-clc (Intel ray queries)
+	#  egl-native-platform
+	#  static-libclc
+	#  shader-cache
+	# Clover requires RTTI to be enabled.
 	_meson_setup \
+		-D'cpp_rtti'='true' \
 		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
 		-D'egl'="${mesa_egl}" \
