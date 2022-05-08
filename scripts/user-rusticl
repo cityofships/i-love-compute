@@ -49,11 +49,24 @@ packages=(
 		'-'
 		'-'
 		'clang'
+	# For debugging with libasan, this may be needed
+	# unless the compiled CLang is not used for building
+	# other things than llvm-spirv.
+#	'compiler-rt'
+#		'llvm-project/compiler-rt'
+#		'-'
+#		'-'
+#		'generic_cmake'
 	'SPIRV Headers'
 		'SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
 		'-'
 		'generic_cmake'
+	'SPIRV Tools'
+		'SPIRV-Tools'
+		'https://github.com/KhronosGroup/SPIRV-Tools.git'
+		'-'
+		'spirv_tools'
 	'SPIRV LLVM Translator'
 		'SPIRV-LLVM-Translator'
 		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
@@ -93,13 +106,6 @@ packages=(
 
 _set_env () {
 	local machine="$(uname -m)"
-
-	# CMake only reads them the very first time
-	# and sets them to absolute path, meaning a new
-	# compiler with same name will not be detected
-	# and will not replace the previous one.
-	export CC='clang'
-	export CXX='clang++'
 
 	export PATH="${install_dir}/bin:${PATH:-}"
 
@@ -293,8 +299,18 @@ _build_clang () {
 	_cmake_compile_install
 }
 
+_build_spirv_tools () {
+	if ! [ -e 'external/SPIRV-Headers' ]
+	then
+		ln -sv '../../SPIRV-Headers' 'external/SPIRV-Headers'
+	fi
+
+	_build_generic_cmake
+}
+
 _build_spirv_llvm_translator () {
 	_cmake_setup \
+		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/clang++" \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
 
@@ -308,17 +324,22 @@ _build_spirv_llvm_translator () {
 }
 
 _build_mesa () {
+	# When building Mesa with Clang 15, this may be needed:
+	#  -D'c_args'='-Wno-error=incompatible-pointer-types-discards-qualifiers'
+	# See https://gitlab.freedesktop.org/mesa/mesa/-/issues/6402
+	# For debugging with libasan, this is needed:
+	#  -D'b_sanitize'='address'
 	_meson_setup \
-		-D'c_args=-Wno-error=incompatible-pointer-types-discards-qualifiers' \
+		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
 		-D'gallium-rusticl'='true' \
 		-D'opencl-spirv'='true' \
 		-D'shader-cache'='true' \
 		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
-		-D'egl'='disabled' \
+		-D'egl'='enabled' \
 		-D'gbm'='disabled' \
-		-D'glx'='disabled' \
+		-D'glx'='dri' \
 		-D'gallium-drivers'='radeonsi,r600,nouveau,swrast,iris' \
 		-D'gallium-nine'='false' \
 		-D'gallium-opencl'='disabled' \
@@ -326,7 +347,7 @@ _build_mesa () {
 		-D'gallium-vdpau'='disabled' \
 		-D'gallium-xa'='disabled' \
 		-D'gallium-xvmc'='disabled' \
-		-D'opengl'='false' \
+		-D'opengl'='true' \
 		-D'gles1'='disabled' \
 		-D'gles2'='disabled' \
 		-D'vulkan-drivers'='[]' \
