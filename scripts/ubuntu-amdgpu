@@ -1,6 +1,15 @@
 #! /usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# Copyright 2021 Thomas “illwieckz“ Debesse
+# Copyright 2022 Thomas “illwieckz“ Debesse
+
+# This script is known to work on Ubuntu 20.04 LTS and Ubuntu 21.10.
+# Clover packages installed with this script will probably not work
+# with Ubuntu 22.04 LTS as required dependencies would not be available
+# in repositories. Official Ubuntu Clover packages may be usable
+# with radeonsi as long as -cl-fast-relaxed-math is not enabled.
+# See https://github.com/llvm/llvm-project/issues/54947
+# Official Ubuntu Clover packages may not be usable with r600.
+# See https://github.com/llvm/llvm-project/issues/54942
 
 # Exit in case of failure.
 set -e
