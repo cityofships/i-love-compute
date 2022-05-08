@@ -302,7 +302,7 @@ _build_clang () {
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
-		-D'CLANG_ENABLE_OPAQUE_POINTERS'='OFF'
+		-D'CLANG_ENABLE_OPAQUE_POINTERS'='ON'
 
 	_cmake_compile_install
 }
