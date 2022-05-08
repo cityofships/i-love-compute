@@ -81,6 +81,8 @@ It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (Ter
 - The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
 - The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
 
+This script is known to work on Ubuntu 20.04 LTS and Ubuntu 21.10. Clover packages installed with this script will probably not work with Ubuntu 22.04 LTS as required dependencies would not be available in repositories. Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+
 ### [`user-clvk`](scripts/user-clvk)
 A script to download, build clvk and run software using clvk.
 
@@ -195,7 +197,7 @@ Orca requires an X11 server being up and running.
     * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified).
   - Mesa Clover, LLVM libclc amdgcn,  
   open, incomplete, GCN1-5 (verified), RDNA (not verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), LuxRender is twice faster on Clover than on Orca, PAL and ROCr.
+    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), LuxRender is twice faster on Clover than on Orca, PAL and ROCr, upstream Clover may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled, see [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947), upstream clover packages may not be usable with r600, see [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
   - AMDGPU-PRO Orca (legacy),  
   closed, complete, GCN1-3 (verified), probably GCN4 (not verified).
     * Last working version for Orca (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
@@ -335,7 +337,7 @@ Having multiple OpenCL frameworks installed at the same time is useful because a
 
 This is very similar to what happens on gaming side where some apps would work well with `radv` but others would require `amdvlk`, both being installable at the same time.
 
-Also, having multiple frameworks may help to improve compute performance by putting everyone's hand on the desk. For example on that laptop the best LuxMark score would be done running three OpenCL devices: the Nvidia GPU, the Intel GPU, and the Intel CPU ([example](http://luxmark.info/node/3425)), that can be done with only two frameworks but some other combinations involving three frameworks may give better score.
+Also, having multiple frameworks may help to improve compute performance by putting everyone's hand on the desk. For example on an Haswell/Nvidia optimus laptop the best LuxMark score would be done running three OpenCL devices: the Nvidia GPU, the Intel GPU, and the Intel CPU ([example](http://luxmark.info/node/3425)), that can be done with only two frameworks but some other combinations involving three frameworks may give better score, for example if another CPU-based OpenCL implementation is faster than the Intel one.
 
 
 ### Compatibility and performance matrix
