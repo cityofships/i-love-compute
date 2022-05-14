@@ -296,13 +296,10 @@ _build_llvm () {
 _build_clang () {
 	# Explicit build type is now mandatory,
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
-	# Disable opaque pointers for now,
-	# See https://gitlab.freedesktop.org/mesa/mesa/-/issues/6342
-	# It is currently built only for building llvm-spirv.
+	# It is currently tuilt only for building llvm-spirv.
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
-		-D'CLANG_ENABLE_OPAQUE_POINTERS'='ON'
+		-D'LLVM_LINK_LLVM_DYLIB'='ON'
 
 	_cmake_compile_install
 }
