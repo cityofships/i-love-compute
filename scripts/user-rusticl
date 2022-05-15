@@ -50,7 +50,7 @@ packages=(
 		'-'
 		'clang'
 	# For debugging with libasan, this may be needed
-	# unless the compiled CLang is not used for building
+	# if the compiled CLang is also used for building
 	# other things than llvm-spirv.
 #	'compiler-rt'
 #		'llvm-project/compiler-rt'
@@ -87,11 +87,11 @@ packages=(
 		'https://gitlab.freedesktop.org/wayland/wayland-protocols.git'
 		'-'
 		'generic_meson'
-#	'libpciaccess'
-#		'libpciaccess'
-#		'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
-#		'-'
-#		'generic_meson'
+	'libpciaccess'
+		'libpciaccess'
+		'https://gitlab.freedesktop.org/xorg/lib/libpciaccess.git'
+		'-'
+		'generic_meson'
 	'DRM'
 		'drm'
 		'https://gitlab.freedesktop.org/mesa/drm.git'
@@ -289,12 +289,9 @@ _build_llvm () {
 _build_clang () {
 	# Explicit build type is now mandatory,
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
-	# Disable opaque pointers for now,
-	# See https://gitlab.freedesktop.org/mesa/mesa/-/issues/6342
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
-		-D'CLANG_ENABLE_OPAQUE_POINTERS'='OFF'
+		-D'LLVM_LINK_LLVM_DYLIB'='ON'
 
 	_cmake_compile_install
 }
@@ -514,6 +511,16 @@ _clean () {
 	fi
 }
 
+_shell () {
+	_set_env
+
+	_cd
+
+	pwd | _prefix "Shell ${script_name}"
+
+	"${SHELL}"
+}
+
 _run () {
 	if [ "${1:-}" = '--force' ]
 	then
@@ -570,6 +577,8 @@ _help () {
 	${tab}${tab}Download and build ${project_name}.
 	${tab}clean
 	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
+	${tab}shell
+	${tab}${tab}Open an interactive shell in the ${project_name} workspace.
 	${tab}run
 	${tab}${tab}Run command with ${project_name}.
 
@@ -595,8 +604,6 @@ _help () {
 
 	${tab}LP_CL=1 ${script_name} run clinfo --list
 
-	${tab}${script_name} run --force bash
-
 	EOF
 
 	_mention
@@ -605,7 +612,7 @@ _help () {
 }
 
 case "${1:-}" in
-	'build'|'clean'|'run')
+	'build'|'clean'|'shell'|'run')
 		action="${1}"
 		;;
 	'-h'|'--help'|'')
