@@ -355,10 +355,6 @@ _build_mesa () {
 	_meson_compile_install
 }
 
-_test () {
-	clinfo --list
-}
-
 _build () {
 	local job_count="$(nproc)"
 	local do_force='false'
