@@ -1,0 +1,400 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2022 Thomas “illwieckz“ Debesse
+
+# You may need to install:
+# build-essential ocl-icd-libopencl1 cmake git pkg-config libclang-12-dev clang-12 llvm-12 make ninja-build ocl-icd-libopencl1 ocl-icd-dev ocl-icd-opencl-dev libhwloc-dev zlib1g zlib1g-dev clinfo dialog apt-utils
+
+# Exit in case of failure.
+set -e
+set -o pipefail
+
+# Error on undefined variable.
+set -u
+
+project_name='PoCL'
+required_file='/etc/OpenCL/vendors/pocl.icd'
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+workspace_parent_dir="${script_dir}/workspace"
+workspace_dir="${workspace_parent_dir}/${script_name}"
+install_dir="${workspace_dir}/install"
+
+packages=(
+	# package name
+	#	directory name
+	#	repository url
+	#	branch name
+	#	build slug
+	'PoCL'
+		'pocl'
+		'https://github.com/pocl/pocl.git'
+		'-'
+		'generic_cmake'
+)
+
+_set_env () {
+	local machine="$(uname -m)"
+
+	export PATH="${install_dir}/bin:${PATH:-}"
+
+	export LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LIBRARY_PATH:-}"
+	export LIBRARY_PATH="${install_dir}/lib:${LIBRARY_PATH:-}"
+
+	export LD_LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LD_LIBRARY_PATH:-}"
+	export LD_LIBRARY_PATH="${install_dir}/lib:${LD_LIBRARY_PATH:-}"
+
+	export PKG_CONFIG_PATH="${install_dir}/lib/${machine}-linux-gnu/pkgconfig:${PKG_CONFIG_PATH:-}"
+	export PKG_CONFIG_PATH="${install_dir}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+	export PKG_CONFIG_PATH="${install_dir}/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+
+	export PYTHONUSERBASE="${install_dir}"
+
+	export CMAKE_PREFIX_PATH="${install_dir}:${CMAKE_PREFIX_PATH:-}"
+
+	export OPENCL_VENDOR_PATH="${install_dir}/etc/OpenCL/vendors"
+}
+
+_error () {
+	printf 'ERROR: %s\n\n' "${1}" >&2
+
+	exit 1
+}
+
+usable_job_count=1
+do_pull='true'
+
+_prefix () {
+	sed -e 's/^/'"${1}"': /'
+}
+
+_cd () {
+	cd "${script_dir}"
+
+	mkdir --parents --verbose "${workspace_dir}"
+
+	cd "${workspace_dir}"
+}
+
+_pull () {
+	if "${do_pull}"
+	then
+		git pull || true
+	fi
+}
+
+_fetch () {
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local repository="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local branch="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# slug
+		i="$((${i} + 1))"
+
+		if [ "${repository}" = '-' ]
+		then
+			continue
+		fi
+
+		_cd
+
+		if ! [ -d "${directory}" ]
+		then
+			{
+				echo "$(pwd)/${directory}"
+				if [ "${branch}" = '-' ]
+				then
+					git clone "${repository}"
+				else
+					git clone --branch "${branch}" "${repository}"
+				fi
+			} | _prefix "Clone ${name}"
+		fi
+
+		{
+			cd "${directory}"
+			pwd
+
+			_pull
+		} | _prefix "Pull ${name}"
+	done
+}
+
+_cmake_setup () {
+	cmake \
+		-S'.' \
+		-B'build' \
+		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		"${@}"
+
+	echo '*' > 'build/.gitignore'
+}
+
+_cmake_target () {
+	cmake \
+		--build 'build' \
+		--parallel "${usable_job_count}" \
+		-- "${@}"
+}
+
+_cmake_compile_install () {
+	_cmake_target
+
+	_cmake_target install
+}
+
+_build_generic_cmake () {
+	_cmake_setup
+
+	_cmake_compile_install
+}
+
+_build () {
+	local job_count="$(nproc)"
+	local do_force='false'
+
+	local enable_list=''
+	local disable_list=''
+
+	while ! [ -z "${1:-}" ]
+	do
+		case "${1:-}" in
+			'--no-pull')
+				do_pull='false'
+				shift
+				;;
+			'-j'|'--jobs')
+				shift
+				if [ -z "${1:-}" ]
+				then
+					_error 'Missing job count.'
+				fi
+
+				job_count="${1}"
+				shift
+				;;
+			'-j'*)
+				job_count="${1:2}"
+				shift
+				;;
+			'-h'|'--help'|'')
+				_help
+				;;
+			'-'*|'--'*)
+				_error 'Unknown build option.'
+				;;
+			*)
+				_error 'Unknown build parameter.'
+				;;
+		esac
+	done
+
+	_set_env
+
+	_fetch
+
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# repository
+		i="$((${i} + 1))"
+		# branch
+		i="$((${i} + 1))"
+		local slug="${packages[${i}]}"
+		i="$((${i} + 1))"
+
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
+
+		usable_job_count="${job_count}"
+
+		{
+			_cd
+
+			cd "${directory}"
+			pwd
+
+			echo "${slug}"
+			"_build_${slug}"
+		} | _prefix "Build ${name}"
+	done
+}
+
+_clean () {
+	cd "${script_dir}"
+
+	if [ -d "${workspace_dir}" ]
+	then
+		cd "${workspace_dir}"
+
+		local i=0
+		while [ "${i}" -lt "${#packages[@]}" ]
+		do
+			local name="${packages[${i}]}"
+			i="$((${i} + 1))"
+			local directory="${packages[${i}]}"
+			i="$((${i} + 1))"
+			local repository="${packages[${i}]}"
+			i="$((${i} + 1))"
+			# branch
+			i="$((${i} + 1))"
+			# slug
+			i="$((${i} + 1))"
+
+			if [ "${repository}" = '-' ]
+			then
+				continue
+			fi
+
+			{
+				_cd
+
+				echo "$(pwd)/${directory}"
+				rm -force --recursive --verbose "${directory}"
+			} | _prefix "Clean ${name}"
+		done
+
+		cd "${script_dir}"
+
+		rmdir --verbose "${workspace_dir}"
+	fi
+
+	if [ -d "${workspace_parent_dir}" ]
+	then
+		rmdir --ignore-fail-on-non-empty --verbose "${workspace_parent_dir}"
+	fi
+}
+
+_shell () {
+	_set_env
+
+	_cd
+
+	pwd | _prefix "Shell ${script_name}"
+
+	"${SHELL}"
+}
+
+_run () {
+	if [ "${1:-}" = '--force' ]
+	then
+		shift
+	elif ! [ -f "${install_dir}${required_file}" ]
+	then
+		_error "${project_name} is not built."
+	fi
+
+	_set_env
+
+	if [ -z "${1:-}" ]
+	then
+		_error 'Missing command.'
+	fi
+	
+	"${@}"
+
+	exit
+}
+
+tab=$'\t'
+
+_mention () {
+	cat >&2 <<-EOF
+	This tool is provided by the I love compute! initiative.
+
+	Always backup this script for future uninstallation, future versions
+	of this script may not uninstall what was installed with this one.
+
+	Always uninstall before upgrading to an higher version of the
+	distribution you use.
+
+	Support the effort to keep OpenCL working on Linux, if this script saved
+	your life, you can make a donation, see:
+
+	${tab}https://gitlab.com/illwieckz/i-love-compute#funding
+
+	EOF
+}
+
+_help () {
+	cat <<-EOF
+	${script_name}: Download and build ${project_name}.
+
+	Usage: ${script_name} [OPTION] [ACTION] [OPTION] [COMMAND]
+
+	Option:
+	${tab}-h, --help
+	${tab}${tab}Print this help.
+
+	Actions:
+	${tab}build
+	${tab}${tab}Download and build ${project_name}.
+	${tab}clean
+	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
+	${tab}shell
+	${tab}${tab}Open an interactive shell in the ${project_name} workspace.
+	${tab}run
+	${tab}${tab}Run command with ${project_name}.
+
+	Build options:
+	${tab}--no-pull
+	${tab}${tab}Do not pull updates from source repositories when building.
+	${tab}-jN,--jobs N
+	${tab}${tab}Build with N parallel jobs (default: Availables core count).
+
+	Run options:
+	${tab}--force
+	${tab}${tab}Run the command even if ${project_name} isn't installed yet.
+
+	Commands:
+	${tab}Anything you want, for example clinfo.
+
+	Examples:
+	${tab}${script_name} build
+
+	${tab}${script_name} run clinfo --list
+
+	EOF
+
+	_mention
+
+	exit
+}
+
+case "${1:-}" in
+	'build'|'clean'|'shell'|'run')
+		action="${1}"
+		;;
+	'-h'|'--help'|'')
+		_help
+		;;
+	'-'*|'--'*)
+		_error 'Unknown option.'
+		;;
+	*)
+		_error 'Unknown action.'
+		;;
+esac
+
+shift
+
+"_${action}" "${@}"
+
+printf '\n'
+
+_mention
