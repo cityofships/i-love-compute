@@ -72,6 +72,7 @@ The user can do combinations: `./user-mesa run ./user-clvk run clinfo --list` to
 
 The scripts do some download, build and other operations in a `workspace` folder next to where the script file is stored.
 
+
 ### [`ubuntu-amdgpu`](scripts/ubuntu-amdgpu)
 
 A script to install amdgpu-pro OpenCL on Ubuntu. This was based on many scripts [like this one](https://github.com/RadeonOpenCompute/ROCr/issues/484#issuecomment-554738964) written on various places through the years to make possible to use OpenCL with AMD GPUs.
@@ -82,6 +83,7 @@ It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (Ter
 - The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
 
 This script is known to work on Ubuntu 20.04 LTS and Ubuntu 21.10. Clover packages installed with this script will probably not work with Ubuntu 22.04 LTS as required dependencies would not be available in repositories. Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+
 
 ### [`user-clvk`](scripts/user-clvk)
 A script to download, build clvk and run software using clvk.
@@ -99,16 +101,27 @@ A script to download, build Mesa (and its dependencies including LLVM) and run s
 - The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
 
+
 ### [`user-rusticl`](scripts/user-rusticl)
 
 A script to download, build Mesa work-in-progress rusticl (and its dependencies including LLVM) and run software using it.
 
 - The user can download, build and install Mesa work-in-progress rusticl by doing `./user-rusticl build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-rusticl run [COMMAND]`.
+- The user can run `COMMAND` with built Mesa rusticl by doing `./user-rusticl run [COMMAND]`.
 - The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
 - The rusticl platform is built from the [work-in-progress merge request at Mesa](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439), this script will be removed once rusticl is merged to the Mesa `main` branch (then the `user-mesa` script will be used to build rusticl).
+
+
+### [`user-pocl`](scripts/user-pocl)
+
+A script to download, build and run PoCL (Portable Computing Language) and run software using it.
+
+- The user can download build and install PoCL by doing `./user-pocl build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`.
+
 
 ### [`user-luxmark3`](scripts/user-luxmark3)
 
