@@ -123,6 +123,17 @@ A script to download, build and run PoCL (Portable Computing Language) and run s
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`.
 
 
+### [`user-amdoclfix`](scripts/user-amdoclfix)
+
+A script to download, build amdocl-fix and run software using it, for example DaVinci Resolve.
+
+- The user can download build and install amdocl-fix by doing `./user-amdoclfix build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`, for example `./user-pocl run resolve`.
+
+This may be needed to workaround some bugs in AMD APP when running DaVinci Resolve.
+
+
 ### [`user-luxmark3`](scripts/user-luxmark3)
 
 A script to download, build and run LuxMark 3.1.
