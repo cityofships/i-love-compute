@@ -264,6 +264,16 @@ _clean () {
 	fi
 }
 
+_shell () {
+	_set_env
+
+	_cd
+
+	pwd | _prefix "Shell ${script_name}"
+
+	"${SHELL}"
+}
+
 _run () {
 	if [ "${1:-}" = '--force' ]
 	then
@@ -320,6 +330,8 @@ _help () {
 	${tab}${tab}Download and build ${project_name}.
 	${tab}clean
 	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
+	${tab}shell
+	${tab}${tab}Open an interactive shell in the ${project_name} workspace.
 	${tab}run
 	${tab}${tab}Run command with ${project_name}.
 
@@ -347,7 +359,7 @@ _help () {
 }
 
 case "${1:-}" in
-	'build'|'clean'|'run')
+	'build'|'clean'|'shell'|'run')
 		action="${1}"
 		;;
 	'-h'|'--help'|'')
