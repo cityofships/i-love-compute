@@ -92,6 +92,7 @@ A script to download, build clvk and run software using clvk.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built clvk by doing `./user-clvk run [COMMAND]`.
 
+
 ### [`user-mesa`](scripts/user-mesa)
 
 A script to download, build Mesa (and its dependencies including LLVM) and run software using Clover OpenCL or Vulkan.
@@ -132,6 +133,15 @@ A script to download, build amdocl-fix and run software using it, for example Da
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`, for example `./user-pocl run resolve`.
 
 This may be needed to workaround some bugs in AMD APP when running DaVinci Resolve.
+
+
+### [`user-piglit`](scripts/user-piglit)
+
+A script to download, build and run piglit.
+
+- The user can download build and install piglit by doing `./user-piglit build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run piglit by doing something like `./user-piglit run piglit run quick_cl /tmp/results/cl`, it can be run with platforms built with other scripts, for example: `./user-mesa run ./user-piglit run piglit run quick_cl gpu /tmp/results/cl-gpu`.
 
 
 ### [`user-luxmark3`](scripts/user-luxmark3)
