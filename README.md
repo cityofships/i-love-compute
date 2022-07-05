@@ -308,7 +308,7 @@ Orca requires an X11 server being up and running.
 - mesa3d-comp-bridge:
   - https://github.com/matszpk/mesa3d-comp-bridge
 - Various Intel OpenCL:
-  - https://software.intel.com/content/www/cn/zh/develop/articles/intel-sdk-for-opencl-applications-release-notes.html
+  - https://www.intel.com/content/www/us/en/developer/articles/release-notes/intel-sdk-for-opencl-applications-release-notes.html
 - Intel NEO OpenCL:
   - https://github.com/intel/compute-runtime
   - https://01.org/compute-runtime
