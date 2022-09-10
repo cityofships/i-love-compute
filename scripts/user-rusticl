@@ -330,6 +330,7 @@ _build_mesa () {
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
 		-D'gallium-rusticl'='true' \
+		-D'rust_std'='2021' \
 		-D'opencl-spirv'='true' \
 		-D'shader-cache'='true' \
 		-D'dri-drivers'='[]' \
