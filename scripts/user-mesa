@@ -335,24 +335,6 @@ _build_clang () {
 	_cmake_compile_install
 }
 
-# Unused.
-_build_spirv_llvm_translator () {
-	_cmake_setup \
-		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/clang++" \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
-		-D'BUILD_SHARED_LIBS'='ON' \
-		-D'LLVM_BUILD_TOOLS'='ON' \
-		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
-
-	_cmake_compile_install
-
-	_cmake_target 'llvm-spirv'
-
-	cp -av \
-		'build/tools/llvm-spirv/llvm-spirv' \
-		"${install_dir}/bin/llvm-spirv"
-}
-
 _build_mesa () {
 	mesa_egl='disabled'
 	mesa_gbm='disabled'
