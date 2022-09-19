@@ -65,12 +65,12 @@ packages=(
 		'SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
 		'-'
-		'generic_cmake'
+		'generic_none'
 	'SPIRV LLVM Translator'
 		'SPIRV-LLVM-Translator'
 		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
 		'-'
-		'spirv_llvm_translator'
+		'generic_none'
 	'libclc'
 		'llvm-project/libclc'
 		'-'
@@ -261,6 +261,10 @@ _meson_compile_install () {
 		-C 'build'
 }
 
+_build_generic_none () {
+	true
+}
+
 _build_generic_python () {
 	python3 'setup.py' build
 
@@ -282,6 +286,24 @@ _build_generic_meson () {
 }
 
 _build_llvm () {
+	llvm_spirv_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator"
+	if ! [ -e "${llvm_spirv_embedded_folder}" ]
+	then
+		ln -s "${workspace_dir}/SPIRV-LLVM-Translator" \
+			"${llvm_spirv_embedded_folder}"
+	fi
+
+	spirv_headers_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers"
+	if ! [ -e "${spirv_headers_embedded_folder}" ]
+	then
+		ln -s "${workspace_dir}/SPIRV-Headers" \
+			"${spirv_headers_embedded_folder}"
+	fi
+
+	# Use -D'LLVM_ENABLE_PROJECTS'='clang' or:
+	# The dependency target "clang" of target "check-all" does not exist
+	# The dependency target "clang" of target "check-llvm-spirv" does not exist.
+
 	# Explicit build type is now mandatory,
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
 	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
@@ -290,8 +312,12 @@ _build_llvm () {
 		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_ENABLE_PROJECTS'='clang' \
 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
-		-D'LLVM_ENABLE_RTTI'='ON'
+		-D'LLVM_ENABLE_RTTI'='ON' \
+		-D'LLVM_BUILD_TESTS'='OFF' \
+		-D'LLVM_BUILD_TOOLS'='ON' \
+		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
 
 	_cmake_compile_install
 }
@@ -302,18 +328,20 @@ _build_clang () {
 	# It is currently built only for building llvm-spirv.
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON'
+		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
+		-D'LLVM_ENABLE_RTTI'='ON'
 
 	_cmake_compile_install
 }
 
+# Unused.
 _build_spirv_llvm_translator () {
 	_cmake_setup \
 		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/clang++" \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
-		-D'BUILD_SHARED_LIBS'='OFF' \
+		-D'BUILD_SHARED_LIBS'='ON' \
 		-D'LLVM_BUILD_TOOLS'='ON' \
-		-D'LLVM_BUILD_TESTS'='OFF' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
 
 	_cmake_compile_install
@@ -739,7 +767,7 @@ _run () {
 	then
 		_error 'Missing command.'
 	fi
-	
+
 	"${@}"
 
 	exit
