@@ -415,11 +415,11 @@ _build_mesa () {
 		mesa_opengl='true'
 	fi
 
-	mesa_gallium_drivers="$(echo "${mesa_gallium_drivers//,/$'\n'}" | sort -u | egrep -v '^$' || true)"
+	mesa_gallium_drivers="$(echo "${mesa_gallium_drivers//,/$'\n'}" | sort -u | grep -v -E '^$' || true)"
 	mesa_gallium_drivers="${mesa_gallium_drivers//$'\n'/,}"
 	mesa_gallium_drivers="${mesa_gallium_drivers:-[]}"
 
-	mesa_vulkan_drivers="$(echo "${mesa_vulkan_drivers//,/$'\n'}" | sort -u | egrep -v '^$' || true)"
+	mesa_vulkan_drivers="$(echo "${mesa_vulkan_drivers//,/$'\n'}" | sort -u | grep -v -E '^$' || true)"
 	mesa_vulkan_drivers="${mesa_vulkan_drivers//$'\n'/,}"
 	mesa_vulkan_drivers="${mesa_vulkan_drivers:-[]}"
 
