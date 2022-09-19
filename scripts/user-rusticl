@@ -329,10 +329,6 @@ _build_mesa () {
 	_meson_setup \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
-		-D'gallium-rusticl'='true' \
-		-D'rust_std'='2021' \
-		-D'opencl-spirv'='true' \
-		-D'shader-cache'='true' \
 		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
 		-D'egl'='enabled' \
@@ -341,10 +337,13 @@ _build_mesa () {
 		-D'gallium-drivers'='radeonsi,r600,nouveau,swrast,iris' \
 		-D'gallium-nine'='false' \
 		-D'gallium-opencl'='disabled' \
+		-D'gallium-rusticl'='true' \
 		-D'gallium-va'='disabled' \
 		-D'gallium-vdpau'='disabled' \
 		-D'gallium-xa'='disabled' \
 		-D'gallium-xvmc'='disabled' \
+		-D'shader-cache'='true' \
+		-D'opencl-spirv'='true' \
 		-D'opengl'='true' \
 		-D'gles1'='disabled' \
 		-D'gles2'='disabled' \
@@ -493,7 +492,7 @@ _clean () {
 				_cd
 
 				echo "$(pwd)/${directory}"
-				rm -force --recursive --verbose "${directory}"
+				rm --force --recursive --verbose "${directory}"
 			} | _prefix "Clean ${name}"
 		done
 
