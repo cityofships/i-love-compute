@@ -22,8 +22,8 @@ workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
 install_dir="${workspace_dir}/install"
 
-known_feature_list='opencl,vulkan,opengl,gles,nine,va,vdpau,xa,xvmc,egl'
-default_feature_list='opencl,vulkan'
+known_feature_list='opencl,rusticl,vulkan,opengl,gles,nine,va,vdpau,xa,xvmc,egl'
+default_feature_list='opencl,rusticl,vulkan'
 feature_opencl='false'
 feature_vulkan='false'
 feature_opengl='false'
@@ -342,11 +342,12 @@ _build_mesa () {
 	mesa_vulkan_drivers=''
 
 	# Used by opengl, gles, and nine.
-	gallium_opencl_drivers='swrast,radeonsi,r600,nouveau,iris'
+	gallium_graphics_drivers='swrast,radeonsi,r300,r600,nouveau,i915,iris,zink,crocus'
 	# Used by vulkan.
 	gallium_vulkan_drivers='swrast'
 	# Used by opencl.
-	gallium_graphics_drivers='swrast,radeonsi,r300,r600,nouveau,i915,iris,zink,crocus'
+	gallium_opencl_drivers='radeonsi,r600,nouveau,iris'
+	gallium_rusticl_drivers='swrast,nouveau,iris'
 
 	vulkan_drivers='swrast,amd,intel'
 
@@ -354,6 +355,13 @@ _build_mesa () {
 	then
 		mesa_gallium_drivers+=",${gallium_opencl_drivers}"
 		mesa_gallium_opencl='icd'
+		mesa_opencl_native='true'
+		mesa_opencl_spirv='true'
+	fi
+
+	if "${feature_rusticl}"
+	then
+		mesa_gallium_drivers+=",${gallium_rusticl_drivers}"
 		mesa_gallium_rusticl='true'
 		mesa_opencl_native='true'
 		mesa_opencl_spirv='true'
