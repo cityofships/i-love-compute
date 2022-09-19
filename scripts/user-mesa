@@ -503,40 +503,34 @@ _build () {
 		case "${1:-}" in
 			'--no-pull')
 				do_pull='false'
-				shift
 				;;
 			'--force')
 				do_force='true'
-				shift
 				;;
 			'-j'|'--jobs')
 				shift
+
 				if [ -z "${1:-}" ]
 				then
 					_error 'Missing job count.'
 				fi
 
 				job_count="${1}"
-				shift
 				;;
 			'-j'*)
 				job_count="${1:2}"
-				shift
 				;;
 			'--features='*)
 				feature_list="${1:11}"
 				feature_list="${feature_list//,/ }"
-				shift
 				;;
 			'--enable='*)
 				enable_list="${1:9}"
 				enable_list="${enable_list//,/ }"
-				shift
 				;;
 			'--disable='*)
 				disable_list="${1:10}"
 				disable_list="${disable_list//,/ }"
-				shift
 				;;
 			'-h'|'--help'|'')
 				_help
@@ -548,6 +542,8 @@ _build () {
 				_error 'Unknown build parameter.'
 				;;
 		esac
+
+		shift
 	done
 
 	local llvm_job_count="${job_count}"

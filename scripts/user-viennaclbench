@@ -208,21 +208,19 @@ _build () {
 		case "${1:-}" in
 			'--no-pull')
 				do_pull='false'
-				shift
 				;;
 			'-j'|'--jobs')
 				shift
+
 				if [ -z "${1:-}" ]
 				then
 					_error 'Missing job count.'
 				fi
 
 				job_count="${1}"
-				shift
 				;;
 			'-j'*)
 				job_count="${1:2}"
-				shift
 				;;
 			'-h'|'--help'|'')
 				_help
@@ -234,6 +232,8 @@ _build () {
 				_error 'Unknown build parameter.'
 				;;
 		esac
+
+		shift
 	done
 
 	_set_env
