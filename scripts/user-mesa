@@ -331,7 +331,7 @@ _build_mesa () {
 	mesa_opengl='false'
 	mesa_gallium_nine='false'
 	mesa_gallium_opencl='disabled'
-	mesa_gallium_rusticl='enabled'
+	mesa_gallium_rusticl='disabled'
 	mesa_gallium_va='disabled'
 	mesa_gallium_vdpau='disabled'
 	mesa_gallium_xa='disabled'
