@@ -5,18 +5,22 @@ I ♥ Compute!
 
 Task force to promote and make easy usage of OpenCL on Linux and beyond.
 
-Targets:
+Tasks being worked on:
 
-- Identify all existing compute frameworks, focusing with OpenCL on Linux to begin with,
+- Identify existing compute frameworks, focusing on OpenCL on Linux to begin with,
 - Track issues accross projects,
-- Provide installation instructions, scripts, repository links or packages
+- Provide installation instructions, scripts, repository links or packages,
 - Help to make possible to install multiple OpenCL frameworks and multiple version of OpenCL frameworks when possible,
-- Provide compatibility matrix for softwares and OpenCL frameworks,
-- Provide compatibility matrix for hardwares and OpenCL frameworks,
-- Provide performance matrix for softwares and OpenCL frameworks,
 - Gather generic knowldege about compute solutions.
 
-Knowledge about Vulkan compute or legacy Shader-based compute is welcome, same for knowledge about other operating systems like BSD ones, Haiku and others.
+
+Postponed tasks:
+
+- Provide compatibility matrix for pieces of software and OpenCL frameworks,
+- Provide compatibility matrix for pieces of hardware and OpenCL frameworks,
+- Provide performance matrix for pieces of software and OpenCL frameworks.
+
+Knowledge about Vulkan compute or legacy shader-based compute is welcome, same for knowledge about other operating systems like BSD ones, Haiku and others.
 
 
 Funding
@@ -35,6 +39,19 @@ Commercial support and consultancy can be obtained from [rebatir.fr](https://reb
 Hardware donation
 -----------------
 
+For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation. Hardware has to be shipped to France.
+
+Missing:
+
+- AMD GCN4 (Polaris),
+- AMD RDNA1 (Navi), CDNA1,
+- AMD RDNA2 (Big Navi), CDNA2,
+- AMD hardware supported by ROCr,
+- Via hardware (Chrome 520 and later),
+- Nvidia hardware that is not Tesla or Kepler,
+- Intel hardware that is not Gen7 (Haswell),
+- Non-integrated Intel hardware like Intel Xe.
+
 Already sourced:
 
 - AMD TeraScale 1 (PCIe, PCI, AGP),
@@ -48,19 +65,6 @@ Already sourced:
 - Nvidia Tesla 2.0 (PCIe),
 - Nvidia Kepler (PCIe),
 - Intel Gen7 (integrated).
-
-Missing:
-
-- AMD GCN4 (Polaris),
-- AMD RDNA1 (Navi), CDNA1,
-- AMD RDNA2 (Big Navi), CDNA2,
-- AMD hardware supported by ROCr,
-- Via hardware (Chrome 520 and later),
-- Nvidia hardware that is not Tesla or Kepler,
-- Intel hardware that is not Gen7 (Haswell),
-- Non-integrated Intel hardware like Intel Xe.
-
-For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation. Hardware has to be shipped to France.
 
 
 Scripts
@@ -82,7 +86,9 @@ It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (Ter
 - The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
 - The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
 
-This script is known to work on Ubuntu 20.04 LTS and Ubuntu 21.10. Clover packages installed with this script will probably not work with Ubuntu 22.04 LTS as required dependencies would not be available in repositories. Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+This script is known to work on Ubuntu 20.04 LTS and Ubuntu 21.10. Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+
+Ubuntu 22.04 LTS isn't supported. The amdgpu library shipped with Orca packages will not be compatible with graphic drivers and will left the computer without working desktop. Clover packages installed with this script will probably not work with Ubuntu 22.04 LTS as required dependencies would not be available in repositories. It may be possible to install a 20.04 LTS chroot and use this script to install OpenCL drivers in the chroot and run applications in the chroot.
 
 
 ### [`user-clvk`](scripts/user-clvk)
@@ -100,19 +106,8 @@ A script to download, build Mesa (and its dependencies including LLVM) and run s
 - The user can download, build and install Mesa Clover and Vulkan by doing `./user-mesa build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
-- Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
-
-
-### [`user-rusticl`](scripts/user-rusticl)
-
-A script to download, build Mesa work-in-progress rusticl (and its dependencies including LLVM) and run software using it.
-
-- The user can download, build and install Mesa work-in-progress rusticl by doing `./user-rusticl build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built Mesa rusticl by doing `./user-rusticl run [COMMAND]`.
 - The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
-- The rusticl platform is built from the [work-in-progress merge request at Mesa](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439), this script will be removed once rusticl is merged to the Mesa `main` branch (then the `user-mesa` script will be used to build rusticl).
 
 
 ### [`user-pocl`](scripts/user-pocl)
@@ -152,6 +147,15 @@ A script to download, build and run LuxMark 3.1.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run LuxMark by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
 - Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7.
+
+
+### [`user-viennaclbench`](scripts/user-viennaclbench)
+
+A script to download, build and run ViennaCLBehch.
+
+- The user can download build and install ViennaCLBench by doing `./user-viennaclbench build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run LuxMark by doing `./user-viennaclbench run` or `./user-viennaclbench run ViennaCLBench`.
 
 
 Knowledge
