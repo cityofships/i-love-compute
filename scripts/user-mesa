@@ -296,7 +296,7 @@ _build_llvm () {
 _build_clang () {
 	# Explicit build type is now mandatory,
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
-	# It is currently tuilt only for building llvm-spirv.
+	# It is currently built only for building llvm-spirv.
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON'
@@ -330,6 +330,7 @@ _build_mesa () {
 	mesa_opengl='false'
 	mesa_gallium_nine='false'
 	mesa_gallium_opencl='disabled'
+	mesa_gallium_rusticl='enabled'
 	mesa_gallium_va='disabled'
 	mesa_gallium_vdpau='disabled'
 	mesa_gallium_xa='disabled'
@@ -339,23 +340,29 @@ _build_mesa () {
 	mesa_gallium_drivers=''
 	mesa_vulkan_drivers=''
 
-	gallium_opencl_drivers='radeonsi,r600,nouveau'
+	# Used by opengl, gles, and nine.
+	gallium_opencl_drivers='swrast,radeonsi,r600,nouveau,iris'
+	# Used by vulkan.
 	gallium_vulkan_drivers='swrast'
-	gallium_graphics_drivers='radeonsi,r300,r600,nouveau,swrast,i915,iris,zink,crocus'
+	# Used by opencl.
+	gallium_graphics_drivers='swrast,radeonsi,r300,r600,nouveau,i915,iris,zink,crocus'
+
+	vulkan_drivers='swrast,amd,intel'
 
 	if "${feature_opencl}"
 	then
 		mesa_gallium_drivers+=",${gallium_opencl_drivers}"
 		mesa_gallium_opencl='icd'
+		mesa_gallium_rusticl='true'
 		mesa_opencl_native='true'
 		mesa_opencl_spirv='true'
 	fi
 
 	if "${feature_vulkan}"
 	then
-		# swrast vulkan requires gallium swrast
+		# swrast vulkan requires swrast gallium
 		mesa_gallium_drivers+=",${gallium_vulkan_drivers}"
-		mesa_vulkan_drivers='amd,intel,swrast'
+		mesa_vulkan_drivers="${vulkan_drivers}"
 	fi
 
 	if "${feature_opengl}"
@@ -428,6 +435,7 @@ _build_mesa () {
 	# Clover requires RTTI to be enabled.
 	_meson_setup \
 		-D'cpp_rtti'='true' \
+		-D'rust_std'='2021' \
 		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
 		-D'egl'="${mesa_egl}" \
@@ -438,6 +446,7 @@ _build_mesa () {
 		-D'gallium-nine'="${mesa_gallium_nine}" \
 		-D'gallium-omx'='disabled' \
 		-D'gallium-opencl'="${mesa_gallium_opencl}" \
+		-D'gallium-rusticl'="${mesa_gallium_rusticl}" \
 		-D'gallium-va'="${mesa_gallium_va}" \
 		-D'gallium-vdpau'="${mesa_gallium_vdpau}" \
 		-D'gallium-xa'="${mesa_gallium_xa}" \
