@@ -233,6 +233,7 @@ _cmake_setup () {
 		-S'.' \
 		-B'build' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		-G Ninja \
 		"${@}"
 
 	echo '*' > 'build/.gitignore'
