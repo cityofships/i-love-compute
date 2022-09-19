@@ -22,9 +22,10 @@ workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
 install_dir="${workspace_dir}/install"
 
-known_feature_list='opencl vulkan opengl gles nine va vdpau xa xvmc egl'
-feature_opencl='true'
-feature_vulkan='true'
+known_feature_list='opencl,vulkan,opengl,gles,nine,va,vdpau,xa,xvmc,egl'
+default_feature_list='opencl,vulkan'
+feature_opencl='false'
+feature_vulkan='false'
 feature_opengl='false'
 feature_gles='false'
 feature_nine='false'
@@ -470,6 +471,7 @@ _build () {
 	local job_count="$(nproc)"
 	local do_force='false'
 
+	local feature_list=''
 	local enable_list=''
 	local disable_list=''
 
@@ -496,6 +498,11 @@ _build () {
 				;;
 			'-j'*)
 				job_count="${1:2}"
+				shift
+				;;
+			'--features='*)
+				feature_list="${1:11}"
+				feature_list="${feature_list//,/ }"
 				shift
 				;;
 			'--enable='*)
@@ -539,15 +546,30 @@ _build () {
 
 			Use --force to force using ${job_count} jobs when compiling LLVM.
 			EOF
-
 			sleep 5s
 		fi
+	fi
+
+	if [ -z "${feature_list}" ]
+	then
+		feature_list="${default_feature_list}"
+	elif [ "${feature_list}" = 'all' ]
+	then
+		feature_list="${known_feature_list}"
 	fi
 
 	local feature_mode
 	local feature_name
 	local feature_is_unknown
 	local feature_value
+
+	local iteratable_known_feature_list="${known_feature_list//,/ }"
+	local iteratable_feature_list="${feature_list//,/ }"
+
+	for feature_name in ${iteratable_feature_list}
+	do
+		eval "feature_${feature_name}='true'"
+	done
 
 	for feature_mode in 'enable' 'disable'
 	do
@@ -561,7 +583,7 @@ _build () {
 		for feature_name in $(eval 'echo ${'"${feature_mode}"'_list}')
 		do
 			feature_is_unknown='true'
-			for known_feature in ${known_feature_list}
+			for known_feature in ${iteratable_known_feature_list}
 			do
 				if [ "${feature_name}" = "${known_feature}" ]
 				then
@@ -579,7 +601,7 @@ _build () {
 
 	local enabled_feature_list=''
 	local disabled_feature_list=''
-	for feature_name in ${known_feature_list}
+	for feature_name in ${iteratable_known_feature_list}
 	do
 		if eval '${feature_'"${feature_name}"'}'
 		then
@@ -754,17 +776,23 @@ _help () {
 	${tab}--no-pull
 	${tab}${tab}Do not pull updates from source repositories when building.
 	${tab}-jN,--jobs N
-	${tab}${tab}Build with N parallel jobs (default: Availables core count).
+	${tab}${tab}Build with N parallel jobs, default: Availables core count.
 	${tab}--force
 	${tab}${tab}Force using as much parallel jobs even when there may not be enough memory.
+	${tab}--features=[FEATURES]
+	${tab}${tab}Build those features, comma separated list, default: ${default_feature_list}.
+	${tab}${tab}Special name: all, build all known features.
 	${tab}--enable=[FEATURES]
-	${tab}${tab}Build feature (comma separated list), default: opencl,vulkan
+	${tab}${tab}Add features to feature build list, comma separated list.
 	${tab}--disable=[FEATURES]
-	${tab}${tab}Do not build feature (comma separated list), default: opengl,gles,nine,va,vdpau,xa,xvmc,egl
+	${tab}${tab}Remove features from feature build list, comma separated list.
 
 	Run options:
 	${tab}--force
 	${tab}${tab}Run the command even if ${project_name} isn't installed yet.
+
+	Features:
+	${tab}${known_feature_list}.
 
 	Commands:
 	${tab}Anything you want, for example clinfo or vulkaninfo.
