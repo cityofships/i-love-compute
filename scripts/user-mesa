@@ -289,6 +289,7 @@ _build_llvm () {
 		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON'
 
 	_cmake_compile_install
@@ -309,6 +310,9 @@ _build_spirv_llvm_translator () {
 	_cmake_setup \
 		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/clang++" \
 		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'BUILD_SHARED_LIBS'='ON' \
+		-D'LLVM_BUILD_TOOLS'='ON' \
+		-D'LLVM_BUILD_TESTS'='OFF' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
 
 	_cmake_compile_install
