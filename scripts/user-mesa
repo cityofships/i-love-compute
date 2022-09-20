@@ -233,6 +233,7 @@ _cmake_setup () {
 		-S'.' \
 		-B'build' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		-D'BUILD_SHARED_LIBS'='ON' \
 		-G Ninja \
 		"${@}"
 
@@ -310,8 +311,9 @@ _build_llvm () {
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
-		-D'LLVM_BUILD_LLVM_DYLIB'='ON' \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_BUILD_LLVM_DYLIB'='OFF' \
+		-D'LLVM_LINK_LLVM_DYLIB'='OFF' \
+		-D'CLANG_LINK_CLANG_DYLIB'='OFF' \
 		-D'LLVM_ENABLE_PROJECTS'='clang' \
 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON' \
@@ -328,7 +330,8 @@ _build_clang () {
 	# It is currently built only for building llvm-spirv.
 	_cmake_setup \
 		-D'CMAKE_BUILD_TYPE'='Debug' \
-		-D'LLVM_LINK_LLVM_DYLIB'='ON' \
+		-D'LLVM_LINK_LLVM_DYLIB'='OFF' \
+		-D'CLANG_LINK_CLANG_DYLIB'='OFF' \
 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON'
 
