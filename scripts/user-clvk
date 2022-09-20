@@ -141,7 +141,7 @@ _build_generic_cmake () {
 }
 
 _build_clvk () {
-	"${clvk_source_dir}/external/clspv/utils/fetch_sources.py"
+	"${workspace_dir}/clvk/external/clspv/utils/fetch_sources.py"
 
 	_build_generic_cmake
 }
