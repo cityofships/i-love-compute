@@ -654,9 +654,14 @@ _build () {
 
 	_fetch
 
+	local time_log=''
+	local full_time_before="$(date '+%s')"
+
 	local i=0
 	while [ "${i}" -lt "${#packages[@]}" ]
 	do
+		local time_before="$(date '+%s')"
+
 		local name="${packages[${i}]}"
 		i="$((${i} + 1))"
 		local directory="${packages[${i}]}"
@@ -689,7 +694,23 @@ _build () {
 			echo "${slug}"
 			"_build_${slug}"
 		} | _prefix "Build ${name}"
+
+		local time_after="$(date '+%s')"
+		local time_spent="$((${time_after} - ${time_before}))"
+
+		time_log+="${name}: ${time_spent}s"
+		time_log+=$'\n'
 	done
+
+	local full_time_after="$(date '+%s')"
+	local full_time_spent="$((${full_time_after} - ${full_time_before}))"
+
+	cat <<-EOF
+	Time spent on building packages:
+	${time_log}
+	Time spent on building all packages:
+	All: ${full_time_spent}s
+	EOF
 }
 
 _clean () {
