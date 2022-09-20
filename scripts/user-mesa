@@ -136,6 +136,10 @@ _set_env () {
 
 	export VK_ICD_FILENAMES="$(_find_vulkan_icd_files):${VK_ICD_FILENAMES:-}"
 
+	export CFLAGS='-fno-lto'
+	export CXXFLAGS="${CFLAGS}"
+	export LDFLAGS="${CFLAGS}"
+
 	# Doesn't work:
 	# export VK_DRIVERS_PATH="${install_dir}/share/vulkan/icd.d:${VK_DRIVERS_PATH:-}"
 }
