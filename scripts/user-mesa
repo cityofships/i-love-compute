@@ -46,6 +46,11 @@ packages=(
 		'https://github.com/mesonbuild/meson.git'
 		'-'
 		'generic_python'
+	'Mold'
+		'mold'
+		'https://github.com/rui314/mold.git'
+		'-'
+		'generic_cmake'
 	'LLVM project'
 		'llvm-project'
 		'https://github.com/llvm/llvm-project.git'
@@ -216,15 +221,25 @@ _fetch () {
 	done
 }
 
+_mold () {
+	if command -v 'mold' >/dev/null
+	then
+		mold --run "${@}"
+		return
+	fi
+
+	"${@}"
+}
+
 _meson_setup () {
 	if ! [ -f 'build/compile_commands.json' ]
 	then
-		meson setup \
+		_mold meson setup \
 			'build' \
 			-D'prefix'="${install_dir}" \
 			"${@}"
 	else
-		meson setup \
+		_mold meson setup \
 			--reconfigure \
 			'build' \
 			-D'prefix'="${install_dir}" \
@@ -233,7 +248,7 @@ _meson_setup () {
 }
 
 _cmake_setup () {
-	cmake \
+	_mold cmake \
 		-S'.' \
 		-B'build' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
@@ -245,7 +260,7 @@ _cmake_setup () {
 }
 
 _cmake_target () {
-	cmake \
+	_mold cmake \
 		--build 'build' \
 		--parallel "${usable_job_count}" \
 		-- "${@}"
@@ -258,11 +273,11 @@ _cmake_compile_install () {
 }
 
 _meson_compile_install () {
-	meson compile \
+	_mold meson compile \
 		-C 'build' \
 		-j "${usable_job_count}"
 
-	meson install \
+	_mold meson install \
 		-C 'build'
 }
 
