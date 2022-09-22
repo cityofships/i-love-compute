@@ -465,6 +465,12 @@ _build_mesa () {
 	mesa_vulkan_drivers="${mesa_vulkan_drivers//$'\n'/,}"
 	mesa_vulkan_drivers="${mesa_vulkan_drivers:-[]}"
 
+	# Workaround lack of libudev linker flag.
+	# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/18761
+	export CFLAGS+=" -ludev"
+	export CXXFLAGS+=" -ludev"
+	export LDFLAGS+=" -ludev"
+
 	set -x
 	# See also:
 	#  gallium-drivers: virgl
