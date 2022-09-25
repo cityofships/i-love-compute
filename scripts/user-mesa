@@ -72,6 +72,11 @@ packages=(
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
 		'-'
 		'generic_none'
+	'SPIRV Tools'
+		'SPIRV-Tools'
+		'https://github.com/KhronosGroup/SPIRV-Tools.git'
+		'-'
+		'spirv_tools'
 	'SPIRV LLVM Translator'
 		'SPIRV-LLVM-Translator'
 		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
@@ -351,6 +356,17 @@ _build_clang () {
 		-D'LLVM_ENABLE_RTTI'='ON'
 
 	_cmake_compile_install
+}
+
+_build_spirv_tools () {
+	local spirv_headers_embedded_folder="${workspace_dir}/SPIRV-Tools/external/SPIRV-Headers"
+	if ! [ -e "${spirv_headers_embedded_folder}" ]
+	then
+		ln -s "${workspace_dir}/SPIRV-Headers" \
+			"${spirv_headers_embedded_folder}"
+	fi
+
+	_build_generic_cmake
 }
 
 _build_mesa () {
