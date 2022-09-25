@@ -243,12 +243,14 @@ _meson_setup () {
 		_mold meson setup \
 			'build' \
 			-D'prefix'="${install_dir}" \
+			-D'buildtype'='debug' \
 			"${@}"
 	else
 		_mold meson setup \
 			--reconfigure \
 			'build' \
 			-D'prefix'="${install_dir}" \
+			-D'buildtype'='debug' \
 			"${@}"
 	fi
 }
@@ -258,6 +260,7 @@ _cmake_setup () {
 		-S'.' \
 		-B'build' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
+		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'BUILD_SHARED_LIBS'='ON' \
 		-G Ninja \
 		"${@}"
@@ -335,7 +338,6 @@ _build_llvm () {
 	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
-		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_ENABLE_PROJECTS'='clang' \
 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON' \
@@ -351,7 +353,6 @@ _build_clang () {
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
 	# It is currently built only for building llvm-spirv.
 	_cmake_setup \
-		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
 		-D'LLVM_ENABLE_RTTI'='ON'
 
@@ -495,7 +496,6 @@ _build_mesa () {
 	#  shader-cache
 	# Clover requires RTTI to be enabled.
 	_meson_setup \
-		-D'buildtype'='debug' \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
 		-D'dri-drivers'='[]' \
