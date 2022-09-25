@@ -59,11 +59,11 @@ pal_tarball_sum='9b064a3b02d2a1ec18fdd6c098b70f4a8c6f93e4bfdc4e9a032ca387bdf7223
 pal_deb_file_list='opencl-amdgpu-pro-comgr_20.40-1147286_amd64.deb opencl-amdgpu-pro-icd_20.40-1147286_amd64.deb'
 pal_tarball_dir="$(basename "${pal_tarball_file}" '.tar.xz')"
 
-amdgpupro_deb_repo='https://repo.radeon.com/amdgpu-install/21.40.2/ubuntu/focal'
+amdgpupro_deb_repo='https://repo.radeon.com/amdgpu-install/22.20.3/ubuntu/focal'
 
-amdgpupro_deb_version='21.40.2.40502-1'
+amdgpupro_deb_version='22.20.50203-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
-amdgpupro_deb_sum='65454bc0d5f6faaecda85c6cdc416e0066012d16c17f9072cf384ae86cfd98af23ede11c224b573074c36740e1760c14c58cd05e3246b75d584589b2ae2d6916'
+amdgpupro_deb_sum='a9edc0644bd61234db37b3a08b2cc3d68859b950121fdd81332d5d171b2cf11111c99218fb7b5cda17789479434e87b28e2648f96260591f8a447f5759637a99'
 
 rocm_package_name_list="${amdgpupro_libopencl_package_name} rocm-opencl"
 
