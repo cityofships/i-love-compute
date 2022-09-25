@@ -312,14 +312,14 @@ _build_generic_meson () {
 }
 
 _build_llvm () {
-	llvm_spirv_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator"
+	local llvm_spirv_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator"
 	if ! [ -e "${llvm_spirv_embedded_folder}" ]
 	then
 		ln -s "${workspace_dir}/SPIRV-LLVM-Translator" \
 			"${llvm_spirv_embedded_folder}"
 	fi
 
-	spirv_headers_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers"
+	local spirv_headers_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers"
 	if ! [ -e "${spirv_headers_embedded_folder}" ]
 	then
 		ln -s "${workspace_dir}/SPIRV-Headers" \
@@ -370,34 +370,34 @@ _build_spirv_tools () {
 }
 
 _build_mesa () {
-	mesa_egl='disabled'
-	mesa_gbm='disabled'
-	mesa_glx='disabled'
-	mesa_glx_direct='false'
-	mesa_gles1='disabled'
-	mesa_gles2='disabled'
-	mesa_glvnd='false'
-	mesa_opengl='false'
-	mesa_gallium_nine='false'
-	mesa_gallium_opencl='disabled'
-	mesa_gallium_rusticl='false'
-	mesa_gallium_va='disabled'
-	mesa_gallium_vdpau='disabled'
-	mesa_gallium_xa='disabled'
-	mesa_gallium_xvmc='disabled'
-	mesa_opencl_spirv='false'
-	mesa_gallium_drivers=''
-	mesa_vulkan_drivers=''
+	local mesa_egl='disabled'
+	local mesa_gbm='disabled'
+	local mesa_glx='disabled'
+	local mesa_glx_direct='false'
+	local mesa_gles1='disabled'
+	local mesa_gles2='disabled'
+	local mesa_glvnd='false'
+	local mesa_opengl='false'
+	local mesa_gallium_nine='false'
+	local mesa_gallium_opencl='disabled'
+	local mesa_gallium_rusticl='false'
+	local mesa_gallium_va='disabled'
+	local mesa_gallium_vdpau='disabled'
+	local mesa_gallium_xa='disabled'
+	local mesa_gallium_xvmc='disabled'
+	local mesa_opencl_spirv='false'
+	local mesa_gallium_drivers=''
+	local mesa_vulkan_drivers=''
 
 	# Used by opengl, gles, and nine.
-	gallium_graphics_drivers='swrast,radeonsi,r300,r600,nouveau,i915,iris,zink,crocus'
+	local gallium_graphics_drivers='swrast,radeonsi,r300,r600,nouveau,i915,iris,zink,crocus'
 	# Used by vulkan.
-	gallium_vulkan_drivers='swrast'
+	local gallium_vulkan_drivers='swrast'
 	# Used by opencl.
-	gallium_opencl_drivers='radeonsi,r600,nouveau,iris'
-	gallium_rusticl_drivers='swrast,radeonsi,nouveau,iris'
+	local gallium_opencl_drivers='radeonsi,r600,nouveau,iris'
+	local gallium_rusticl_drivers='swrast,radeonsi,nouveau,iris'
 
-	vulkan_drivers='swrast,amd,intel'
+	local vulkan_drivers='swrast,amd,intel'
 
 	if "${feature_opencl}"
 	then
