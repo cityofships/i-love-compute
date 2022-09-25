@@ -482,6 +482,7 @@ _build_mesa () {
 	#  shader-cache
 	# Clover requires RTTI to be enabled.
 	_meson_setup \
+		-D'buildtype'='debug' \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
 		-D'dri-drivers'='[]' \
