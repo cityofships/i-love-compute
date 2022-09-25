@@ -818,7 +818,7 @@ _mention () {
 
 _help () {
 	cat <<-EOF
-	${script_name}: Download and build ${project_name} to run OpenCL or Vulkan on supported devices.
+	${script_name}: Download and build ${project_name} to run OpenCL, Vulkan or other technologies on supported devices.
 
 	Usage: ${script_name} [OPTION] [ACTION] [OPTION] [COMMAND]
 
@@ -864,13 +864,23 @@ _help () {
 	Examples:
 	${tab}${script_name} build
 
+	${tab}${script_name} build --features=all
+
 	${tab}${script_name} build --enable=opengl,nine,va
 
 	${tab}${script_name} run clinfo --list
 
 	${tab}${script_name} run vulkaninfo --summary
 
+	${tab}${script_name} run glxinfo -B
+
+	${tab}LP_CL=1 RUSTICL_DEVICE_TYPE=gpu ${script_name} run clinfo --list
+
 	${tab}AMD_VULKAN_ICD=RADV ${script_name} run vulkaninfo --summary
+
+	${tab}LIBGL_ALWAYS_SOFTWARE=true ${script_name} run glxinfo -B
+
+	${tab}R600_DEBUG=nir ${script_name} run glxinfo -B
 
 	EOF
 
