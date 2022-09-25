@@ -237,22 +237,25 @@ _mold () {
 	"${@}"
 }
 
-_meson_setup () {
+_meson_setup_wrapper () {
 	if ! [ -f 'build/compile_commands.json' ]
 	then
 		_mold meson setup \
 			'build' \
-			-D'prefix'="${install_dir}" \
-			-D'buildtype'='debug' \
 			"${@}"
 	else
 		_mold meson setup \
 			--reconfigure \
 			'build' \
-			-D'prefix'="${install_dir}" \
-			-D'buildtype'='debug' \
 			"${@}"
 	fi
+}
+
+_meson_setup () {
+	_meson_setup_wrapper \
+		-D'prefix'="${install_dir}" \
+		-D'buildtype'='debug' \
+		"${@}"
 }
 
 _cmake_setup () {
