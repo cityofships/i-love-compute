@@ -380,7 +380,7 @@ _build_mesa () {
 	gallium_vulkan_drivers='swrast'
 	# Used by opencl.
 	gallium_opencl_drivers='radeonsi,r600,nouveau,iris'
-	gallium_rusticl_drivers='swrast,nouveau,iris'
+	gallium_rusticl_drivers='swrast,radeonsi,nouveau,iris'
 
 	vulkan_drivers='swrast,amd,intel'
 
