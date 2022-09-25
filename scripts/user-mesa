@@ -385,7 +385,6 @@ _build_mesa () {
 	mesa_gallium_vdpau='disabled'
 	mesa_gallium_xa='disabled'
 	mesa_gallium_xvmc='disabled'
-	mesa_opencl_native='false'
 	mesa_opencl_spirv='false'
 	mesa_gallium_drivers=''
 	mesa_vulkan_drivers=''
@@ -404,7 +403,6 @@ _build_mesa () {
 	then
 		mesa_gallium_drivers+=",${gallium_opencl_drivers}"
 		mesa_gallium_opencl='icd'
-		mesa_opencl_native='true'
 		mesa_opencl_spirv='true'
 	fi
 
@@ -412,7 +410,6 @@ _build_mesa () {
 	then
 		mesa_gallium_drivers+=",${gallium_rusticl_drivers}"
 		mesa_gallium_rusticl='true'
-		mesa_opencl_native='true'
 		mesa_opencl_spirv='true'
 	fi
 
@@ -516,7 +513,6 @@ _build_mesa () {
 		-D'gallium-vdpau'="${mesa_gallium_vdpau}" \
 		-D'gallium-xa'="${mesa_gallium_xa}" \
 		-D'gallium-xvmc'="${mesa_gallium_xvmc}" \
-		-D'opencl-native'="${mesa_opencl_native}" \
 		-D'opencl-spirv'="${mesa_opencl_spirv}" \
 		-D'opengl'="${mesa_opengl}" \
 		-D'glvnd'="${mesa_glvnd}" \
