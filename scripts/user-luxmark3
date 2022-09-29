@@ -9,7 +9,7 @@
 ## oiio:
 # libilmbase-dev libopenexr-dev libtiff-dev libpython2.7-dev
 ## luxcore and luxmark:
-# libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb-dev
+# libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb2-dev
 
 # GCC10 is needed to build GCC7 (GCC11 and later can't build GCC7).
 # GCC7 is needed to build Qt4 (GCC8 and later can't build Qt4).
@@ -495,6 +495,7 @@ _build_oiio () {
 
 	_cmake_setup \
 		-D'USE_LIBRAW'='OFF' \
+		-D'USE_FFMPEG'='OFF' \
 		-D'CMAKE_CXX_FLAGS'='-Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
 		# For more recent compilers:
 		# -D'CMAKE_CXX_FLAGS'='-Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
