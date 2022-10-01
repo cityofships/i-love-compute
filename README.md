@@ -151,7 +151,7 @@ A script to download, build and run LuxMark 3.1.
 
 ### [`user-viennaclbench`](scripts/user-viennaclbench)
 
-A script to download, build and run ViennaCLBehch.
+A script to download, build and run ViennaCLBench.
 
 - The user can download build and install ViennaCLBench by doing `./user-viennaclbench build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
@@ -283,7 +283,7 @@ Orca requires an X11 server being up and running.
   - Mesa Clover, libclc nouveau.  
   open, early state, not tested,
   - libclc ptx,  
-  open requiring closed component, incomplete, noy tested.
+  open requiring closed component, incomplete, not tested.
   - Nvidia,  
   closed, complete, verified.
   - pocl with Nvidia,  
