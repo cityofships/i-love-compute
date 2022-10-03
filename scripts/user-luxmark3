@@ -496,7 +496,7 @@ _build_oiio () {
 	_cmake_setup \
 		-D'USE_LIBRAW'='OFF' \
 		-D'USE_FFMPEG'='OFF' \
-		-D'CMAKE_CXX_FLAGS'='-Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
+		-D'CMAKE_CXX_FLAGS'='-Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new= -Wno-error=mismatched-new-delete'
 		# For more recent compilers:
 		# -D'CMAKE_CXX_FLAGS'='-Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
 
