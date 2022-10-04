@@ -51,7 +51,7 @@ packages=(
 		'mold'
 		'https://github.com/rui314/mold.git'
 		'-'
-		'generic_cmake'
+		'mold'
 	'LLVM project'
 		'llvm-project'
 		'https://github.com/llvm/llvm-project.git'
@@ -228,13 +228,19 @@ _fetch () {
 }
 
 _mold () {
-	if command -v 'mold' >/dev/null
+	if [ -n "${self_mold:-}" ]
 	then
-		mold --run "${@}"
+		"${@}"
 		return
 	fi
 
-	"${@}"
+	if ! command -v 'mold' >/dev/null
+	then
+		"${@}"
+		return
+	fi
+
+	mold --run "${@}"
 }
 
 _meson_setup_wrapper () {
@@ -315,6 +321,15 @@ _build_generic_meson () {
 	_meson_setup
 
 	_meson_compile_install
+}
+
+_build_mold ()  {
+	local self_mold='1'
+
+	if do_pull
+	then
+		_build_generic_cmake
+	fi
 }
 
 _build_llvm () {
