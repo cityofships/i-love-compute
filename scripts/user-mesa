@@ -416,7 +416,7 @@ _build_mesa () {
 	local gallium_opencl_drivers='radeonsi,r600,nouveau,iris'
 	local gallium_rusticl_drivers='swrast,radeonsi,nouveau,iris'
 
-	local vulkan_drivers='swrast,amd,intel'
+	local vulkan_drivers='swrast,amd,intel,intel_hasvk'
 
 	if "${feature_opencl}"
 	then
