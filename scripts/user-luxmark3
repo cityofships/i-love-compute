@@ -22,7 +22,7 @@ set -o pipefail
 set -u
 
 project_name='LuxMark v3.1'
-required_file='/bin/luxmark'
+required_file='/opt/luxmark/luxmark'
 
 script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
@@ -91,6 +91,7 @@ _set_env () {
 	local machine="$(uname -m)"
 
 	export PATH="${install_dir}/bin:${PATH:-}"
+	export PATH="${install_dir}/opt/luxmark:${PATH:-}"
 
 	export LIBRARY_PATH="${install_dir}/lib/${machine}-linux-gnu:${LIBRARY_PATH:-}"
 	export LIBRARY_PATH="${install_dir}/lib:${LIBRARY_PATH:-}"
@@ -561,14 +562,6 @@ _build_luxmark () {
 
 	mkdir -pv "${install_dir}/opt/luxmark"
 	cp -av 'build/bin/luxmark' "${install_dir}/opt/luxmark/luxmark"
-
-	cat > "${install_dir}/bin/luxmark" <<\EOF
-#! /usr/bin/env bash
-script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-cd "${script_dir}/../opt/luxmark"
-./luxmark "${@}"
-EOF
-	chmod +x "${install_dir}/bin/luxmark"
 }
 
 _build_scenes () {
@@ -721,6 +714,8 @@ _run () {
 	then
 		"${install_dir}${required_file}"
 	fi
+
+	cd "${install_dir}/opt/luxmark"
 	
 	"${@}"
 
