@@ -535,7 +535,6 @@ _build_luxcore () {
 	# It is known to build with GCC10,
 	# but we built GCC7 anyway.
 	_cmake_setup \
-		-D'CMAKE_BUILD_TYPE'='Debug' \
 		-D'CMAKE_CXX_COMPILER'="${install_dir}/bin/g++-7"
 
 	_cmake_target
