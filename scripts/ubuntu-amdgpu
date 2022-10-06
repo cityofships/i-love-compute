@@ -128,6 +128,7 @@ _checksum () {
 				fi
 
 				false
+				return
 			done
 
 			return
