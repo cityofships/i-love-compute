@@ -86,9 +86,9 @@ It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (Ter
 - The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
 - The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
 
-This script is known to work on Ubuntu 20.04 LTS and Ubuntu 21.10. Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+This script is known to work on Ubuntu 22.04 LTS.
 
-Ubuntu 22.04 LTS isn't supported. The amdgpu library shipped with Orca packages will not be compatible with graphic drivers and will left the computer without working desktop. Clover packages installed with this script will probably not work with Ubuntu 22.04 LTS as required dependencies would not be available in repositories. It may be possible to install a 20.04 LTS chroot and use this script to install OpenCL drivers in the chroot and run applications in the chroot.
+Note: Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942). This script installs older clover packages that are known to work but may not support newer cards.
 
 
 ### [`user-clvk`](scripts/user-clvk)
