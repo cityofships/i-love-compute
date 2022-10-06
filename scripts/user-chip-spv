@@ -1,0 +1,152 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2022 Thomas “illwieckz“ Debesse
+
+# You may need to install:
+# build-essential ocl-icd-libopencl1 cmake git pkg-config libclang-12-dev clang-12 llvm-12 make ninja-build ocl-icd-libopencl1 ocl-icd-dev ocl-icd-opencl-dev libhwloc-dev zlib1g zlib1g-dev clinfo dialog apt-utils
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+. "${script_dir}/include.common.sh"
+
+project_name='CHIP-SPV'
+required_file='/lib/libCHIP.so'
+help_preset='basic_platform'
+build_preset='basic_project'
+has_llvm='true'
+
+packages=(
+	# package name
+	#	directory name
+	#	repository url
+	#	branch name
+	#	build slug
+	'LLVM project'
+		'llvm-project'
+		'https://github.com/llvm/llvm-project.git'
+		'release/15.x'
+		'-'
+	'LLVM'
+		'llvm-project/llvm'
+		'-'
+		'-'
+		'llvm'
+	'Clang'
+		'llvm-project/clang'
+		'-'
+		'-'
+		'clang'
+	'SPIRV Headers'
+		'SPIRV-Headers'
+		'https://github.com/KhronosGroup/SPIRV-Headers.git'
+		'-'
+		'generic_none'
+	'SPIRV LLVM Translator'
+		'SPIRV-LLVM-Translator'
+		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
+		'llvm_release_150'
+		'generic_none'
+	'CHIP-SPV'
+		'chip-spv'
+		'https://github.com/CHIP-SPV/chip-spv.git'
+		'-'
+		'chip_spv'
+)
+
+_build_llvm () {
+	local llvm_spirv_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator"
+	if ! [ -e "${llvm_spirv_embedded_folder}" ]
+	then
+		ln -s "${workspace_dir}/SPIRV-LLVM-Translator" \
+			"${llvm_spirv_embedded_folder}"
+	fi
+
+	local spirv_headers_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers"
+	if ! [ -e "${spirv_headers_embedded_folder}" ]
+	then
+		ln -s "${workspace_dir}/SPIRV-Headers" \
+			"${spirv_headers_embedded_folder}"
+	fi
+
+	# Use -D'LLVM_ENABLE_PROJECTS'='clang' or:
+	# The dependency target "clang" of target "check-all" does not exist
+	# The dependency target "clang" of target "check-llvm-spirv" does not exist.
+
+	# Explicit build type is now mandatory,
+	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
+	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
+	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
+	_cmake_setup \
+		-D'LLVM_ENABLE_PROJECTS'='clang' \
+		-D'LLVM_ENABLE_ASSERTIONS'='OFF' \
+		-D'LLVM_ENABLE_RTTI'='ON' \
+		-D'LLVM_BUILD_TESTS'='OFF' \
+		-D'LLVM_BUILD_TOOLS'='ON' \
+		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
+
+	_cmake_compile_install
+}
+
+_build_clang () {
+	# Explicit build type is now mandatory,
+	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
+	# It is currently built only for building llvm-spirv.
+	_cmake_setup \
+		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
+		-D'LLVM_ENABLE_RTTI'='ON'
+
+	_cmake_compile_install
+}
+
+_build_chip_spv () {
+<<\EOF
+CMake Error at cmake/FindLLVM.cmake:72 (message):
+  Can't find llvm-config at /usr/bin.  Please provide CMake argument
+  -DLLVM_CONFIG=<path/to/llvm-config>
+Call Stack (most recent call first):
+  CMakeLists.txt:48 (include)
+
+CMake Error at cmake/FindLLVM.cmake:94 (message):
+  Can't find llvm-link at /usr/bin.  Please install it into that directory
+Call Stack (most recent call first):
+  CMakeLists.txt:48 (include)
+
+CMake Error at cmake/FindLLVM.cmake:105 (message):
+  Can't find llvm-spirv at /usr/bin.  Please install it into that directory,
+  or provide explicit path with -DLLVM_SPIRV_BINARY=
+Call Stack (most recent call first):
+  CMakeLists.txt:48 (include)
+
+CMake Error at cmake/FindLLVM.cmake:114 (message):
+  Can't find clang-offload-bundler at /usr/bin.  Please install it into that
+  directory
+Call Stack (most recent call first):
+  CMakeLists.txt:48 (include)
+EOF
+
+<<\EOF
+CMake Error at cmake_install.cmake:119 (file):
+  file cannot create directory: /usr/local/lib/cmake/hip.  Maybe need
+  administrative privileges.
+EOF
+
+	_cmake_setup \
+		-D'CMAKE_C_COMPILER'='clang' \
+		-D'CMAKE_CXX_COMPILER'='clang++' \
+		-D'LLVM_CONFIG'="$(command -v 'llvm-config')" \
+		-D'LLVM_LINK'="$(command -v 'llvm-link')" \
+		-D'LLVM_SPIRV'="$(command -v 'llvm-spirv')" \
+		-D'CLANG_OFFLOAD_BUNDLER'="$(command -v 'clang-offload-bundler')"
+
+	_cmake_compile_install
+}
+
+_help_custom_run () {
+	cat <<-EOF
+
+	${tab}${script_name} run hipconfig
+	EOF
+}
+
+_spawn "${@}"
