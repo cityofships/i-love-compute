@@ -30,6 +30,8 @@ tarball_repo='https://drivers.amd.com/drivers/linux'
 amdgpupro_libopencl_package_name='ocl-icd-libopencl1-amdgpu-pro'
 
 clover_deb_url_list='
+http://archive.ubuntu.com/ubuntu/pool/main/l/llvm-toolchain-9/libllvm9_9.0.1-12_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/universe/l/llvm-toolchain-9/libclang-common-9-dev_9.0.1-12_amd64.deb
 http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-dev_0.2.0+git20190827-4_all.deb
 http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-amdgcn_0.2.0+git20190827-4_all.deb
 http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-r600_0.2.0+git20190827-4_all.deb
@@ -37,6 +39,8 @@ http://archive.ubuntu.com/ubuntu/pool/universe/m/mesa/mesa-opencl-icd_20.0.4-2ub
 '
 
 clover_deb_sum_list='
+48bd8b89c9ca18b9360dbc04a65fea3d37b97664b4fc39202ff9006105f218dbab7fd7ce80c897e22c0e7b5e338317a361b54b726059ab74e6780e88c197b689  libllvm9_9.0.1-12_amd64.deb
+18f5008921e7b1f52e0d91b07e170b22fca1a34899fc1d4d6e6ff8ed8f93137d88dc0aecc7631aac381e9e84f2c9bf54b2f0bdfa306d10d61f1380f42e53660f  libclang-common-9-dev_9.0.1-12_amd64.deb
 800186922168ff3563a875adcd3f8084749858d64f37ffd044fbfa9f0625d466552afdbd1469f00ee6feb93b6bd33dae377c043df43d02678ae8c643f09560c5  libclc-dev_0.2.0+git20190827-4_all.deb
 dc1510a5dd0cfbec431d046527dd11bcfc84c82a3fdd6d649781afb93a2af3a9dc28551a29024a5c7ae55b3457bd067481db3826cc0c931cd7f82881542d50d2  libclc-amdgcn_0.2.0+git20190827-4_all.deb
 5680efd08badbbda9c7bd252890dd107fd4bf3399d0c73b5c685abd755419088a5c32d42ac419dd21f33968258937880782c1ae4129b9411b12aac9d531f85bc  libclc-r600_0.2.0+git20190827-4_all.deb
