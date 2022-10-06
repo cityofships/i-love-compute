@@ -47,11 +47,6 @@ packages=(
 		'https://github.com/mesonbuild/meson.git'
 		'-'
 		'generic_python'
-	'Mold'
-		'mold'
-		'https://github.com/rui314/mold.git'
-		'-'
-		'mold'
 	'LLVM project'
 		'llvm-project'
 		'https://github.com/llvm/llvm-project.git'
@@ -321,15 +316,6 @@ _build_generic_meson () {
 	_meson_setup
 
 	_meson_compile_install
-}
-
-_build_mold ()  {
-	local self_mold='1'
-
-	if do_pull
-	then
-		_build_generic_cmake
-	fi
 }
 
 _build_llvm () {
