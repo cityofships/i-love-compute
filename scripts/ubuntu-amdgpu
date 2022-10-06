@@ -316,7 +316,7 @@ _purge () {
 			do
 				clover_package_name="$(echo "${clover_deb_file}" | cut -f1 -d'_' )"
 
-				apt-mark unhold "${clover_package_name}"
+				apt-mark unhold "${clover_package_name}" || true
 
 				dpkg --purge "${clover_package_name}"
 			done
