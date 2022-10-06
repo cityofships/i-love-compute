@@ -47,11 +47,11 @@ dc1510a5dd0cfbec431d046527dd11bcfc84c82a3fdd6d649781afb93a2af3a9dc28551a29024a5c
 f276430f9f1d70d75692857dc7aa79365d6ef5dc1fd4ad816319e6f375e86f8eb29f49288d4f51d54da0f276712195fc217957c0e742696b338b91959bcd2e6e  mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
 '
 
-stream_tarball_file="radeon-crimson-15.12-15.302-151217a-297685e.zip"
-stream_tarball_sum='1658c3109e9dca2a1f0bd972e9042e7ccf17742e9c6110f04151334f342eb53d5a736b9cb63358a26d97562f1efb9e36c281bca85664e06f0cd11c275972f3af'
-stream_tarball_dir='fglrx-15.302'
-stream_script_file='amd-driver-installer-15.302-x86.x86_64.run'
-stream_install_dir='/opt/amd-stream'
+fglrx_tarball_file="radeon-crimson-15.12-15.302-151217a-297685e.zip"
+fglrx_tarball_sum='1658c3109e9dca2a1f0bd972e9042e7ccf17742e9c6110f04151334f342eb53d5a736b9cb63358a26d97562f1efb9e36c281bca85664e06f0cd11c275972f3af'
+fglrx_tarball_dir='fglrx-15.302'
+fglrx_script_file='amd-driver-installer-15.302-x86.x86_64.run'
+fglrx_install_dir='/opt/amd-fglrx'
 
 orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
 orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
@@ -81,7 +81,7 @@ _error () {
 }
 
 is_clover='false'
-is_stream='false'
+is_fglrx='false'
 is_orca='false'
 is_pal='false'
 is_rocm='false'
@@ -91,8 +91,8 @@ _is () {
 		'clover')
 			"${is_clover}"
 			;;
-		'stream')
-			"${is_stream}"
+		'fglrx')
+			"${is_fglrx}"
 			;;
 		'orca')
 			"${is_orca}"
@@ -133,9 +133,9 @@ _checksum () {
 
 			return
 			;;
-		'stream')
-			sum="${stream_tarball_sum}"
-			file="${stream_tarball_file}"
+		'fglrx')
+			sum="${fglrx_tarball_sum}"
+			file="${fglrx_tarball_file}"
 			;;
 		'amdgpupro')
 			sum="${amdgpupro_deb_sum}"
@@ -193,17 +193,17 @@ _download () {
 		fi
 	fi
 
-	if _is stream
+	if _is fglrx
 	then
-		if ! _checksum 'stream'
+		if ! _checksum 'fglrx'
 		then
-			echo "Download ${stream_tarball_file}."
+			echo "Download ${fglrx_tarball_file}."
 
 			wget --continue \
 				--header="Referer: ${tarball_referer}" \
-				"${tarball_repo}/${stream_tarball_file}"
+				"${tarball_repo}/${fglrx_tarball_file}"
 
-			_checksum 'stream'
+			_checksum 'fglrx'
 		fi
 	fi
 
@@ -253,13 +253,13 @@ _extract () {
 
 	_download
 
-	if _is stream
+	if _is fglrx
 	then
-		if ! [ -d "${stream_tarball_dir}" ]
+		if ! [ -d "${fglrx_tarball_dir}" ]
 		then
-			echo "Extract ${stream_tarball_file}."
+			echo "Extract ${fglrx_tarball_file}."
 
-			unzip "${stream_tarball_file}"
+			unzip "${fglrx_tarball_file}"
 		fi
 	fi
 
@@ -289,8 +289,8 @@ _clean () {
 
 	if [ -d "${workspace_dir}" ]
 	then
-		rm --force --verbose "${workspace_dir}/${stream_tarball_file}"
-		rm --force --recursive --verbose "${workspace_dir}/${stream_tarball_dir}"
+		rm --force --verbose "${workspace_dir}/${fglrx_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${fglrx_tarball_dir}"
 
 		rm --force --verbose "${workspace_dir}/${orca_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${orca_tarball_dir}"
@@ -322,28 +322,28 @@ _purge () {
 				dpkg --purge "${clover_package_name}"
 			done
 			;;
-		'stream')
+		'fglrx')
 			rm --force --verbose \
-				"${stream_install_dir}/x86_64-linux-gnu/libamdocl64-stream.so"
+				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
 			rm --force --verbose \
-				"${stream_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+				"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
 
-			if [ -d "${stream_install_dir}/x86_64-linux-gnu" ]
+			if [ -d "${fglrx_install_dir}/x86_64-linux-gnu" ]
 			then
 				rmdir --ignore-fail-on-non-empty --verbose \
-					"${stream_install_dir}/x86_64-linux-gnu"
+					"${fglrx_install_dir}/x86_64-linux-gnu"
 			fi
 
-			if [ -d "${stream_install_dir}" ]
+			if [ -d "${fglrx_install_dir}" ]
 			then
 				rmdir --ignore-fail-on-non-empty --verbose \
-					"${stream_install_dir}"
+					"${fglrx_install_dir}"
 			fi
 
 			rm --force --verbose \
-				'/etc/ld.so.conf.d/30-amd-stream.conf'
+				'/etc/ld.so.conf.d/30-amd-fglrx.conf'
 			rm --force --verbose \
-				'/etc/OpenCL/vendors/amdocl-stream64.icd'
+				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 			;;
 		'orca')
 			for orca_deb_file in \
@@ -377,7 +377,7 @@ _purge () {
 _uninstall () {
 	_purge clover
 	_purge orca
-	_purge stream
+	_purge fglrx
 	_purge pal
 	_purge rocm
 
@@ -441,35 +441,35 @@ _install () {
 		done
 	fi
 
-	if _is stream
+	if _is fglrx
 	then
-		_purge stream
+		_purge fglrx
 
-		local stream_extract_prefix="${stream_tarball_dir}/prefix"
+		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
 
-		if ! [ -d "${stream_extract_prefix}" ]
+		if ! [ -d "${fglrx_extract_prefix}" ]
 		then
-			"${stream_tarball_dir}/${stream_script_file}" --extract "${stream_extract_prefix}"
+			"${fglrx_tarball_dir}/${fglrx_script_file}" --extract "${fglrx_extract_prefix}"
 		fi
 
-		mkdir --parents --verbose "${stream_install_dir}"
-		mkdir --parents --verbose "${stream_install_dir}/x86_64-linux-gnu"
+		mkdir --parents --verbose "${fglrx_install_dir}"
+		mkdir --parents --verbose "${fglrx_install_dir}/x86_64-linux-gnu"
 
 		cp --archive --verbose \
-			"${stream_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
-			"${stream_install_dir}/x86_64-linux-gnu/libamdocl64-stream.so"
+			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
+			"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
 
 		cp --archive --verbose \
-			"${stream_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
-			"${stream_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
+			"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
 
 		sed -e 's/libamdocl12cl64.so/libfglocl12cl64.so/g' \
-			-i "${stream_install_dir}/x86_64-linux-gnu/libamdocl64-stream.so"
+			-i "${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
 
-		echo 'libamdocl64-stream.so' > '/etc/OpenCL/vendors/amdocl-stream64.icd'
+		echo 'libamdocl64-fglrx.so' > '/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 
-		echo "${stream_install_dir}/x86_64-linux-gnu" \
-			> '/etc/ld.so.conf.d/30-amd-stream.conf'
+		echo "${fglrx_install_dir}/x86_64-linux-gnu" \
+			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
 	if _is orca
@@ -583,8 +583,8 @@ _help () {
 	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
 	${tab}clover (default)
 	${tab}${tab}Mesa Clover for Terascale2-3 and GCN+ GPUs.
-	${tab}stream
-	${tab}${tab}AMD APP Stream from Radeon Crimson for CPUs.
+	${tab}fglrx
+	${tab}${tab}AMD APP fglrx from Radeon Crimson for CPUs.
 	${tab}orca
 	${tab}${tab}AMD APP Orca from AMDGPU-PRO for GCN1-3 GPUs.
 	${tab}pal
@@ -595,7 +595,7 @@ _help () {
 	Examples:
 	${tab}${script_name} install all
 
-	${tab}${script_name} install stream orca pal
+	${tab}${script_name} install fglrx orca pal
 
 	${tab}${script_name} uninstall
 
@@ -635,7 +635,7 @@ case "${action}" in
 			case "${1}" in
 				'all')
 					is_clover='true'
-					is_stream='true'
+					is_fglrx='true'
 					is_orca='true'
 					is_pal='true'
 					is_rocm='true'
@@ -643,8 +643,8 @@ case "${action}" in
 				'clover')
 					is_clover='true'
 					;;
-				'stream')
-					is_stream='true'
+				'fglrx')
+					is_fglrx='true'
 					;;
 				'orca')
 					is_orca='true'
