@@ -428,4 +428,4 @@ Create issues, make pull requests, contact _Thomas Debesse_ `<dev (ad) illwieckz
 
 You can also donate hardware, see [Hardware donations](#hardware-donations).
 
-Content must be submitted under MIT or CC 0 1.0 license.
+Contributions must be submitted under MIT or CC 0 1.0 license.
