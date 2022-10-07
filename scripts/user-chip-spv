@@ -14,7 +14,8 @@ project_name='CHIP-SPV'
 required_file='/lib/libCHIP.so'
 help_preset='basic_platform'
 build_preset='basic_project'
-has_llvm='true'
+provides_hip='true'
+builds_llvm='true'
 
 packages=(
 	# package name
@@ -140,13 +141,6 @@ EOF
 		-D'CLANG_OFFLOAD_BUNDLER'="$(command -v 'clang-offload-bundler')"
 
 	_cmake_compile_install
-}
-
-_help_custom_run () {
-	cat <<-EOF
-
-	${tab}${script_name} run hipconfig
-	EOF
 }
 
 _spawn "${@}"

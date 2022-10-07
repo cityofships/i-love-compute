@@ -14,9 +14,11 @@ project_name='Mesa'
 required_file='/etc/OpenCL/vendors/mesa.icd'
 help_preset='featured_platform'
 build_preset='featured_project'
-provides_vulkan='true'
 provides_opencl='true'
-has_llvm='true'
+provides_vulkan='true'
+provides_opengl='true'
+provides_egl='true'
+builds_llvm='true'
 
 known_feature_list='opencl,rusticl,vulkan,opengl,gles,nine,va,vdpau,xa,xvmc,egl'
 default_feature_list='opencl,rusticl,vulkan'
@@ -342,19 +344,12 @@ _build_mesa () {
 
 _help_custom_build() {
 	cat <<-EOF
-	${tab}${script_name} build --enable=opengl,nine,va
+	${tab}${script_name} build --enable='opengl,nine'
 	EOF
 }
 
 _help_custom_run () {
 	cat <<-EOF
-
-	${tab}${script_name} run clinfo --list
-
-	${tab}${script_name} run vulkaninfo --summary
-
-	${tab}${script_name} run glxinfo -B
-
 	${tab}LP_CL=1 RUSTICL_DEVICE_TYPE=gpu ${script_name} run clinfo --list
 
 	${tab}AMD_VULKAN_ICD=RADV ${script_name} run vulkaninfo --summary

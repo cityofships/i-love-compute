@@ -38,8 +38,6 @@ _build_clvk () {
 
 _help_custom_run () {
 	cat <<-EOF
-	${tab}${script_name} run clinfo --list
-
 	${tab}AMD_VULKAN_ICD=AMDVLK ${script_name} run clinfo --list
 
 	${tab}AMD_VULKAN_ICD=RADV ${script_name} run clinfo --list

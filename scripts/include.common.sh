@@ -6,11 +6,14 @@ workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
 install_dir="${workspace_dir}/install"
 
-usable_job_count='1'
+provides_hip='false'
 provides_opencl='false'
 provides_vulkan='false'
-has_llvm='false'
+provides_opengl='false'
+provides_egl='false'
+builds_llvm='false'
 
+usable_job_count='1'
 do_pull='true'
 
 tab=$'\t'
@@ -248,7 +251,7 @@ _get_llvm_job_count () {
 	local do_force="${1}"; shift
 	local llvm_job_count="${1}"; shift
 	
-	if ! "${has_llvm}"
+	if ! "${builds_llvm}"
 	then
 		echo "${llvm_job_count}"
 		return
@@ -680,6 +683,12 @@ _help_custom_run () {
 	true
 }
 
+_help_common_application_run () {
+	cat <<-EOF
+	${tab}${script_name} run
+	EOF
+}
+
 _help_basic_application () {
 	uniq <<-EOF
 	${script_name}: Download and build ${project_name}.
@@ -718,7 +727,7 @@ _help_basic_application () {
 
 	$(_help_custom_build)
 
-	${tab}${script_name} run
+	$(_help_common_application_run)
 
 	$(_help_custom_run)
 
@@ -727,6 +736,56 @@ _help_basic_application () {
 	_mention
 
 	exit
+}
+
+_help_common_platform_run () {
+	# Always add an empty line after default options
+
+	if "${provides_opencl}"
+	then
+		cat <<-EOF
+		${tab}${script_name} run clinfo --list
+
+		EOF
+	fi
+
+	if "${provides_hip}"
+	then
+		cat <<-EOF
+		${tab}${script_name} run hipconfig
+
+		EOF
+	fi
+
+	if "${provides_vulkan}"
+	then
+		cat <<-EOF
+		${tab}${script_name} run vulkaninfo --summary
+
+		${tab}${script_name} run vkcube
+
+		EOF
+	fi
+
+	if "${provides_opengl}"
+	then
+		cat <<-EOF
+		${tab}${script_name} run glxinfo -B
+
+		${tab}${script_name} run glxgears
+
+		${tab}${script_name} run glxheads
+
+		EOF
+	fi
+
+	if "${provides_egl}"
+	then
+		cat <<-EOF
+		${tab}${script_name} run eglinfo
+
+		EOF
+	fi
 }
 
 _help_basic_platform () {
@@ -766,6 +825,8 @@ _help_basic_platform () {
 	${tab}${script_name} build
 
 	$(_help_custom_build)
+
+	$(_help_common_platform_run)
 
 	$(_help_custom_run)
 
@@ -825,6 +886,8 @@ _help_featured_platform () {
 	${tab}${script_name} build
 
 	$(_help_custom_build)
+
+	$(_help_common_platform_run)
 
 	$(_help_custom_run)
 

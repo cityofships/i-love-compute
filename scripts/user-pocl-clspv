@@ -52,10 +52,4 @@ _build_pocl () {
 	_cmake_compile_install
 }
 
-_help_custom_run () {
-	cat <<-EOF
-	${tab}${script_name} run clinfo --list
-	EOF
-}
-
 _spawn "${@}"

@@ -29,10 +29,4 @@ packages=(
 		'generic_cmake'
 )
 
-_help_custom_run () {
-	cat <<-EOF
-	${tab}${script_name} run clinfo --list
-	EOF
-}
-
 _spawn "${@}"
