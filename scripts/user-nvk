@@ -10,7 +10,7 @@ script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
 
 . "${script_dir}/include.common.sh"
 
-project_name='Mesa'
+project_name='NVK'
 required_file='/lib/x86_64-linux-gnu/libvulkan_nouveau.so'
 help_preset='basic_platform'
 build_preset='basic_project'
@@ -22,7 +22,7 @@ packages=(
 	#	repository url
 	#	branch name
 	#	build slug
-	'Nvk'
+	'NVK'
 		'mesa'
 		'https://gitlab.freedesktop.org/nouveau/mesa.git'
 		'nvk/main'
