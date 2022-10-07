@@ -96,7 +96,7 @@ Note: Official Ubuntu Clover packages may be usable with radeonsi as long as `-c
 
 A script to download, build Mesa (and its dependencies including LLVM) and run software using OpenCL or Vulkan.
 
-- The user can download, build and install Mesa Clover and Vulkan by doing `./user-mesa build`.
+- The user can download, build and install Mesa by doing `./user-mesa build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
 - The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
@@ -107,7 +107,11 @@ A script to download, build Mesa (and its dependencies including LLVM) and run s
 
 A script to download, build Mesa nvk and run software using Vulkan.
 
-This is a variant of `user-mesa` building the experimental out-of-tree nvk vulkan driver.
+This is a variant of the `user-mesa` script building the experimental out-of-tree nvk vulkan driver.
+
+- The user can download, build and install nvk by doing `./user-nvk build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-nvk run [COMMAND]`.
 
 
 ### [`user-clvk`](scripts/user-clvk)
@@ -133,12 +137,20 @@ A script to download, build and run PoCL (Portable Computing Language) and run s
 
 This is a variant of `user-pocl` building the experimental vulkan backend using clspv.
 
+- The user can download build and install PoCL by doing `./user-pocl-spv build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built PoCL by doing `./user-pocl-spv run [COMMAND]`.
+
 
 ### [`user-chip-spv`](scripts/user-chip-spv)
 
 A script to download, build and run CHIP-SPV (a platform to run HIP over OpenCL) and run software using it.
 
 CHIP-SPV is an integration of HIPCL and HIPLZ supporting OpenCL and Level Zero backends.
+
+- The user can download build and instal CHIP-SPV by doing `./user-chip-spv build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built CHIP-SPV by doing `./user-chip-spv run [COMMAND]`.
 
 
 ### [`user-amdoclfix`](scripts/user-amdoclfix)
