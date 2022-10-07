@@ -98,20 +98,20 @@ A script to download, build Mesa (and its dependencies including LLVM) and run s
 
 - The user can download, build and install Mesa by doing `./user-mesa build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
+- The user can run `COMMAND` with Mesa by doing `./user-mesa run [COMMAND]`.
 - The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
 
 
 ### [`user-nvk`](scripts/user-nvk)
 
-A script to download, build Mesa nvk and run software using Vulkan.
+A script to download, build Mesa NVK and run software using Vulkan.
 
 This is a variant of the `user-mesa` script building the experimental out-of-tree nvk vulkan driver.
 
-- The user can download, build and install nvk by doing `./user-nvk build`.
+- The user can download, build and install NVK by doing `./user-nvk build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-nvk run [COMMAND]`.
+- The user can run `COMMAND` with built NVK by doing `./user-nvk run [COMMAND]`.
 
 
 ### [`user-clvk`](scripts/user-clvk)
