@@ -14,6 +14,7 @@ project_name='Mesa'
 required_file='/etc/OpenCL/vendors/mesa.icd'
 help_preset='featured_platform'
 build_preset='featured_project'
+provides_vulkan='true'
 provides_opencl='true'
 has_llvm='true'
 
@@ -184,7 +185,12 @@ _build_mesa () {
 	local mesa_gallium_xvmc='disabled'
 	local mesa_opencl_spirv='false'
 	local mesa_gallium_drivers=''
+	local mesa_vulkan_beta='false'
 	local mesa_vulkan_drivers=''
+	local mesa_vulkan_rt_drivers=''
+	local mesa_intel_clc='disabled'
+	local mesa_llvm='disabled'
+	local mesa_shared_llvm='disabled'
 
 	# Used by opengl, gles, and nine.
 	local gallium_graphics_drivers='swrast,radeonsi,r300,r600,nouveau,i915,iris,zink,crocus'
@@ -195,6 +201,10 @@ _build_mesa () {
 	local gallium_rusticl_drivers='swrast,radeonsi,nouveau,iris'
 
 	local vulkan_drivers='swrast,amd,intel,intel_hasvk'
+
+	# radv, radeonsi, opencl, clc
+	mesa_llvm='enabled'
+	mesa_shared_llvm='enabled'
 
 	if "${feature_opencl}"
 	then
@@ -214,7 +224,10 @@ _build_mesa () {
 	then
 		# swrast vulkan requires swrast gallium
 		mesa_gallium_drivers+=",${gallium_vulkan_drivers}"
+		# mesa_vulkan_beta='true'
 		mesa_vulkan_drivers="${vulkan_drivers}"
+		mesa_vulkan_rt_drivers='auto'
+		mesa_intel_clc='enabled'
 	fi
 
 	if "${feature_opengl}"
@@ -281,16 +294,16 @@ _build_mesa () {
 	export CXXFLAGS+=" -ludev"
 	export LDFLAGS+=" -ludev"
 
-	set -x
+	# Clover requires LLVM RTTI to be enabled.
+
+	# rusticl requires shader-cache to be enabled.
+
 	# See also:
 	#  gallium-drivers: virgl
 	#  vulkan-drivers: virtio-experimental
-	#  vulkan-beta (Vulkan beta extensions)
-	#  intel-clc (Intel ray queries)
 	#  egl-native-platform
 	#  static-libclc
 	#  shader-cache
-	# Clover requires RTTI to be enabled.
 	_meson_setup \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
@@ -315,10 +328,14 @@ _build_mesa () {
 		-D'gles1'="${mesa_gles1}" \
 		-D'gles2'="${mesa_gles2}" \
 		-D'vulkan-drivers'="${mesa_vulkan_drivers}" \
+		-D'vulkan-rt-drivers'="${mesa_vulkan_rt_drivers}" \
+		-D'vulkan-beta'="${mesa_vulkan_beta}" \
+		-D'intel-clc'="${mesa_intel_clc}" \
+		-D'shader-cache'='true' \
 		-D'platforms'='auto' \
-		-D'llvm'='enabled' \
-		-D'lmsensors'='disabled' \
-		-D'shared-llvm'='enabled'
+		-D'llvm'="${mesa_llvm}" \
+		-D'shared-llvm'="${mesa_shared_llvm}" \
+		-D'lmsensors'='disabled'
 
 	_meson_compile_install
 }
