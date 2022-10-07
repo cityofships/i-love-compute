@@ -13,7 +13,6 @@ Tasks being worked on:
 - Help to make possible to install multiple OpenCL frameworks and multiple version of OpenCL frameworks when possible,
 - Gather generic knowldege about compute solutions.
 
-
 Postponed tasks:
 
 - Provide compatibility matrix for pieces of software and OpenCL frameworks,
@@ -76,6 +75,8 @@ The user can do combinations: `./user-mesa run ./user-clvk run clinfo --list` to
 
 The scripts do some download, build and other operations in a `workspace` folder next to where the script file is stored.
 
+The `user-` scripts are no longer standalone and now share common parts externalized as a library, they must be executed from within this repository to load the library and be working.
+
 
 ### [`ubuntu-amdgpu`](scripts/ubuntu-amdgpu)
 
@@ -91,23 +92,30 @@ This script is known to work on Ubuntu 22.04 LTS.
 Note: Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942). This script installs older clover packages that are known to work but may not support newer cards.
 
 
-### [`user-clvk`](scripts/user-clvk)
-A script to download, build clvk and run software using clvk.
-
-- The user can download, build and install clvk by doing `./user-clvk build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
-- The user can run `COMMAND` with built clvk by doing `./user-clvk run [COMMAND]`.
-
-
 ### [`user-mesa`](scripts/user-mesa)
 
-A script to download, build Mesa (and its dependencies including LLVM) and run software using Clover OpenCL or Vulkan.
+A script to download, build Mesa (and its dependencies including LLVM) and run software using OpenCL or Vulkan.
 
 - The user can download, build and install Mesa Clover and Vulkan by doing `./user-mesa build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built Mesa Clover or Vulkan by doing `./user-mesa run [COMMAND]`.
 - The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
+
+
+### [`user-nvk`](scripts/user-nvk)
+
+A script to download, build Mesa nvk and run software using Vulkan.
+
+This is a variant of `user-mesa` building the experimental out-of-tree nvk vulkan driver.
+
+
+### [`user-clvk`](scripts/user-clvk)
+A script to download, build clvk and run software using clvk.
+
+- The user can download, build and install clvk by doing `./user-clvk build`.
+- The installation is done in user workspace and provided software is not made available in default environment.
+- The user can run `COMMAND` with built clvk by doing `./user-clvk run [COMMAND]`.
 
 
 ### [`user-pocl`](scripts/user-pocl)
@@ -117,6 +125,20 @@ A script to download, build and run PoCL (Portable Computing Language) and run s
 - The user can download build and install PoCL by doing `./user-pocl build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`.
+
+
+### [`user-pocl-clspv`](scripts/user-pocl-clspv)
+
+A script to download, build and run PoCL (Portable Computing Language) and run software using it.
+
+This is a variant of `user-pocl` building the experimental vulkan backend using clspv.
+
+
+### [`user-chip-spv`](scripts/user-chip-spv)
+
+A script to download, build and run CHIP-SPV (a platform to run HIP over OpenCL) and run software using it.
+
+CHIP-SPV is an integration of HIPCL and HIPLZ supporting OpenCL and Level Zero backends.
 
 
 ### [`user-amdoclfix`](scripts/user-amdoclfix)
@@ -203,9 +225,9 @@ Benchmarks currently providing OpenCL support:
 - *[uCLbench](https://opencl.org/coding/tools/uclbench/)*,
 - *[Scalable HeterOgeneous Computing (SHOC)](https://github.com/vetter/shoc)*,
 - *[Parboil benchmarks](http://impact.crhc.illinois.edu/Parboil/parboil.aspx)*,
-- *[OpenCL Toys](http://davibu.interfree.it/index.html)*, including *MandelGPU*, *MandelbulbGPU*, *SmallptGPU*, *SmallptGPU2*, *JuliaGPU*, and *SmallLuxGPU*.
+- *[OpenCL Toys](http://davibu.interfree.it/index.html)*, including *MandelGPU*, *MandelbulbGPU*, *SmallptGPU*, *SmallptGPU2*, *JuliaGPU*, and *SmallLuxGPU* (prefer LuxMark instead of SmallLuxGPU).
 
-The Phoronix Test Suite also provides multiple ready-to-use [OpenCL Benchmarks](https://openbenchmarking.org/suite/pts/opencl) including LuxMark, JuliaGPU, MandelGPU, SmallptGPU, SHOC, Paroboil, Rodinia, etc.
+The Phoronix Test Suite also provides multiple ready-to-use [OpenCL Benchmarks](https://openbenchmarking.org/suite/pts/opencl) including LuxMark, JuliaGPU, MandelGPU, SmallptGPU, SHOC, Parboil, Rodinia, etc.
 
 
 ### AMD quirks
