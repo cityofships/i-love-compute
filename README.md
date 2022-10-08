@@ -19,7 +19,7 @@ Postponed tasks:
 - Provide compatibility matrix for pieces of hardware and OpenCL frameworks,
 - Provide performance matrix for pieces of software and OpenCL frameworks.
 
-Knowledge about Vulkan compute or legacy shader-based compute is welcome, same for knowledge about other operating systems like BSD ones, Haiku and others.
+Knowledge about HIP, HSA, SyCL, Level Zero, oneAPI, Vulkan compute or OpenGL compute shaders is welcome, same for knowledge about other operating systems like BSD ones, Haiku and others.
 
 
 Funding
@@ -40,12 +40,12 @@ Hardware donation
 
 For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` to know more about the operation. Hardware has to be shipped to France.
 
-Missing:
+Looking for:
 
-- AMD GCN4 (Polaris),
+- AMD discrete RDNA2 (Big Navi), CDNA2,
 - AMD RDNA1 (Navi), CDNA1,
-- AMD RDNA2 (Big Navi), CDNA2,
-- AMD hardware supported by ROCr,
+- AMD GCN4 (Polaris),
+- AMD hardware with supported HIP on ROCm,
 - Via hardware (Chrome 520 and later),
 - Nvidia hardware that is not Tesla or Kepler,
 - Intel hardware that is not Gen7 (Haswell),
@@ -53,17 +53,20 @@ Missing:
 
 Already sourced:
 
-- AMD TeraScale 1 (PCIe, PCI, AGP),
-- AMD TeraScale 2 (PCIe, PCI),
-- AMD TeraScale 3 (PCIe),
-- AMD GCN1 (PCIe),
-- AMD GCN2 (PCIe),
-- AMD GCN3 (integrated),
+- AMD RDNA2 (integrated),
 - AMD GCN5 (integrated),
-- Nvidia Tesla 1.0 (PCI),
-- Nvidia Tesla 2.0 (PCIe),
-- Nvidia Kepler (PCIe),
-- Intel Gen7 (integrated).
+- AMD GCN3 (integrated),
+- AMD GCN2 (discrete: PCIe),
+- AMD GCN1 (discrete: PCIe),
+- AMD TeraScale 3 (discrete: PCIe),
+- AMD TeraScale 2 (discrete: PCIe, PCI),
+- AMD TeraScale 1 (discrete: PCIe, PCI, AGP),
+
+- Intel Gen7 GT2 (integrated).
+
+- Nvidia Kepler (integrated: PCIE; onboard),
+- Nvidia Tesla 2.0 (discrete: PCIe),
+- Nvidia Tesla 1.0 (discrete: PCI),
 
 
 Scripts
@@ -253,8 +256,6 @@ Orca requires an X11 server being up and running.
 
 ### Interesting projects to look at
 
-- [rusticl](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439) is a work-in-progress Mesa project by Karol Herbst for a new OpenCL implementation.
-
 - [CLara](https://gitlab.com/illwieckz/clara) is a project by Björn König for a framework to access OpenCL devies over the network. The project is unfortunately stalled since year 2010 and is still in alpha state. If you're an OpenCL wizard and can see the interest of such project, you're welcome to improve it!
 
 
@@ -263,13 +264,17 @@ Orca requires an X11 server being up and running.
 - Vulkan compatible GPU,
   - clvk, based on Google clspv  
   open, incomplete (verified).
+  - PoCL, based on Google clspv
+  open, incomplete (verified).
 - ATI/AMD GPU,
+  - Mesa Clover, LLVM libclc amdgcn,  
+  open, incomplete, GCN1-5 (verified), RDNA (not verified).
+    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), LuxRender is twice faster on Clover than on Orca, PAL and ROCr. Upstream Clover may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled, see [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947), upstream clover packages may not be usable with r600, see [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).  
   - Mesa Clover, LLVM libclc r600,  
   open, incomplete, TeraScale2-3 (verified).
     * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified).
-  - Mesa Clover, LLVM libclc amdgcn,  
-  open, incomplete, GCN1-5 (verified), RDNA (not verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), LuxRender is twice faster on Clover than on Orca, PAL and ROCr, upstream Clover may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled, see [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947), upstream clover packages may not be usable with r600, see [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+  - Mesa rusticl on radeonsi,  
+  open, work-in-progress.
   - AMDGPU-PRO Orca (legacy),  
   closed, complete, GCN1-3 (verified), probably GCN4 (not verified).
     * Last working version for Orca (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
@@ -277,7 +282,7 @@ Orca requires an X11 server being up and running.
   closed, complete, GCN5 (verified), probably RDNA (not verified).
     * Last version for PAL (`2020-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified), removed in favor of ROCr in Radeon Software AMDGPU-PRO without ROCr being actually an alternative.
   - ROCr,  
-  open, incomplete (not for GUI applications, not verified), few GCN, RDNA, CDNA (not verified), may break the whole system with some hardware (verified), replaced PAL in Radeon Software AMDGPU-PRO without being an alternative, neither in purpose, neither in hardware support, neither in implementation, neither in fulfilment.
+  open, assumed to be complete, few GCN, RDNA, CDNA, may break the whole system with some hardware (verified), replaced PAL in Radeon Software AMDGPU-PRO without being an alternative, neither in purpose, neither in hardware support, neither in implementation, neither in fulfilment.
   - fglrx AMD APP,  
   closed and requires old kernel, complete, old GPUs, the only option for TeraScale,  
   people are still [using it in 2020](https://gitlab.com/illwieckz/i-love-compute/-/issues/1#note_451460689).  
@@ -290,10 +295,16 @@ Orca requires an X11 server being up and running.
   open, early state, not tested.
 - AMD CPU,
   - pocl,  
-  open, not verified.
+  open, verified.
+  - Mesa rusticl on llvmpipe,
+  early state, tested.
   - older AMDGPU-PRO or fglrx,  
   closed, complete, verified.
 - Intel GPU,
+  - Mesa Clover, libclc nouveau.  
+  open, early state, not tested,
+  - Mesa rusticl on iris,  
+  open, early state, work-in-progress, not tested.
   - Intel proprietary legacy SDK (SRB4, SRB4.1),  
   closed, complete, verified.
   - Intel proprietary classic SDK (SRB5),  
@@ -307,6 +318,8 @@ Orca requires an X11 server being up and running.
 - Intel CPU,
   - pocl, not verified,  
   open, untested.
+  - Mesa rusticl on llvmpipe,
+  early state, untested.
   - older AMDGPU-PRO,  
   closed, complete, verified.
   - Intel proprietary legacy SDK,  
@@ -316,6 +329,8 @@ Orca requires an X11 server being up and running.
 - Nvidia GPU,
   - Mesa Clover, libclc nouveau.  
   open, early state, not tested,
+  - Mesa rusticl on nouveau,  
+  open, early state, work-in-progress, not tested.
   - libclc ptx,  
   open requiring closed component, incomplete, not tested.
   - Nvidia,  
@@ -337,8 +352,14 @@ Orca requires an X11 server being up and running.
   - https://libclc.llvm.org
   - https://github.com/llvm/llvm-project/tree/main/libclc
   - https://www.x.org/wiki/RadeonFeature
-- Mesa/rusticl:
-  - https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15439
+- Mesa/rusticl radeonsi tracker:
+  - https://gitlab.freedesktop.org/mesa/mesa/-/issues/7366
+- Mesa/rusticl r600 tracker:
+  - https://gitlab.freedesktop.org/mesa/mesa/-/issues/7420
+- Mesa/rusticl iris tracker:
+  - https://gitlab.freedesktop.org/mesa/mesa/-/issues/6311
+- CHIP-SPV
+  - https://github.com/CHIP-SPV/chip-spv
 - AMD ROCr:
   - https://github.com/RadeonOpenCompute/ROCm
 - AMDGPU-PRO:
