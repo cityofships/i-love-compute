@@ -185,8 +185,9 @@ _download () {
 
 				echo "Download ${clover_package_file}."
 
-				wget --continue \
-					"${clover_deb_url}"
+				rm -f "${clover_package_file}"
+
+				wget "${clover_deb_url}"
 			done
 
 			_checksum 'clover'
@@ -199,8 +200,9 @@ _download () {
 		then
 			echo "Download ${fglrx_tarball_file}."
 
-			wget --continue \
-				--header="Referer: ${tarball_referer}" \
+			rm -f "${fglrx_tarball_file}"
+
+			wget --header="Referer: ${tarball_referer}" \
 				"${tarball_repo}/${fglrx_tarball_file}"
 
 			_checksum 'fglrx'
@@ -212,8 +214,10 @@ _download () {
 		if ! _checksum 'amdgpupro'
 		then
 			echo "Download ${amdgpupro_deb_file}."
-			wget --continue \
-				"${amdgpupro_deb_repo}/${amdgpupro_deb_file}"
+
+			rm -f "${amdgpupro_deb_file}"
+
+			wget "${amdgpupro_deb_repo}/${amdgpupro_deb_file}"
 
 			_checksum 'amdgpupro'
 		fi
@@ -225,8 +229,9 @@ _download () {
 		then
 			echo "Download ${orca_tarball_file}."
 
-			wget --continue \
-				--header="Referer: ${tarball_referer}" \
+			rm -f "${orca_tarball_file}"
+
+			wget --header="Referer: ${tarball_referer}" \
 				"${tarball_repo}/${orca_tarball_file}"
 
 			_checksum 'orca'
@@ -239,8 +244,9 @@ _download () {
 		then
 			echo "Download ${pal_tarball_file}."
 
-			wget --continue \
-				--header="Referer: ${tarball_referer}" \
+			rm -f "${pal_tarball_file}"
+
+			wget --header="Referer: ${tarball_referer}" \
 				"${tarball_repo}/${pal_tarball_file}"
 
 			_checksum 'pal'
