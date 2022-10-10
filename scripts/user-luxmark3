@@ -177,7 +177,7 @@ _build_qt4 () {
 			-opensource \
 			-no-openssl \
 			-no-qt3support \
-			-no-gtkstyle \
+			-gtkstyle \
 			-no-cups \
 			-no-multimedia \
 			-no-audio-backend \
