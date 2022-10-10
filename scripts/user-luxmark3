@@ -186,6 +186,7 @@ _build_qt4 () {
 			-no-javascript-jit \
 			-no-script \
 			-no-scripttools \
+			-system-libpng \
 			-no-svg \
 			-no-gif \
 			-no-libtiff \
@@ -195,7 +196,6 @@ _build_qt4 () {
 			-no-sql-mysql \
 			-no-sql-sqlite \
 			-no-sql-sqlite2 \
-			-system-libpng \
 		|| true
 
 		make -j"${usable_job_count}"
