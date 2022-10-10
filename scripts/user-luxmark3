@@ -32,12 +32,12 @@ packages=(
 	'GCC 7.5.0'
 		'gcc-7.5.0'
 		'https://bigsearcher.com/mirrors/gcc/releases/gcc-7.5.0/gcc-7.5.0.tar.xz'
-		'gcc-7.5.0.tar.xz'
+		'fe716cc19f2e3255d3a8b1b8290777bf769c6d98e6e0b07b81a3d6ad43f8af74cb170dfa18b1555dbfcd3f55ae582b91a286ccef496b9b65c1579902f96a1f60'
 		'gcc7'
 	'Qt 4.8.7'
 		'qt-everywhere-opensource-src-4.8.7'
 		'https://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz'
-		'qt-everywhere-opensource-src-4.8.7.tar.gz'
+		'f9f81a2e7205e1fd05c8d923dc73244f29aa33f951fa6b7c5c8193449328b37084796b9b71ad0c317e4e6fd00017c10ea5d67b1b2032551cde00548522218125'
 		'qt4'
 	'OpenImageIO'
 		'oiio'
@@ -75,7 +75,7 @@ packages=(
 	'scenes'
 		'scenes'
 		'https://github.com/LuxCoreRender/LuxMark/releases/download/luxmark_v3.1/scenes-v3.1.zip'
-		'scenes-v3.1.zip'
+		'1b1288fb171e663e5892031be2e544de4d11b86594a7a3f754987fd7b636a6a3cf0a6c2775331a9e7e67ac1263839027592fbb2e4b4baba6c9522869076432bd'
 		'scenes'
 )
 

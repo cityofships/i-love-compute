@@ -102,6 +102,42 @@ _pull () {
 	fi
 }
 
+_fetch_archive () {
+	local url="${1}"
+	local archive="$(basename "${url}")"
+	local checksum="${2}"
+
+	if [ -f "${archive}" ]
+	then
+		case "$(sha512sum "${archive}")" in
+			"${checksum} *${archive}")
+				;;
+			*)
+				rm "${archive}"
+		esac
+	fi
+
+	if [ ! -f "${archive}" ]
+	then
+		wget "${url}"
+	fi
+	
+	case "${archive}" in
+		*'.tar.gz')
+			tar xzvf "${archive}"
+			;;
+		*'.tar.bz2')
+			tar xjvf "${archive}"
+			;;
+		*'.tar.xz')
+			tar xJvf "${archive}"
+			;;
+		*'.zip')
+			unzip "${archive}"
+			;;
+	esac
+}
+
 _fetch () {
 	local i=0
 	while [ "${i}" -lt "${#packages[@]}" ]
@@ -124,42 +160,32 @@ _fetch () {
 
 		_cd
 
-		if [[ "${repository}" == *'.tar.gz' ]]
-		then
-			wget -c "${repository}"
-
-			if ! [ -d "${directory}" ]
-			then
-				tar -xzvf "${branch}"
-			fi
-
-			continue
-		elif [[ "${repository}" == *'.tar.xz' ]]
-		then
-			wget -c "${repository}"
-
-			if ! [ -d "${directory}" ]
-			then
-				tar -xJvf "${branch}"
-			fi
-
-			continue
-		elif [[ "${repository}" == *'.zip' ]]
-		then
-			wget -c "${repository}"
-
-			if ! [ -d "${directory}" ]
-			then
-				unzip "${branch}"
-			fi
-
-			continue
-		fi
-
 		if ! [ -d "${directory}" ]
 		then
+			# Archive url is stored in ${repository}.
+			# Archive checksum is stored in ${branch}.
+			case "${repository}" in
+				*'.tar.gz')
+					_fetch_archive "${repository}" "${branch}"
+					continue
+					;;
+				*'.tar.bz2')
+					_fetch_archive "${repository}" "${branch}"
+					continue
+					;;
+				*'.tar.xz')
+					_fetch_archive "${repository}" "${branch}"
+					continue
+					;;
+				*'.zip')
+					_fetch_archive "${repository}" "${branch}"
+					continue
+					;;
+			esac
+
 			{
 				echo "$(pwd)/${directory}"
+
 				if [ "${branch}" = '-' ]
 				then
 					git clone --recurse-submodules "${repository}"
