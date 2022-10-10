@@ -204,7 +204,7 @@ _fetch () {
 	done
 }
 
-# Muse be called in the source directory to patch.
+# Must be called in the source directory to patch.
 _apply_patches () {
 	if [ ! -d '.git' ]
 	then
