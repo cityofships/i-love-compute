@@ -235,6 +235,17 @@ _build_generic_configure () {
 	_mold make install
 }
 
+_build_generic_autogen () {
+	# FIXME: Implement a RelWithDebInfo equivalent.
+
+	_mold ./autogen.sh \
+		--prefix="${install_dir}" \
+		"${@}"
+
+	_build_generic_configure \
+		"${@}"
+}
+
 _build_generic_cmake () {
 	_cmake_setup
 
