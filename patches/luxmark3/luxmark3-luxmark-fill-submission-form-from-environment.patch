@@ -1,0 +1,14 @@
+diff --git a/src/submitdialog.cpp b/src/submitdialog.cpp
+index a688cd9..a98b615 100644
+--- a/src/submitdialog.cpp
++++ b/src/submitdialog.cpp
+@@ -50,6 +50,9 @@ SubmitDialog::SubmitDialog(
+ 
+ 	ui->setupUi(this);
+ 	ui->genericButton->setText("&Submit");
++	ui->nameEdit->setText(qgetenv("LUXMARK_USERNAME"));
++	ui->pwdEdit->setText(qgetenv("LUXMARK_PASSWORD"));
++	ui->noteTextEdit->setPlainText(qgetenv("LUXMARK_NOTE"));
+ 
+ 	this->setWindowTitle("LuxMark v" LUXMARK_VERSION_MAJOR "." LUXMARK_VERSION_MINOR);
+ }

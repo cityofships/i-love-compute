@@ -4,6 +4,7 @@ set -u -e -o pipefail
 
 workspace_parent_dir="${script_dir}/workspace"
 workspace_dir="${workspace_parent_dir}/${script_name}"
+patch_dir="${script_dir}/../patches"
 install_dir="${workspace_dir}/install"
 
 provides_hip='false'
@@ -135,6 +136,34 @@ _fetch () {
 			_pull
 		} | _prefix "Pull ${name}"
 	done
+}
+
+# Muse be called in the source directory to patch.
+_apply_patches () {
+	if [ ! -d '.git' ]
+	then
+		git init
+		git add .
+		git commit -m 'init'
+		git branch -M 'master'
+	fi
+
+	case "$(git rev-parse --abbrev-ref HEAD)" in
+		'patched')
+			;;
+		'patched/'*)
+			;;
+		*)
+			git checkout -b 'patched'
+
+			for patch_file in "${@}"
+			do
+				patch_fullpath="${patch_dir}/${patch_file}"
+				patch -p1 < "${patch_fullpath}"
+				git commit -am "patch: ${patch_file}"
+			done
+			;;
+	esac
 }
 
 _mold () {

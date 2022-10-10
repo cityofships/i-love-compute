@@ -3,13 +3,12 @@
 # Copyright 2022 Thomas “illwieckz“ Debesse
 
 # You may need to install:
-## gcc7:
-# libgmp-dev libmpfr-dev libmpc-dev
-# gcc-10
-## oiio:
-# libilmbase-dev libopenexr-dev libtiff-dev libpython2.7-dev
-## luxcore and luxmark:
-# libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb2-dev
+# For gcc7:
+#   gcc-10 libgmp-dev libmpfr-dev libmpc-dev
+# For oiio:
+#   libilmbase-dev libopenexr-dev libtiff-dev libpython2.7-dev
+# For luxcore and luxmark:
+#   libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb2-dev
 
 # GCC10 is needed to build GCC7 (GCC11 and later can't build GCC7).
 # GCC7 is needed to build Qt4 (GCC8 and later can't build Qt4).
@@ -94,107 +93,6 @@ _set_custom_run_env () {
 	cd "${install_dir}/opt/luxmark"
 }
 
-_write_custom_patches () {
-	_cd
-
-	cat > qt4-type-conversion.patch <<\EOF
-diff --git a/src/plugins/accessible/widgets/itemviews.cpp b/src/plugins/accessible/widgets/itemviews.cpp
-index 14c9279..fcb02b0 100644
---- a/src/plugins/accessible/widgets/itemviews.cpp
-+++ b/src/plugins/accessible/widgets/itemviews.cpp
-@@ -393,7 +393,7 @@ bool QAccessibleTable2::unselectColumn(int column)
-     QModelIndex index = view()->model()->index(0, column, view()->rootIndex());
-     if (!index.isValid() || view()->selectionMode() & QAbstractItemView::NoSelection)
-         return false;
--    view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
-+    view()->selectionModel()->select(index, static_cast<QItemSelectionModel::SelectionFlag>( QItemSelectionModel::Columns & QItemSelectionModel::Deselect ));
-     return true;
- }
-EOF
-
-	cat > luxcore-no-samples.patch <<\EOF
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7fe48a051..9c668e1f3 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -128,15 +128,15 @@ add_subdirectory(src/luxcore)
- #
- ################################################################################
-
--if(NOT APPLE OR OSX_BUILD_DEMOS)
--	add_subdirectory(samples/benchsimple)
--	add_subdirectory(samples/luxcoredemo)
--	add_subdirectory(samples/luxcorescenedemo)
--	add_subdirectory(samples/luxcoreimplserializationdemo)
--endif()
--if(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
--	add_subdirectory(samples/smallluxgpu4)
--endif(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
-+# if(NOT APPLE OR OSX_BUILD_DEMOS)
-+# 	add_subdirectory(samples/benchsimple)
-+# 	add_subdirectory(samples/luxcoredemo)
-+# 	add_subdirectory(samples/luxcorescenedemo)
-+# 	add_subdirectory(samples/luxcoreimplserializationdemo)
-+# endif()
-+# if(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
-+# 	add_subdirectory(samples/smallluxgpu4)
-+# endif(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND)
-
-
- ################################################################################
-EOF
-
-	cat > luxcore-no-pyluxcore.patch <<\EOF
-diff --git a/src/luxcore/CMakeLists.txt b/src/luxcore/CMakeLists.txt
-index 2a7ebc453..69bef27c9 100644
---- a/src/luxcore/CMakeLists.txt
-+++ b/src/luxcore/CMakeLists.txt
-@@ -133,24 +133,24 @@ link_directories (${SLG_LIB_DIR} ${LuxRays_LIB_DIR})
- #
- ################################################################################
-
--set(PYLUXCORE_SRCS
--	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcore.cpp
--	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcoreforblender.cpp
--)
--
--add_library(pyluxcore MODULE ${PYLUXCORE_SRCS})
--add_definitions(${VISIBILITY_FLAGS})
--if(APPLE)
--	target_link_libraries(pyluxcore -Wl,-undefined -Wl,dynamic_lookup luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
--    SET_TARGET_PROPERTIES(pyluxcore PROPERTIES XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING NO) # exclude pylux from strip, not possible
--else()
--	target_link_libraries(pyluxcore luxcore smallluxgpu luxrays ${OPENEXR_LIBRARIES} ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
--endif()
--
--set_target_properties(pyluxcore PROPERTIES PREFIX "")
--if(MSVC)
--	set_target_properties(pyluxcore PROPERTIES SUFFIX ".pyd")
--endif(MSVC)
-+# set(PYLUXCORE_SRCS
-+# 	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcore.cpp
-+# 	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcoreforblender.cpp
-+# )
-+#
-+# add_library(pyluxcore MODULE ${PYLUXCORE_SRCS})
-+# add_definitions(${VISIBILITY_FLAGS})
-+# if(APPLE)
-+# 	target_link_libraries(pyluxcore -Wl,-undefined -Wl,dynamic_lookup luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
-+#     SET_TARGET_PROPERTIES(pyluxcore PROPERTIES XCODE_ATTRIBUTE_DEPLOYMENT_POSTPROCESSING NO) # exclude pylux from strip, not possible
-+# else()
-+# 	target_link_libraries(pyluxcore luxcore smallluxgpu luxrays ${OPENEXR_LIBRARIES} ${EMBREE_LIBRARY} ${PYTHON_LIBRARIES} ${Boost_LIBRARIES})
-+# endif()
-+#
-+# set_target_properties(pyluxcore PROPERTIES PREFIX "")
-+# if(MSVC)
-+# 	set_target_properties(pyluxcore PROPERTIES SUFFIX ".pyd")
-+# endif(MSVC)
-
- ################################################################################
- #
-EOF
-}
-
 _build_gcc7 () {
 	if [ -f 'done' ]
 	then
@@ -202,10 +100,6 @@ _build_gcc7 () {
 	fi
 
 	(
-		set -e
-		set -o pipefail
-		set -u
-
 		# *** LIBRARY_PATH shouldn't contain the current directory when
 		# *** building gcc. Please change the environment variable
 		# *** and run configure again.
@@ -221,16 +115,21 @@ _build_gcc7 () {
 		export CC="gcc-10"
 		export CXX="g++-10"
 
+		# Disable nls because:
+		# msgfmt: gcc-7.5.0/x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /usr/lib/x86_64-linux-gnu/libicuuc.so.70)
+
 		# Disable libsanitizer because:
 		# ../../.././libsanitizer/sanitizer_common/sanitizer_internal_defs.h:261:72: error: size of array «assertion_failed__1150» is negative
 		#     typedef char IMPL_PASTE(assertion_failed_##_, line)[2*(int)(pred)-1]
 		_build_generic_configure \
 			--program-suffix='-7' \
 			--with-gcc-major-version-only \
+			--disable-nls \
 			--disable-libsanitizer
 
 		unset CC
 		unset CXX
+
 		unset LIBRARY_PATH
 		unset C_INCLUDE_PATH
 		unset CPLUS_INCLUDE_PATH
@@ -245,16 +144,12 @@ _build_qt4 () {
 		return
 	fi
 
-	if ! [ -f 'patched' ]
-	then
-		# itemviews.cpp: In member function ‘virtual bool QAccessibleTable2::unselectColumn(int)’:
-		# itemviews.cpp:396:105: error: conversion from ‘int’ to ‘QItemSelectionModel::SelectionFlags {aka QFlags<QItemSelectionModel::SelectionFlag>}’ is ambiguous
-		#      view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
-		#                                                                                                          ^
-		patch -p1 < '../qt4-type-conversion.patch'
-
-		touch 'patched'
-	fi
+	# itemviews.cpp: In member function ‘virtual bool QAccessibleTable2::unselectColumn(int)’:
+	# itemviews.cpp:396:105: error: conversion from ‘int’ to ‘QItemSelectionModel::SelectionFlags {aka QFlags<QItemSelectionModel::SelectionFlag>}’ is ambiguous
+	#      view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
+	#                                                                                                          ^
+	_apply_patches \
+		'luxmark3/luxmark3-qt4-type-conversion.patch'
 
 	(
 		set -e
@@ -325,19 +220,9 @@ _build_oiio () {
 	#		'src/build-scripts/build_pybind11.bash'
 	#	fi
 
-	if ! [ -f 'patched' ]
-	then
-		sed -e 's/GPSTAG_/gpstag_/g' \
-			-i 'src/libOpenImageIO/exif.cpp'
-
-		find -type f \
-			-name '*.cpp' \
-			-exec \
-				sed -e 's/\([ ,(]\)_1/\1boost::placeholders::_1/g' \
-					-i {} \;
-
-		touch 'patched'
-	fi
+	_apply_patches \
+		'luxmark3/luxmark3-oiio-gpstag-redefinition.patch' \
+		'luxmark3/luxmark3-oiio-boost-placeholders-rewrite.patch'
 
 	_cmake_setup \
 		-D'USE_LIBRAW'='OFF' \
@@ -368,13 +253,9 @@ _build_clhpp () {
 }
 
 _build_luxcore () {
-	if ! [ -f 'patched' ]
-	then
-		patch -p1 < '../luxcore-no-samples.patch'
-		patch -p1 < '../luxcore-no-pyluxcore.patch'
-
-		touch 'patched'
-	fi
+	_apply_patches \
+		'luxmark3/luxmark3-luxcore-no-samples.patch' \
+		'luxmark3/luxmark3-luxcore-no-pyluxcore.patch'
 
 	# LuxCore can't be built with GCC11,
 	# It is known to build with GCC10,
@@ -399,6 +280,11 @@ _build_luxcore () {
 }
 
 _build_luxmark () {
+	_apply_patches \
+		'luxmark3/luxmark3-luxmark-more-opencl-compiler-options.patch' \
+		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
+		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch'
+
 	_cmake_setup \
 		-D'LuxRays_HOME'="${install_dir}"
 
