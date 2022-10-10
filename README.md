@@ -61,12 +61,10 @@ Already sourced:
 - AMD TeraScale 3 (discrete: PCIe),
 - AMD TeraScale 2 (discrete: PCIe, PCI),
 - AMD TeraScale 1 (discrete: PCIe, PCI, AGP),
-
-- Intel Gen7 GT2 (integrated).
-
+- Intel Gen7 GT2 (integrated),
 - Nvidia Kepler (integrated: PCIE; onboard),
 - Nvidia Tesla 2.0 (discrete: PCIe),
-- Nvidia Tesla 1.0 (discrete: PCI),
+- Nvidia Tesla 1.0 (discrete: PCI).
 
 
 Scripts
@@ -183,7 +181,7 @@ A script to download, build and run LuxMark 3.1.
 - The user can download build and install LuxMark 3.1 by doing `./user-luxmark3 build`.
 - The installation is done in user workspace and provided software is not made available in default environment.
 - The user can run LuxMark by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
-- Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7.
+- Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7. The script has been verified to be working on Ubuntu 22.04.
 
 
 ### [`user-viennaclbench`](scripts/user-viennaclbench)
