@@ -94,7 +94,7 @@ _set_custom_run_env () {
 }
 
 _build_gcc7 () {
-	if [ -f 'done' ]
+	if _is_done
 	then
 		return
 	fi
@@ -135,11 +135,11 @@ _build_gcc7 () {
 		unset CPLUS_INCLUDE_PATH
 	)
 
-	touch 'done'
+	_set_done
 }
 
 _build_qt4 () {
-	if [ -f 'done' ]
+	if _is_done
 	then
 		return
 	fi
@@ -210,7 +210,7 @@ _build_qt4 () {
 		unset CXXFLAGS
 	)
 
-	touch 'done'
+	_set_done
 }
 
 _build_oiio () {

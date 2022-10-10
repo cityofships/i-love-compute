@@ -37,6 +37,14 @@ _cd () {
 	cd "${workspace_dir}"
 }
 
+_is_done () {
+	[ -f "$(pwd).done" ]
+}
+
+_set_done () {
+	touch "$(pwd).done"
+}
+
 _find_vulkan_icd_files () {
 	if [ -d "${install_dir}/share/vulkan/icd.d" ]
 	then
