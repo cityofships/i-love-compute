@@ -116,6 +116,38 @@ _fetch () {
 
 		_cd
 
+		if [[ "${repository}" == *'.tar.gz' ]]
+		then
+			wget -c "${repository}"
+
+			if ! [ -d "${directory}" ]
+			then
+				tar -xzvf "${branch}"
+			fi
+
+			continue
+		elif [[ "${repository}" == *'.tar.xz' ]]
+		then
+			wget -c "${repository}"
+
+			if ! [ -d "${directory}" ]
+			then
+				tar -xJvf "${branch}"
+			fi
+
+			continue
+		elif [[ "${repository}" == *'.zip' ]]
+		then
+			wget -c "${repository}"
+
+			if ! [ -d "${directory}" ]
+			then
+				unzip "${branch}"
+			fi
+
+			continue
+		fi
+
 		if ! [ -d "${directory}" ]
 		then
 			{
