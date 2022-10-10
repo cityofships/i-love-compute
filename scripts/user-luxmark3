@@ -152,11 +152,9 @@ _build_qt4 () {
 		'luxmark3/luxmark3-qt4-type-conversion.patch'
 
 	(
-		set -e
-		set -o pipefail
-		set -u
 		export CC="${install_dir}/bin/gcc-7"
 		export CXX="${install_dir}/bin/g++-7"
+
 		# It still uses system's GCC for some steps
 		# including configure steps.
 		mkdir -pv 'path'
@@ -206,8 +204,6 @@ _build_qt4 () {
 
 		unset CC
 		unset CXX
-		unset CFLAGS
-		unset CXXFLAGS
 	)
 
 	_set_done
