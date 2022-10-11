@@ -3,7 +3,7 @@
 # Copyright 2022 Thomas “illwieckz“ Debesse
 
 # You may need to install:
-# clang python3-setuptools python3-mako cmake meson doxygen libexpat1-dev libxml2-dev xsltproc xmlto libvulkan-dev libelf-dev byacc bison flex libxcb-glx0-dev libxcb-shm0-dev libx11-xcb-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxshmfence-dev libvdpau-dev libxvmc-dev libva-dev glslang-tools
+# clang python3-setuptools python3-mako cmake meson doxygen libexpat1-dev libxml2-dev xsltproc xmlto libvulkan-dev libelf-dev byacc bison flex libxcb-glx0-dev libxcb-shm0-dev libx11-xcb-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxshmfence-dev libvdpau-dev libva-dev glslang-tools
 
 script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
@@ -20,7 +20,7 @@ provides_opengl='true'
 provides_egl='true'
 builds_llvm='true'
 
-known_feature_list='opencl,rusticl,vulkan,opengl,gles,nine,va,vdpau,xa,xvmc,egl'
+known_feature_list='opencl,rusticl,vulkan,opengl,gles,nine,va,vdpau,xa,egl'
 default_feature_list='opencl,rusticl,vulkan'
 feature_opencl='false'
 feature_rusticl='false'
@@ -31,7 +31,6 @@ feature_nine='false'
 feature_va='false'
 feature_vdpau='false'
 feature_xa='false'
-feature_xvmc='false'
 feature_egl='false'
 
 packages=(
@@ -184,7 +183,6 @@ _build_mesa () {
 	local mesa_gallium_va='disabled'
 	local mesa_gallium_vdpau='disabled'
 	local mesa_gallium_xa='disabled'
-	local mesa_gallium_xvmc='disabled'
 	local mesa_opencl_spirv='false'
 	local mesa_gallium_drivers=''
 	local mesa_vulkan_beta='false'
@@ -269,11 +267,6 @@ _build_mesa () {
 		mesa_gallium_xa='enabled'
 	fi
 
-	if "${feature_xvmc}"
-	then
-		mesa_gallium_xvmc='enabled'
-	fi
-
 	if "${feature_egl}"
 	then
 		mesa_egl='enabled'
@@ -323,7 +316,6 @@ _build_mesa () {
 		-D'gallium-va'="${mesa_gallium_va}" \
 		-D'gallium-vdpau'="${mesa_gallium_vdpau}" \
 		-D'gallium-xa'="${mesa_gallium_xa}" \
-		-D'gallium-xvmc'="${mesa_gallium_xvmc}" \
 		-D'opencl-spirv'="${mesa_opencl_spirv}" \
 		-D'opengl'="${mesa_opengl}" \
 		-D'glvnd'="${mesa_glvnd}" \
