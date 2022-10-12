@@ -61,6 +61,7 @@ _build_mesa () {
 	# the features are not used or disabled reduce the
 	# diff noise between the twos.
 	_meson_setup \
+		-D'b_ndebug'='false' \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
 		-D'dri-drivers'='[]' \
