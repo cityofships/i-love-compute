@@ -251,7 +251,8 @@ _build_clhpp () {
 _build_luxcore () {
 	_apply_patches \
 		'luxmark3/luxmark3-luxcore-no-samples.patch' \
-		'luxmark3/luxmark3-luxcore-no-pyluxcore.patch'
+		'luxmark3/luxmark3-luxcore-no-pyluxcore.patch' \
+		'luxmark3/luxmark3-luxcore-catch-opencl-errors.patch'
 
 	# LuxCore can't be built with GCC11,
 	# It is known to build with GCC10,
@@ -277,6 +278,7 @@ _build_luxcore () {
 
 _build_luxmark () {
 	_apply_patches \
+		'luxmark3/luxmark3-luxmark-catch-context-errors.patch' \
 		'luxmark3/luxmark3-luxmark-more-opencl-compiler-options.patch' \
 		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
 		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch'
