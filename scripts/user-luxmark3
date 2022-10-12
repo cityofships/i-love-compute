@@ -281,6 +281,7 @@ _build_luxmark () {
 	_apply_patches \
 		'luxmark3/luxmark3-luxmark-catch-context-errors.patch' \
 		'luxmark3/luxmark3-luxmark-more-opencl-compiler-options.patch' \
+		'luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch' \
 		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
 		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch'
 
