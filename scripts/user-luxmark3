@@ -252,6 +252,7 @@ _build_luxcore () {
 	_apply_patches \
 		'luxmark3/luxmark3-luxcore-no-samples.patch' \
 		'luxmark3/luxmark3-luxcore-no-pyluxcore.patch' \
+		'luxmark3/luxmark3-luxcore-do-not-crash-on-kernel-build-failure.patch' \
 		'luxmark3/luxmark3-luxcore-catch-opencl-errors.patch'
 
 	# LuxCore can't be built with GCC11,

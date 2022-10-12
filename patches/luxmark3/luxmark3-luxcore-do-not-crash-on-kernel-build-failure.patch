@@ -1,0 +1,37 @@
+diff --git a/include/luxrays/core/oclintersectiondevice.h b/include/luxrays/core/oclintersectiondevice.h
+index f8de35615..4c6aa8003 100644
+--- a/include/luxrays/core/oclintersectiondevice.h
++++ b/include/luxrays/core/oclintersectiondevice.h
+@@ -201,7 +201,7 @@ private:
+ 
+ 	// OpenCL queues
+ 	vector<OpenCLDeviceQueue *> oclQueues;
+-	OpenCLKernels *kernels;
++	OpenCLKernels *kernels = nullptr;
+ 
+ 	bool reportedPermissionError;
+ };
+diff --git a/src/luxrays/idevices/openclidevice.cpp b/src/luxrays/idevices/openclidevice.cpp
+index f0b4adbd5..ecbb7d41b 100644
+--- a/src/luxrays/idevices/openclidevice.cpp
++++ b/src/luxrays/idevices/openclidevice.cpp
+@@ -275,6 +275,8 @@ void OpenCLIntersectionDevice::Update() {
+ void OpenCLIntersectionDevice::Start() {
+ 	IntersectionDevice::Start();
+ 
++	kernels = nullptr;
++
+ 	oclQueues.clear();
+ 	if (dataParallelSupport) {
+ 		// Compile all required kernels
+@@ -304,7 +306,9 @@ void OpenCLIntersectionDevice::Stop() {
+ 		delete queue;
+ 	oclQueues.clear();
+ 
+-	delete kernels;
++	if (kernels)
++		delete kernels;
++
+ 	kernels = NULL;
+ }
+ 
