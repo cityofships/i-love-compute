@@ -222,7 +222,7 @@ _download () {
 		fi
 	fi
 
-	if _is orca
+	if _is orca || _is pal
 	then
 		if ! _checksum 'orca'
 		then
@@ -268,7 +268,7 @@ _extract () {
 		fi
 	fi
 
-	if _is orca
+	if _is orca || _is pal
 	then
 		if ! [ -d "${orca_tarball_dir}" ]
 		then
@@ -383,10 +383,10 @@ _purge () {
 
 _uninstall () {
 	_purge clover
-	_purge orca
-	_purge fglrx
 	_purge pal
+	_purge orca
 	_purge rocm
+	_purge fglrx
 
 	dpkg-divert \
 		--rename \
@@ -475,7 +475,7 @@ _install () {
 			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
-	if _is orca
+	if _is orca || _is pal
 	then
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
@@ -483,11 +483,14 @@ _install () {
 		local orca_deb_file
 		for orca_deb_file in ${orca_deb_file_list}
 		do
-			echo "Install ${orca_deb_file} package."
-			
-			gdebi --non-interactive "${orca_tarball_dir}/${orca_deb_file}"
-
 			local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+
+			if _is orca || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
+			then
+				echo "Install ${orca_deb_file} package."
+
+				gdebi --non-interactive "${orca_tarball_dir}/${orca_deb_file}"
+			fi
 
 			if [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
