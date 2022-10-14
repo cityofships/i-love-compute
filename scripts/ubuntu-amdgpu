@@ -502,7 +502,7 @@ _install () {
 		# libamdocl-rocm64.so
 		# /etc/OpenCL/vendors/amdocl-orca64.icd
 	fi
-	
+
 	if _is pal
 	then
 		dpkg-divert \
@@ -607,7 +607,7 @@ _help () {
 	${tab}${script_name} uninstall
 
 	EOF
-	
+
 	_mention
 
 	exit
