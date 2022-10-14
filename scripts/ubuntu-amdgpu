@@ -324,7 +324,7 @@ _purge () {
 
 				apt-mark unhold "${clover_package_name}" || true
 
-				apt-get remove --purge "${clover_package_name}" || true
+				apt-get remove --yes --purge "${clover_package_name}" || true
 			done
 			;;
 		'fglrx')
@@ -356,11 +356,11 @@ _purge () {
 			do
 				local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
 
-				apt-get remove --purge "${orca_package_name}" || true
+				apt-get remove --yes --purge "${orca_package_name}" || true
 			done
 
 			# Alternate name for opencl-orca-amdgpu-pro-icd package.
-			apt-get remove --purge 'opencl-legacy-amdgpu-pro-icd' || true
+			apt-get remove --yes --purge 'opencl-legacy-amdgpu-pro-icd' || true
 			;;
 		'pal')
 			for pal_deb_file in \
@@ -368,14 +368,14 @@ _purge () {
 			do
 				local pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
 
-				apt-get remove --purge "${pal_package_name}" || true
+				apt-get remove --yes --purge "${pal_package_name}" || true
 			done
 			;;
 		'rocm')
 			for rocm_package_name in \
 				$(echo "${old_rocm_package_name_list}" "${rocm_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --purge "${rocm_package_name}" || true
+				apt-get remove --yes --purge "${rocm_package_name}" || true
 			done
 			;;
 	esac
@@ -400,7 +400,7 @@ _uninstall () {
 	fi
 
 	amdgpupro_package_name="$(echo "${amdgpupro_deb_file}" | cut -f1 -d'_')"
-	apt-get remove --purge "${amdgpupro_package_name}" || true
+	apt-get remove --yes --purge "${amdgpupro_package_name}" || true
 
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
