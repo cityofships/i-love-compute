@@ -86,11 +86,11 @@ A script to install amdgpu-pro OpenCL on Ubuntu. This was based on many scripts 
 It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (TeraScale, GCN+).
 
 - The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
-- The installation is done system-wide (requires `root` permission), and provided software is made available in default environment.
+- The installation is done as root and system-wide, provided software is made available to default environment.
 
 This script is known to work on Ubuntu 22.04 LTS.
 
-Note: Official Ubuntu Clover packages may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942). This script installs older clover packages that are known to work but may not support newer cards.
+Note: This script installs older Clover packages that are known to work but may not support newer cards. Newer versions are known to suffer from a regression in LLVM. Official Ubuntu Clover package `mesa-opencl-icd` may be installed by hand and used with radeonsi as long as OpenCL applications do not make use of the `-cl-fast-relaxed-math` OpenCL compilation option. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
 
 
 ### [`user-mesa`](scripts/user-mesa)
@@ -98,7 +98,7 @@ Note: Official Ubuntu Clover packages may be usable with radeonsi as long as `-c
 A script to download, build Mesa (and its dependencies including LLVM) and run software using OpenCL or Vulkan.
 
 - The user can download, build and install Mesa by doing `./user-mesa build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-mesa` and provided software is not made available in default environment.
 - The user can run `COMMAND` with Mesa by doing `./user-mesa run [COMMAND]`.
 - The `LP_CL=1` environment variable can be set to run OpenCL on llvmpipe virtual device and the `RUSTICL_DEVICE_TYPE=gpu` environment variable can be set to make make it appeaing as a GPU devices to softwares.
 - Beware that linking LLVM may consumes hundreds of gigabytes of RAM! By default the script reduces the amount of jobs when building LLVM : 1 job per 8GB of available RAM, as it was observed some files need 8GB of RAM to be linked.
@@ -119,7 +119,7 @@ This is a variant of the `user-mesa` script building the experimental out-of-tre
 A script to download, build clvk and run software using clvk.
 
 - The user can download, build and install clvk by doing `./user-clvk build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-clvk` and provided software is not made available in default environment.
 - The user can run `COMMAND` with built clvk by doing `./user-clvk run [COMMAND]`.
 
 
@@ -128,7 +128,7 @@ A script to download, build clvk and run software using clvk.
 A script to download, build and run PoCL (Portable Computing Language) and run software using it.
 
 - The user can download build and install PoCL by doing `./user-pocl build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-pocl` and provided software is not made available in default environment.
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`.
 
 
@@ -139,7 +139,7 @@ A script to download, build and run PoCL (Portable Computing Language) and run s
 This is a variant of `user-pocl` building the experimental vulkan backend using clspv.
 
 - The user can download build and install PoCL by doing `./user-pocl-spv build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-pocl-clspv` and provided software is not made available in default environment.
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl-spv run [COMMAND]`.
 
 
@@ -150,7 +150,7 @@ A script to download, build and run CHIP-SPV (a platform to run HIP over OpenCL)
 CHIP-SPV is an integration of HIPCL and HIPLZ supporting OpenCL and Level Zero backends.
 
 - The user can download build and instal CHIP-SPV by doing `./user-chip-spv build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-chip-spv` and provided software is not made available in default environment.
 - The user can run `COMMAND` with built CHIP-SPV by doing `./user-chip-spv run [COMMAND]`.
 
 
@@ -159,7 +159,7 @@ CHIP-SPV is an integration of HIPCL and HIPLZ supporting OpenCL and Level Zero b
 A script to download, build amdocl-fix and run software using it, for example DaVinci Resolve.
 
 - The user can download build and install amdocl-fix by doing `./user-amdoclfix build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-amdoclfix` and provided software is not made available in default environment.
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`, for example `./user-pocl run resolve`.
 
 This may be needed to workaround some bugs in AMD APP when running DaVinci Resolve.
@@ -170,7 +170,7 @@ This may be needed to workaround some bugs in AMD APP when running DaVinci Resol
 A script to download, build and run piglit.
 
 - The user can download build and install piglit by doing `./user-piglit build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-piglit` and provided software is not made available in default environment.
 - The user can run piglit by doing something like `./user-piglit run piglit run quick_cl /tmp/results/cl`, it can be run with platforms built with other scripts, for example: `./user-mesa run ./user-piglit run piglit run quick_cl gpu /tmp/results/cl-gpu`.
 
 
@@ -179,7 +179,7 @@ A script to download, build and run piglit.
 A script to download, build and run LuxMark 3.1.
 
 - The user can download build and install LuxMark 3.1 by doing `./user-luxmark3 build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-luxmark3` and provided software is not made available in default environment.
 - The user can run LuxMark by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
 - Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7. The script has been verified to be working on Ubuntu 22.04.
 
@@ -189,7 +189,7 @@ A script to download, build and run LuxMark 3.1.
 A script to download, build and run ViennaCLBench.
 
 - The user can download build and install ViennaCLBench by doing `./user-viennaclbench build`.
-- The installation is done in user workspace and provided software is not made available in default environment.
+- The installation is done as user in `workspace/user-viennaclbench` and provided software is not made available in default environment.
 - The user can run LuxMark by doing `./user-viennaclbench run` or `./user-viennaclbench run ViennaCLBench`.
 
 
