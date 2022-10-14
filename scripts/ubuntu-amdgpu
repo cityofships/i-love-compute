@@ -53,7 +53,7 @@ fglrx_install_dir='/opt/amd-fglrx'
 
 orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
 orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
-orca_deb_file_list='opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb'
+orca_deb_file_list='amdgpu-core_21.20-1271047_all.deb amdgpu-pro-core_21.20-1271047_all.deb opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb'
 orca_tarball_dir="$(basename "${orca_tarball_file}" '.tar.xz')"
 
 pal_tarball_file="amdgpu-pro-20.40-1147286-ubuntu-20.04.tar.xz"
@@ -492,6 +492,13 @@ _install () {
 			echo "Install ${orca_deb_file} package."
 			
 			gdebi --non-interactive "${orca_tarball_dir}/${orca_deb_file}"
+
+			local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+
+			if [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
+			then
+				apt-mark auto "${orca_package_name}"
+			fi
 		done
 
 		# Already correct:
