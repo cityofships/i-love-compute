@@ -320,7 +320,7 @@ _purge () {
 			for clover_deb_file in \
 				$(echo "${clover_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }' | tac)
 			do
-				clover_package_name="$(echo "${clover_deb_file}" | cut -f1 -d'_' )"
+				local clover_package_name="$(echo "${clover_deb_file}" | cut -f1 -d'_' )"
 
 				apt-mark unhold "${clover_package_name}" || true
 
@@ -354,7 +354,8 @@ _purge () {
 			for orca_deb_file in \
 				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | tac)
 			do
-				orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+				local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+
 				dpkg --purge "${orca_package_name}"
 			done
 
@@ -365,7 +366,8 @@ _purge () {
 			for pal_deb_file in \
 				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | tac)
 			do
-				pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
+				local pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
+
 				dpkg --purge "${pal_package_name}"
 			done
 			;;
