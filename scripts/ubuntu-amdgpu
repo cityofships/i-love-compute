@@ -433,8 +433,6 @@ _install () {
 
 	if _is clover
 	then
-		_purge clover
-
 		for clover_deb_file in \
 			$(echo "${clover_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
 		do
@@ -450,8 +448,6 @@ _install () {
 
 	if _is fglrx
 	then
-		_purge fglrx
-
 		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
 
 		if ! [ -d "${fglrx_extract_prefix}" ]
@@ -481,8 +477,6 @@ _install () {
 
 	if _is orca
 	then
-		_purge orca
-
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
 
@@ -508,8 +502,6 @@ _install () {
 	
 	if _is pal
 	then
-		_purge pal
-
 		dpkg-divert \
 			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
 			--rename '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
@@ -529,8 +521,6 @@ _install () {
 
 	if _is rocm
 	then
-		_purge rocm
-
 		# Already correct (icd may be renamed):
 		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
