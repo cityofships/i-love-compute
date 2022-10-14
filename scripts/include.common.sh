@@ -15,7 +15,7 @@ provides_egl='false'
 builds_llvm='false'
 
 usable_job_count='1'
-do_pull='true'
+do_pull='false'
 
 tab=$'\t'
 
@@ -94,7 +94,7 @@ _set_env () {
 	_set_custom_env
 }
 
-_pull () {
+_update () {
 	if "${do_pull}"
 	then
 		git pull || true
@@ -199,9 +199,15 @@ _fetch () {
 			cd "${directory}"
 			pwd
 
-			_pull
+			_update
 		} | _prefix "Pull ${name}"
 	done
+}
+
+_pull () {
+	do_pull='true'
+
+	_fetch
 }
 
 # Must be called in the source directory to patch.
@@ -399,8 +405,8 @@ _build_basic_project () {
 	while ! [ -z "${1:-}" ]
 	do
 		case "${1:-}" in
-			'--no-pull')
-				do_pull='false'
+			'--pull')
+				do_pull='true'
 				;;
 			'--force')
 				do_force='true'
@@ -510,8 +516,8 @@ _build_featured_project () {
 	while ! [ -z "${1:-}" ]
 	do
 		case "${1:-}" in
-			'--no-pull')
-				do_pull='false'
+			'--pull')
+				do_pull='true'
 				;;
 			'--force')
 				do_force='true'
@@ -806,8 +812,10 @@ _help_basic_application () {
 	${tab}${tab}Print this help.
 
 	Actions:
+	${tab}pull
+	${tab}${tab}Download ${project_name} or pull updates.
 	${tab}build
-	${tab}${tab}Download and build ${project_name}.
+	${tab}${tab}Build ${project_name}.
 	${tab}clean
 	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
 	${tab}shell
@@ -816,8 +824,8 @@ _help_basic_application () {
 	${tab}${tab}Run ${project_name} or another command.
 
 	Build options:
-	${tab}--no-pull
-	${tab}${tab}Do not pull updates from source repositories when building.
+	${tab}--pull
+	${tab}${tab}Pull updates before building.
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs (default: Availables core count).
 
@@ -905,8 +913,10 @@ _help_basic_platform () {
 	${tab}${tab}Print this help.
 
 	Actions:
+	${tab}pull
+	${tab}${tab}Download ${project_name} or pull updates.
 	${tab}build
-	${tab}${tab}Download and build ${project_name}.
+	${tab}${tab}Build ${project_name}.
 	${tab}clean
 	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
 	${tab}shell
@@ -915,8 +925,8 @@ _help_basic_platform () {
 	${tab}${tab}Run command with ${project_name}.
 
 	Build options:
-	${tab}--no-pull
-	${tab}${tab}Do not pull updates from source repositories when building.
+	${tab}--pull
+	${tab}${tab}Pull updates before building.
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs, default: Availables core count.
 
@@ -954,8 +964,10 @@ _help_featured_platform () {
 	${tab}${tab}Print this help.
 
 	Actions:
+	${tab}pull
+	${tab}${tab}Download ${project_name} or pull updates.
 	${tab}build
-	${tab}${tab}Download and build ${project_name}.
+	${tab}${tab}Build ${project_name}.
 	${tab}clean
 	${tab}${tab}Clean-up downloaded and built files for ${project_name}.
 	${tab}shell
@@ -964,8 +976,8 @@ _help_featured_platform () {
 	${tab}${tab}Run command with ${project_name}.
 
 	Build options:
-	${tab}--no-pull
-	${tab}${tab}Do not pull updates from source repositories when building.
+	${tab}--pull
+	${tab}${tab}Pull updates before building.
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs, default: Availables core count.
 	${tab}--force
@@ -1029,7 +1041,7 @@ _mention () {
 
 _spawn () {
 	case "${1:-}" in
-		'build'|'clean'|'shell'|'run')
+		'pull'|'build'|'clean'|'shell'|'run')
 			action="${1}"
 			;;
 		'-h'|'--help'|'')
