@@ -54,11 +54,6 @@ packages=(
 		'-'
 		'-'
 		'llvm'
-	'Clang'
-		'llvm-project/clang'
-		'-'
-		'-'
-		'clang'
 	'SPIRV Headers'
 		'SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
@@ -142,17 +137,6 @@ _build_llvm () {
 		-D'LLVM_BUILD_TESTS'='OFF' \
 		-D'LLVM_BUILD_TOOLS'='ON' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF'
-
-	_cmake_compile_install
-}
-
-_build_clang () {
-	# Explicit build type is now mandatory,
-	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
-	# It is currently built only for building llvm-spirv.
-	_cmake_setup \
-		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
-		-D'LLVM_ENABLE_RTTI'='ON'
 
 	_cmake_compile_install
 }
