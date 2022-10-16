@@ -73,7 +73,7 @@ packages=(
 		'llvm-project/libclc'
 		'-'
 		'-'
-		'generic_cmake'
+		'libclc'
 	'Wayland'
 		'wayland'
 		'https://gitlab.freedesktop.org/wayland/wayland.git'
@@ -154,6 +154,13 @@ _build_spirv_tools () {
 	fi
 
 	_build_generic_cmake
+}
+
+_build_libclc () {
+	_cmake_setup \
+		-D'LIBCLC_TARGETS_TO_BUILD'='amdgcn--;r600--;spirv-mesa3d-;spirv64-mesa3d-'
+
+	_cmake_compile_install
 }
 
 _build_mesa () {
