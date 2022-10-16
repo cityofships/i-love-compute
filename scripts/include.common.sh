@@ -310,10 +310,6 @@ _meson_compile_install () {
 		-C 'build'
 }
 
-_build_generic_none () {
-	true
-}
-
 _build_generic_python () {
 	# FIXME: Implement a RelWithDebInfo equivalent.
 
