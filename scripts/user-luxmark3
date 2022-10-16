@@ -250,6 +250,7 @@ _build_clhpp () {
 
 _build_luxcore () {
 	_apply_patches \
+		'luxmark3/luxmark3-luxcore-no-division-by-zero-pdf-clamp.patch' \
 		'luxmark3/luxmark3-luxcore-no-samples.patch' \
 		'luxmark3/luxmark3-luxcore-no-pyluxcore.patch' \
 		'luxmark3/luxmark3-luxcore-do-not-crash-on-kernel-build-failure.patch' \

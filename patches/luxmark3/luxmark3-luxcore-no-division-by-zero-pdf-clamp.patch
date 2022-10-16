@@ -1,0 +1,35 @@
+diff --git a/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl b/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl
+index 5a7547e49..b21530ed8 100644
+--- a/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl
++++ b/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl
+@@ -1083,7 +1083,7 @@ uint ContinueTracePath(
+ 
+ 		// Continue to trace the path
+ 		const float3 throughputFactor = bsdfSample *
+-			((lastBSDFEvent & SPECULAR) ? 1.f : min(1.f, lastPdfW / PARAM_PDF_CLAMP_VALUE));
++			((lastBSDFEvent & SPECULAR) ? 1.f : min(1.f, lastPdfW / (PARAM_PDF_CLAMP_VALUE == 0.f ? lastPdfW : PARAM_PDF_CLAMP_VALUE)));
+ 		pathThroughput *= throughputFactor;
+ #if defined(PARAM_FILM_CHANNELS_HAS_IRRADIANCE)
+ 		// Update also irradiance AOV path throughput
+@@ -1186,7 +1186,7 @@ uint SampleComponent(
+ #endif
+ 
+ 			// Continue to trace the path
+-			const float pdfFactor = scaleFactor * ((event & SPECULAR) ? 1.f : min(1.f, pdfW / PARAM_PDF_CLAMP_VALUE));
++			const float pdfFactor = scaleFactor * ((event & SPECULAR) ? 1.f : min(1.f, pdfW / (PARAM_PDF_CLAMP_VALUE == 0.f ? pdfW : PARAM_PDF_CLAMP_VALUE)));
+ 			const float3 continuePathThroughput = throughputPathVertex1 * bsdfSample * pdfFactor;
+ 
+ #if defined(PARAM_FILM_CHANNELS_HAS_IRRADIANCE)
+diff --git a/include/slg/engines/pathocl/kernels/pathocl_kernels_micro.cl b/include/slg/engines/pathocl/kernels/pathocl_kernels_micro.cl
+index 9d15fc36c..fd6c6385c 100644
+--- a/include/slg/engines/pathocl/kernels/pathocl_kernels_micro.cl
++++ b/include/slg/engines/pathocl/kernels/pathocl_kernels_micro.cl
+@@ -639,7 +639,7 @@ __kernel __attribute__((work_group_size_hint(64, 1, 1))) void AdvancePaths_MK_GE
+ 		// RR increases path contribution
+ 		throughputFactor /= rrProb;
+ 		// PDF clamping (or better: scaling)
+-		const float pdfFactor = (event & SPECULAR) ? 1.f : min(1.f, lastPdfW / PARAM_PDF_CLAMP_VALUE);
++		const float pdfFactor = (event & SPECULAR) ? 1.f : min(1.f, lastPdfW / (PARAM_PDF_CLAMP_VALUE == 0.f ? lastPdfW : PARAM_PDF_CLAMP_VALUE));
+ 		throughputFactor *= bsdfSample * pdfFactor;
+ 
+ 		VSTORE3F(throughputFactor * VLOAD3F(taskState->throughput.c), taskState->throughput.c);
