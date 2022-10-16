@@ -128,19 +128,30 @@ _build_llvm () {
 
 	# Explicit build type is now mandatory,
 	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
+
 	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
-		-D'LLVM_ENABLE_PROJECTS'='clang' \
-		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
-		-D'LLVM_ENABLE_RTTI'='ON' \
+ 		-D'LLVM_ENABLE_PROJECTS'='clang' \
+ 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
+ 		-D'LLVM_ENABLE_RTTI'='ON' \
+		-D'LLVM_ENABLE_PLUGINS'='OFF' \
+		-D'LLVM_BUILD_RUNTIME'='OFF' \
+		-D'LLVM_BUILD_RUNTIMES'='OFF' \
 		-D'LLVM_BUILD_TESTS'='OFF' \
 		-D'LLVM_BUILD_TOOLS'='ON' \
+		-D'LLVM_BUILD_UTILS'='OFF' \
+ 		-D'LLVM_INCLUDE_BENCHMARKS'='OFF' \
+ 		-D'LLVM_INCLUDE_DOCS'='OFF' \
+ 		-D'LLVM_INCLUDE_EXAMPLES'='OFF' \
+ 		-D'LLVM_INCLUDE_TESTS'='OFF' \
+		-D'LLVM_INCLUDE_UTILS'='OFF' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF' \
-		-D'LLVM_INCLUDE_BENCHMARKS'='OFF' \
-		-D'LLVM_INCLUDE_DOCS'='OFF' \
-		-D'LLVM_INCLUDE_EXAMPLES'='OFF' \
-		-D'LLVM_INCLUDE_TESTS'='OFF' \
+		-D'CLANG_ENABLE_ARCMT'='OFF' \
+		-D'CLANG_ENABLE_STATIC_ANALYZER'='OFF' \
+		-D'CLANG_TOOL_DICTIONARY_BUILD'='OFF' \
+		-D'CLANG_TOOL_HANDLE_CXX_BUILD'='OFF' \
+		-D'CLANG_TOOL_HANDLE_LLVM_BUILD'='OFF'
 
 	_cmake_compile_install
 }
