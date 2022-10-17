@@ -755,7 +755,7 @@ _run_custom_command () {
 	"${install_dir}${required_file}"
 }
 
-_run () {
+_run_common () {
 	if [ "${1:-}" = '--force' ]
 	then
 		shift
@@ -767,6 +767,10 @@ _run () {
 	_set_env
 
 	_set_custom_run_env
+}
+
+_run () {
+	_run_common
 
 	if [ -z "${1:-}" ]
 	then
@@ -781,6 +785,17 @@ _run () {
 	fi
 
 	exit
+}
+
+_run_flatpak () {
+	_run_common
+
+	if [ -z "${1:-}" ]
+	then
+		_error 'Missing command.'
+	else
+		flatpak run --filesystem=host --env=LD_LIBRARY_PATH="${LD_LIBRARY_PATH}" "${@}"
+	fi
 }
 
 _help_custom_build () {
@@ -817,7 +832,9 @@ _help_basic_application () {
 	${tab}shell
 	${tab}${tab}Open an interactive shell in the ${project_name} workspace.
 	${tab}run
-	${tab}${tab}Run ${project_name} or another command.
+	${tab}${tab}Run ${project_name} or another command with ${project_name} environment.
+	${tab}run-flatpak
+	${tab}${tab}Run flatpak in ${project_name} environment.
 
 	Build options:
 	${tab}--pull
@@ -918,7 +935,9 @@ _help_basic_platform () {
 	${tab}shell
 	${tab}${tab}Open an interactive shell in the ${project_name} workspace.
 	${tab}run
-	${tab}${tab}Run command with ${project_name}.
+	${tab}${tab}Run command in ${project_name} environment.
+	${tab}run-flatpak
+	${tab}${tab}Run flatpak in ${project_name} environment.
 
 	Build options:
 	${tab}--pull
@@ -969,7 +988,9 @@ _help_featured_platform () {
 	${tab}shell
 	${tab}${tab}Open an interactive shell in the ${project_name} workspace.
 	${tab}run
-	${tab}${tab}Run command with ${project_name}.
+	${tab}${tab}Run command in ${project_name} environment.
+	${tab}run-flatpak
+	${tab}${tab}Run flatpak in ${project_name} environment.
 
 	Build options:
 	${tab}--pull
@@ -1037,7 +1058,7 @@ _mention () {
 
 _spawn () {
 	case "${1:-}" in
-		'pull'|'build'|'clean'|'shell'|'run')
+		'pull'|'build'|'clean'|'shell'|'run'|'run-flatpak')
 			action="${1}"
 			;;
 		'-h'|'--help'|'')
@@ -1053,7 +1074,7 @@ _spawn () {
 
 	shift
 
-	"_${action}" "${@}"
+	"_${action//-/_}" "${@}"
 
 	printf '\n'
 
