@@ -132,15 +132,15 @@ _build_llvm () {
 	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
- 		-D'LLVM_ENABLE_PROJECTS'='clang' \
- 		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
- 		-D'LLVM_ENABLE_RTTI'='ON' \
-		-D'LLVM_ENABLE_PLUGINS'='OFF' \
+		-D'LLVM_BUILD_TOOLS'='ON' \
+		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
+		-D'LLVM_ENABLE_PROJECTS'='clang' \
+		-D'LLVM_ENABLE_RTTI'='ON' \
 		-D'LLVM_BUILD_RUNTIME'='OFF' \
 		-D'LLVM_BUILD_RUNTIMES'='OFF' \
 		-D'LLVM_BUILD_TESTS'='OFF' \
-		-D'LLVM_BUILD_TOOLS'='ON' \
 		-D'LLVM_BUILD_UTILS'='OFF' \
+		-D'LLVM_ENABLE_PLUGINS'='OFF' \
  		-D'LLVM_INCLUDE_BENCHMARKS'='OFF' \
  		-D'LLVM_INCLUDE_DOCS'='OFF' \
  		-D'LLVM_INCLUDE_EXAMPLES'='OFF' \
