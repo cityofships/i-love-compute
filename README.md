@@ -189,6 +189,20 @@ A script to download, build and run LuxMark 3.1.
 - The user can run LuxMark by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
 - Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7. The script has been verified to be working on Ubuntu 22.04.
 
+LuxMark 3.1 has been ported to Qt5 and a lot of patches are applied to both LuxCore and LuxMark to make it more useful for OpenCL platform developers:
+
+- A division by zero error in OpenCL code is fixed to avoid breaking the render on platforms using LLVM (like Clover or ROCm) as with LLVM `min(1.0, infinite)` is not `1.0` when using `-cl-fast-relaxed-math`.  
+  See https://forums.luxcorerender.org/viewtopic.php?t=4600
+- LuxCore now catches properly every OpenCL error (missing platform, missing device, OpenCL compilation error, etc.) and log them. This also enable LuxMark to not shutdown on missing platform and not stop listing devices on first platform without devices.
+- Both LuxCore and LuxMark also print their logs to `stderr` (not only within the application) so it survives a crash. Those logs don't have timestamps.
+- A bunch of environment variables are read to easily tweak the behaviour of LuxCore and LuxMark:
+  * LuxMark submission form can be pre-filled using `LUXMARK_USERNAME`, `LUXMARK_PASSWORD` and `LUXMARK_NOTE`.
+  * `LUXMARK_DEVICE_TYPE_ENABLE` can be set to `gpu` to select all GPUs by default (original behaviour), `cpu` to select all CPUs by default, `all` to select everything by default, or `none` to unselect everything by default.
+  * `LUXMARK_OCL_OPTIONS` allows to pass extra OpenCL compiler options to be used by LuxMark when building OpenCL kernels. For example one can set `LUXMARK_OCL_OPTIONS=-cl-strict-aliasing` to enable that option that is disabled by default. The menu will not reflect the options set from the environment, but the build log will print all the used options including those set from the environment.
+  * `LUXCORE_OCL_BUILD_LOG=y` enables the printing of the OpenCL build log.
+  * `LUXCORE_PREFER_BVH=y` force the usage of the BVH renderer instead of the QBVH one even if the platform provide the features required by QBVH.
+  * `LUXCORE_DISABLE_IMAGE=y` force the disablement of image support, this selects the related code path in QBVH renderer even if the platform implements image support.
+
 
 ### [`user-viennaclbench`](scripts/user-viennaclbench)
 
