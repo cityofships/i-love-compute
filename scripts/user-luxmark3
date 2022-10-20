@@ -257,7 +257,8 @@ _build_luxcore () {
 		'luxmark3/luxmark3-luxcore-catch-opencl-errors-on-platform-listing.patch' \
 		'luxmark3/luxmark3-luxcore-catch-opencl-errors-on-device-listing.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch' \
-		'luxmark3/luxmark3-luxcore-optionally-prefer-bvh.patch'
+		'luxmark3/luxmark3-luxcore-optionally-prefer-bvh.patch' \
+		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch'
 
 	# LuxCore can't be built with GCC11,
 	# It is known to build with GCC10,
