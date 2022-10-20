@@ -186,15 +186,14 @@ A script to download, build and run LuxMark 3.1.
 
 - The user can download build and install LuxMark 3.1 by doing `./user-luxmark3 build`.
 - The installation is done as user in `workspace/user-luxmark3` and provided software is not made available in default environment.
-- The user can run LuxMark by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
-- Beware that the scripts compiles old GCC 7 and old Qt 4. You need GCC 10 to build GCC 7. The script has been verified to be working on Ubuntu 22.04.
+- The user can run LuxMark 3.1 by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
 
 LuxMark 3.1 has been ported to Qt5 and a lot of patches are applied to both LuxCore and LuxMark to make it more useful for OpenCL platform developers:
 
 - A division by zero error in OpenCL code is fixed to avoid breaking the render on platforms using LLVM (like Clover or ROCm) as with LLVM `min(1.0, infinite)` is not `1.0` when using `-cl-fast-relaxed-math`.  
   See https://forums.luxcorerender.org/viewtopic.php?t=4600
-- LuxCore now catches properly every OpenCL error (missing platform, missing device, OpenCL compilation error, etc.) and log them. This also enable LuxMark to not shutdown on missing platform and not stop listing devices on first platform without devices.
-- Both LuxCore and LuxMark also print their logs to `stderr` (not only within the application) so it survives a crash. Those logs don't have timestamps.
+- LuxCore now catches properly every OpenCL error (missing platform, missing device, OpenCL compilation error, etc.) and log them. This also enables LuxMark to not shutdown on missing platform and not stop listing devices on first platform without devices.
+- Both LuxCore and LuxMark now print their logs to `stderr` (in addition to the application graphical log) so it survives a crash. Those logs are printed to `stderr` without timestamps.
 - A bunch of environment variables are read to easily tweak the behaviour of LuxCore and LuxMark:
   * LuxMark submission form can be pre-filled using `LUXMARK_USERNAME`, `LUXMARK_PASSWORD` and `LUXMARK_NOTE`.
   * `LUXMARK_DEVICE_TYPE_ENABLE` can be set to `gpu` to select all GPUs by default (original behaviour), `cpu` to select all CPUs by default, `all` to select everything by default, or `none` to unselect everything by default.
