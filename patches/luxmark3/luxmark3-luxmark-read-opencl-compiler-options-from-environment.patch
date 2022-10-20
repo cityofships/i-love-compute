@@ -1,0 +1,18 @@
+diff --git a/src/luxmarkapp.cpp b/src/luxmarkapp.cpp
+index 92e1edd..ceac3d1 100644
+--- a/src/luxmarkapp.cpp
++++ b/src/luxmarkapp.cpp
+@@ -260,6 +260,13 @@ void LuxMarkApp::EngineInitThreadImpl(LuxMarkApp *app) {
+ 			oclCompilerOpts += "-cl-no-signed-zeros";
+ 		}
+ 
++		const char* env_ocl_options = getenv("LUXMARK_OCL_OPTIONS");
++		if (env_ocl_options != nullptr) {
++			if (oclCompilerOpts != "")
++				oclCompilerOpts += " ";
++			oclCompilerOpts += env_ocl_options;
++		}
++
+ 		app->luxSession = new LuxRenderSession(sname, app->mode, deviceSelection, oclCompilerOpts);
+ 
+ 		// Start the rendering
