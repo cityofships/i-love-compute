@@ -13,7 +13,7 @@ index ecbb7d41b..b8b23bbf3 100644
  			accel = dataSet->GetAccelerator(accelType);
  		} else {
 +			const char* env_prefer_bvh = getenv("LUXCORE_PREFER_BVH");
-+			bool prefer_bvh = (env_prefer_bvh != nullptr && strlen(env_prefer_bvh) != 0);
++			const bool prefer_bvh = (env_prefer_bvh != nullptr && strlen(env_prefer_bvh) != 0);
 +
  			// Check if the OpenCL device prefer float4 or float1
 -			if (deviceDesc->GetNativeVectorWidthFloat() >= 4) {

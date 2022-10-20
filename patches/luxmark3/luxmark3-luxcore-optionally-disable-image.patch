@@ -13,7 +13,7 @@ index b8b23bbf3..93c2a6ef8 100644
  	kernels = nullptr;
  
 +	const char* env_disable_image = getenv("LUXCORE_DISABLE_IMAGE");
-+	bool disable_image = (env_disable_image != nullptr && strlen(env_disable_image) != 0);
++	const bool disable_image = (env_disable_image != nullptr && strlen(env_disable_image) != 0);
 +	enableImageStorage = (enableImageStorage && !disable_image);
 +
  	oclQueues.clear();

@@ -1,20 +1,21 @@
-commit 9c1d6d349cc33046a0e43f0369c504149975d7a7
+commit 71b4e6f5fa80eaf9bff1d1e4a7a35661199439a4
 Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Thu Oct 20 18:13:58 2022 +0200
+Date:   Thu Oct 20 18:37:50 2022 +0200
 
     patch: luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch
 
 diff --git a/src/slg/engines/pathoclbase/pathoclbasethread.cpp b/src/slg/engines/pathoclbase/pathoclbasethread.cpp
-index db29d6ecf..ee94c1d2c 100644
+index db29d6ecf..b4b6b5842 100644
 --- a/src/slg/engines/pathoclbase/pathoclbasethread.cpp
 +++ b/src/slg/engines/pathoclbase/pathoclbasethread.cpp
-@@ -1353,6 +1353,12 @@ void PathOCLBaseRenderThread::InitKernels() {
+@@ -1353,6 +1353,13 @@ void PathOCLBaseRenderThread::InitKernels() {
  		throw runtime_error("PathOCLBase kernel compilation error");
  	}
  
 +	const char* env_ocl_build_log = getenv("LUXCORE_OCL_BUILD_LOG");
++	const bool ocl_build_log = (env_ocl_build_log != nullptr && strlen(env_ocl_build_log) != 0);
 +
-+	if (env_ocl_build_log != nullptr && strlen(env_ocl_build_log) != 0) {
++	if (ocl_build_log) {
 +		SLG_LOG("[PathOCLBaseRenderThread::" << threadIndex << "] PathOCL kernel compilation log" << endl << program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(oclDevice));
 +	}
 +
