@@ -42,29 +42,34 @@ For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` 
 
 Looking for:
 
-- AMD discrete RDNA2 (Big Navi), CDNA2,
-- AMD RDNA1 (Navi), CDNA1,
-- AMD GCN4 (Polaris),
+- AMD discrete RDNA2.0 (Big Navi),
+- AMD CDNA 2.0,
+- AMD RDNA 1.0 (Navi),
+- AMD CDNA 1.0,
 - AMD hardware with supported HIP on ROCm,
 - Via hardware (Chrome 520 and later),
-- Nvidia hardware that is not Tesla or Kepler,
-- Intel hardware that is not Gen7 (Haswell),
+- Nvidia hardware that is not Tesla or Kepler,  
+  especially those driven by nvc0 and not nv50.
+- Intel hardware that is not Gen7 (Haswell),  
+  especially those driven by iris and not crocus.
 - Non-integrated Intel hardware like Intel Xe.
 
 Already sourced:
 
-- AMD RDNA2 (integrated),
-- AMD GCN5 (integrated),
-- AMD GCN3 (integrated),
-- AMD GCN2 (discrete: PCIe),
-- AMD GCN1 (discrete: PCIe),
-- AMD TeraScale 3 (discrete: PCIe),
-- AMD TeraScale 2 (discrete: PCIe, PCI),
-- AMD TeraScale 1 (discrete: PCIe, PCI, AGP),
-- Intel Gen7 GT2 (integrated),
-- Nvidia Kepler (integrated: PCIE; onboard),
-- Nvidia Tesla 2.0 (discrete: PCIe),
-- Nvidia Tesla 1.0 (discrete: PCI).
+- AMD RDNA 2.0 (radeonsi; integrated),
+- AMD GCN 5.0 (radeonsi; discrete: PCIe),
+- AMD GCN 5.0 (radeonsi; integrated),
+- AMD GCN 4.0 (radeonsi; discrete: PCIe),
+- AMD GCN 3.0 (radeonsi; integrated),
+- AMD GCN 2.0 (radeonsi; discrete: PCIe),
+- AMD GCN 1.0 (radeonsi; discrete: PCIe),
+- AMD TeraScale 3 (r600; discrete: PCIe),
+- AMD TeraScale 2 (r600; discrete: PCIe, PCI),
+- AMD TeraScale 1 (r600; discrete: PCIe, AGP, PCI),
+- Intel Gen7 GT2 (crocus; integrated),
+- Nvidia Kepler (nv50; discrete: PCIe; onboard),
+- Nvidia Tesla 2.0 (nv50; discrete: PCIe),
+- Nvidia Tesla 1.0 (nv50; discrete: PCI).
 
 
 Scripts
@@ -83,14 +88,14 @@ The `user-` scripts are no longer standalone and now share common parts external
 
 A script to install amdgpu-pro OpenCL on Ubuntu. This was based on many scripts [like this one](https://github.com/RadeonOpenCompute/ROCr/issues/484#issuecomment-554738964) written on various places through the years to make possible to use OpenCL with AMD GPUs.
 
-It makes possible to install Orca (GCN1 to 4), PAL (GCN 5), ROCr and Clover (TeraScale, GCN+).
+It makes possible to install Orca (GCN 2.0 to 4.0), PAL (GCN 5.0), ROCr and Clover (TeraScale 2 and 3, GCN 1 and later).
 
 - The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
 - The installation is done as root and system-wide, provided software is made available to default environment.
 
 This script is known to work on Ubuntu 22.04 LTS.
 
-Note: This script installs older Clover packages that are known to work but may not support newer cards. Newer versions are known to suffer from a regression in LLVM. Official Ubuntu Clover package `mesa-opencl-icd` may be installed by hand and used with radeonsi as long as OpenCL applications do not make use of the `-cl-fast-relaxed-math` OpenCL compilation option. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
+Note: This script installs older Clover packages that are known to work both with radeonsi and r600 but may not support newer cards. Newer versions are known to not work with r600. Official Ubuntu Clover package `mesa-opencl-icd` may be installed by hand instead. See [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947). Official Ubuntu Clover packages may not be usable with r600. See [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).
 
 
 ### [`user-mesa`](scripts/user-mesa)
@@ -116,6 +121,7 @@ This is a variant of the `user-mesa` script building the experimental out-of-tre
 
 
 ### [`user-clvk`](scripts/user-clvk)
+
 A script to download, build clvk and run software using clvk.
 
 - The user can download, build and install clvk by doing `./user-clvk build`.
@@ -217,7 +223,7 @@ Software currently providing OpenCL support:
 - *[OBS Studio](https://obsproject.com/)*,
 - *[DaVinci Resolve](https://www.blackmagicdesign.com/fr/products/davinciresolve/)*.
 
-It is known LuxRender on an AMD R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or PAL or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
+It is known LuxRender on an AMD Radeon R9 390X is almost twice faster on Clover with GCN hardware than on AMD-APP Legacy (Orca) or PAL or ROCr when it worked (see [#10](https://gitlab.com/illwieckz/i-love-compute/-/issues/10)), so people rendering things using this raytracer may prefer to use Clover, but it's known Clover lacks image support so photographers may want to install AMD-APP Legacy instead to run Darktable with working OpenCL using that GPU.
 
 Software formerly providing OpenCL support:
 
@@ -266,16 +272,16 @@ Orca requires an X11 server being up and running.
   open, incomplete (verified).
 - ATI/AMD GPU,
   - Mesa Clover, LLVM libclc amdgcn,  
-  open, incomplete, GCN1-5 (verified), RDNA (not verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), LuxRender is twice faster on Clover than on Orca, PAL and ROCr. Upstream Clover may be usable with radeonsi as long as `-cl-fast-relaxed-math` is not enabled, see [llvm/llvm-project#54947](https://github.com/llvm/llvm-project/issues/54947), upstream clover packages may not be usable with r600, see [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).  
+  open, incomplete, GCN 1.0 to 4.0 (verified), does not work with GCN 5.0 and RDNA (verified).
+    * LuxRender is twice faster on Clover than on Orca, PAL and ROCr.
   - Mesa Clover, LLVM libclc r600,  
   open, incomplete, TeraScale2-3 (verified).
-    * Last known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified).
+    * Known working version: Mesa 20.0.4, LLVM 9.0.1 (`20190827`, verified), more recent build may not work with both TeraScale 2 and 3, see [llvm/llvm-project#55679](https://github.com/llvm/llvm-project/issues/55679), upstream Clover with upstream LLVM may not be usable with TeraScale 3, see [llvm/llvm-project#54942](https://github.com/llvm/llvm-project/issues/54942).  
   - Mesa rusticl on radeonsi,  
-  open, work-in-progress.
+  open, work-in-progress, GCN 1.0 to GCN 5.0 (verified), RDNA 1.0 to RDNA 2.0 (2.0 verified, 1.0 not verified).
   - AMDGPU-PRO Orca (legacy),  
-  closed, complete, GCN1-3 (verified), probably GCN4 (not verified).
-    * Last working version for Orca (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
+  closed, complete, GCN 2.0 to 4.0 (verified). GCN 1.0 is listed but doesn't work (verified).
+    * Last working version for Orca for GCN 2.0 and 3.0 (`2021-06-21`, discontinued?): [AMDGPU-PRO 21.20-1271047](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-21-20) (verified).
   - AMDGPU-PRO PAL,  
   closed, complete, GCN5 (verified), probably RDNA (not verified).
     * Last version for PAL (`2020-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified), removed in favor of ROCr in Radeon Software AMDGPU-PRO without ROCr being actually an alternative.
@@ -284,8 +290,8 @@ Orca requires an X11 server being up and running.
   - fglrx AMD APP,  
   closed and requires old kernel, complete, old GPUs, the only option for TeraScale,  
   people are still [using it in 2020](https://gitlab.com/illwieckz/i-love-compute/-/issues/1#note_451460689).  
-    * Last version for GCN (`2015-12-18`, discontinued): [AMD Radeon Software Crimson 15.12-15.302-151217a-297685e](https://www.amd.com/fr/support/graphics/amd-radeon-r9-series/amd-radeon-r9-300-series/amd-radeon-r9-390x) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified).
-    * Last version for TeraScale2 to 3 (`2015-09-15`discontinued): [AMD Catalyst 15.9-15.201.1151](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-5000-series/ati-radeon-hd-5970) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified).
+    * Last version for GCN (`2015-12-18`, discontinued): [AMD Radeon Software Crimson 15.12-15.302-151217a-297685e](https://www.amd.com/fr/support/graphics/amd-radeon-r9-series/amd-radeon-r9-300-series/amd-radeon-r9-390x) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified for GCN 1.0 and GCN 2.0).
+    * Last version for TeraScale 2 to 3 (`2015-09-15`discontinued): [AMD Catalyst 15.9-15.201.1151](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-5000-series/ati-radeon-hd-5970) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified).
     * Last version for TeraScale1 (`2013-01-21`, discontinued): [AMD Catalyst 13.1](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-4000-series/ati-radeon-hd-4890), requires Ubuntu 12.04 (not verified), only option for TeraScale 1 like Radeon HD 4890 PCIe and Radeon HD 4670 AGP (not verified).
   - mesa3d-comp-bridge,  
     open on closed code, unmaintained, was meant to run Mesa Clover over Mesa APP OpenCL compiler.
@@ -299,7 +305,7 @@ Orca requires an X11 server being up and running.
   - older AMDGPU-PRO or fglrx,  
   closed, complete, verified.
 - Intel GPU,
-  - Mesa Clover, libclc nouveau.  
+  - Mesa Clover on iris.  
   open, early state, not tested,
   - Mesa rusticl on iris,  
   open, early state, work-in-progress, not tested.
@@ -325,16 +331,16 @@ Orca requires an X11 server being up and running.
   - Intel OneAPI OpenCL,  
   open components, full openness unknown, not tested.
 - Nvidia GPU,
-  - Mesa Clover, libclc nouveau.  
+  - Mesa Clover on nouveau.  
   open, early state, not tested,
   - Mesa rusticl on nouveau,  
   open, early state, work-in-progress, not tested.
   - libclc ptx,  
-  open requiring closed component, incomplete, not tested.
+  open requiring closed component, requires an unknown frontend, incomplete, not tested.
   - Nvidia,  
   closed, complete, verified.
   - pocl with Nvidia,  
-  open requiring closed component, early-state, not tested.
+  open requiring closed component (maybe libclc ptx?), early-state, not tested.
 - FPGAs,
   - Intel OneAPI OpenCL,  
   not tested.
