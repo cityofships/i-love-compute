@@ -3,15 +3,12 @@
 # Copyright 2022 Thomas “illwieckz“ Debesse
 
 # You may need to install:
-# For gcc7:
-#   gcc-10 libgmp-dev libmpfr-dev libmpc-dev
 # For oiio:
 #   libilmbase-dev libopenexr-dev libtiff-dev libpython2.7-dev
 # For luxcore and luxmark:
 #   libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb2-dev
-
-# GCC10 is needed to build GCC7 (GCC11 and later can't build GCC7).
-# GCC7 is needed to build Qt4 (GCC8 and later can't build Qt4).
+# For luxmark:
+#   qt5-qmake and others
 
 script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
@@ -29,16 +26,6 @@ packages=(
 	#	repository or archive url
 	#	branch or archive name
 	#	build slug
-	'GCC 7.5.0'
-		'gcc-7.5.0'
-		'https://bigsearcher.com/mirrors/gcc/releases/gcc-7.5.0/gcc-7.5.0.tar.xz'
-		'fe716cc19f2e3255d3a8b1b8290777bf769c6d98e6e0b07b81a3d6ad43f8af74cb170dfa18b1555dbfcd3f55ae582b91a286ccef496b9b65c1579902f96a1f60'
-		'gcc7'
-	'Qt 4.8.7'
-		'qt-everywhere-opensource-src-4.8.7'
-		'https://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz'
-		'f9f81a2e7205e1fd05c8d923dc73244f29aa33f951fa6b7c5c8193449328b37084796b9b71ad0c317e4e6fd00017c10ea5d67b1b2032551cde00548522218125'
-		'qt4'
 	'OpenImageIO'
 		'oiio'
 		'https://github.com/OpenImageIO/oiio.git'
@@ -91,122 +78,6 @@ _set_custom_run_env () {
 	export PATH="${install_dir}/opt/luxmark:${PATH:-}"
 
 	cd "${install_dir}/opt/luxmark"
-}
-
-_build_gcc7 () {
-	if _is_done
-	then
-		return
-	fi
-
-	(
-		# *** LIBRARY_PATH shouldn't contain the current directory when
-		# *** building gcc. Please change the environment variable
-		# *** and run configure again.
-		LIBRARY_PATH=''
-
-		# Those other variables must be unset:
-		# ../.././gcc/statistics.h:25:2: error: #error GATHER_STATISTICS must be defined
-		#    25 | #error GATHER_STATISTICS must be defined
-		C_INCLUDE_PATH=''
-		CPLUS_INCLUDE_PATH=''
-
-		# GCC11 cannot build GCC7:
-		export CC="gcc-10"
-		export CXX="g++-10"
-
-		# Disable nls because:
-		# msgfmt: gcc-7.5.0/x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /usr/lib/x86_64-linux-gnu/libicuuc.so.70)
-
-		# Disable libsanitizer because:
-		# ../../.././libsanitizer/sanitizer_common/sanitizer_internal_defs.h:261:72: error: size of array «assertion_failed__1150» is negative
-		#     typedef char IMPL_PASTE(assertion_failed_##_, line)[2*(int)(pred)-1]
-		_build_generic_configure \
-			--program-suffix='-7' \
-			--with-gcc-major-version-only \
-			--disable-nls \
-			--disable-libsanitizer
-
-		unset CC
-		unset CXX
-
-		unset LIBRARY_PATH
-		unset C_INCLUDE_PATH
-		unset CPLUS_INCLUDE_PATH
-	)
-
-	_set_done
-}
-
-_build_qt4 () {
-	if _is_done
-	then
-		return
-	fi
-
-	# itemviews.cpp: In member function ‘virtual bool QAccessibleTable2::unselectColumn(int)’:
-	# itemviews.cpp:396:105: error: conversion from ‘int’ to ‘QItemSelectionModel::SelectionFlags {aka QFlags<QItemSelectionModel::SelectionFlag>}’ is ambiguous
-	#      view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
-	#                                                                                                          ^
-	_apply_patches \
-		'luxmark3/luxmark3-qt4-type-conversion.patch'
-
-	(
-		export CC="${install_dir}/bin/gcc-7"
-		export CXX="${install_dir}/bin/g++-7"
-
-		# It still uses system's GCC for some steps
-		# including configure steps.
-		mkdir -pv 'path'
-		ln -sfv "${install_dir}/bin/gcc-7" 'path/gcc'
-		ln -sfv "${install_dir}/bin/g++-7" 'path/g++'
-		export PATH="$(pwd)/path:${PATH}"
-
-		# Disable javascript because:
-		# ../3rdparty/javascriptcore/JavaScriptCore/wtf/HashTable.h:272:89: error: call of overloaded ‘swap(std::pair<QTWTF::RefPtr<QTJSC::UStringImpl>, QTJSC::SymbolTableEntry>&, std::pair<QTWTF::RefPtr<QTJSC::UStringImpl>, QTJSC::SymbolTableEntry>&)’ is ambiguous
-		#      template<typename T> struct Mover<T, true> { static void move(T& from, T& to) { swap(from, to); } };
-		#                                                                                      ~~~~^~~~~~~~~~
-
-		# Build PNG as LuxMark displays some PNG
-		# file in the about window. It can
-		# be safely disabled anyway and LuxMark
-		# will run without displaying the image.
-		# For some unknown reason it doesn't
-		# return 0 on success.
-		yes | ./configure --prefix="${install_dir}" \
-			-opensource \
-			-no-openssl \
-			-no-qt3support \
-			-gtkstyle \
-			-no-cups \
-			-no-multimedia \
-			-no-audio-backend \
-			-no-phonon \
-			-no-webkit \
-			-no-javascript-jit \
-			-no-script \
-			-no-scripttools \
-			-system-libpng \
-			-no-svg \
-			-no-gif \
-			-no-libtiff \
-			-no-libmng \
-			-no-libjpeg \
-			-no-xvideo \
-			-no-sql-mysql \
-			-no-sql-sqlite \
-			-no-sql-sqlite2 \
-		|| true
-
-		make -j"${usable_job_count}"
-
-		make install
-
-		unset CC
-		unset CXX
-	)
-
-	_set_done
 }
 
 _build_oiio () {
@@ -279,6 +150,8 @@ _build_luxcore () {
 
 _build_luxmark () {
 	_apply_patches \
+		'luxmark3/luxmark3-luxmark-port-to-qt5.patch' \
+		'luxmark3/luxmark3-luxmark-lowercase-false.patch' \
 		'luxmark3/luxmark3-luxmark-catch-context-errors.patch' \
 		'luxmark3/luxmark3-luxmark-more-opencl-compiler-options.patch' \
 		'luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch' \
