@@ -1,0 +1,26 @@
+commit 01843f7d085da39b7f0d11644f9b5bba191c4b86
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Wed Oct 12 15:37:11 2022 +0200
+
+    patch: luxmark3/luxmark3-luxcore-catch-opencl-errors-on-platform-listing.patch
+
+diff --git a/src/luxrays/core/context.cpp b/src/luxrays/core/context.cpp
+index 1bfe2f116..7dada9a8e 100644
+--- a/src/luxrays/core/context.cpp
++++ b/src/luxrays/core/context.cpp
+@@ -43,7 +43,14 @@ Context::Context(LuxRaysDebugHandler handler, const int openclPlatformIndex) {
+ #if !defined(LUXRAYS_DISABLE_OPENCL)
+ 	// Platform info
+ 	VECTOR_CLASS<cl::Platform> platforms;
+-	cl::Platform::get(&platforms);
++
++	try {
++		cl::Platform::get(&platforms);
++	}
++	catch (cl::Error err) {
++		LR_LOG(this, "OpenCL ERROR: " << err.what() << "(" << oclErrorString(err.err()) << ")");
++	}
++
+ 	for (size_t i = 0; i < platforms.size(); ++i)
+ 		LR_LOG(this, "OpenCL Platform " << i << ": " << platforms[i].getInfo<CL_PLATFORM_VENDOR>().c_str());
+ 
