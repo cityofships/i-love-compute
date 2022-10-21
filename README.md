@@ -186,7 +186,7 @@ A script to download, build and run LuxMark 3.1.
 
 - The user can download build and install LuxMark 3.1 by doing `./user-luxmark3 build`.
 - The installation is done as user in `workspace/user-luxmark3` and provided software is not made available in default environment.
-- The user can run LuxMark 3.1 by doing `./user-luxmark3 run` or more complicated commands like `./user-luxmark3 run luxmark --mode=PAUSE`.
+- The user can run LuxMark 3.1 by doing `./user-luxmark3 run` or more complex commands like `./user-luxmark3 run luxmark --help` or like `./user-luxmark3 run gdb -args luxmark --mode=PAUSE`.
 
 LuxMark 3.1 has been ported to Qt5 and a lot of patches are applied to both LuxCore and LuxMark to make it more useful for OpenCL platform developers:
 
