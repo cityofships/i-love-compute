@@ -1,9 +1,22 @@
-commit 7c3464f4b8113a250da73abe1e58b73c9cd3fc7f
+commit ca4395e9788860e9f3e355e520cbee5ef672a2a3
 Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Fri Oct 21 18:21:11 2022 +0200
+Date:   Fri Oct 21 21:28:41 2022 +0200
 
-    patch: luxmark3/luxmark3-luxcore-no-pyluxcore.patch
+    patch: luxmark3-luxcore-no-pyluxcore.patch
 
+diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
+index aeeb65b69..d245bb4a5 100644
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -58,7 +58,7 @@ set(Boost_MINIMUM_VERSION       "1.44.0")
+ 
+ set(Boost_ADDITIONAL_VERSIONS "1.47.0" "1.46.1" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0")
+ 
+-set(LUXRAYS_BOOST_COMPONENTS thread program_options filesystem serialization iostreams regex system python)
++set(LUXRAYS_BOOST_COMPONENTS thread program_options filesystem serialization iostreams regex system)
+ find_package(Boost ${Boost_MINIMUM_VERSION} COMPONENTS ${LUXRAYS_BOOST_COMPONENTS})
+ if (NOT Boost_FOUND)
+         # Try again with the other type of libs
 diff --git a/src/luxcore/CMakeLists.txt b/src/luxcore/CMakeLists.txt
 index 2a7ebc453..69bef27c9 100644
 --- a/src/luxcore/CMakeLists.txt
