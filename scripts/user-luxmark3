@@ -104,7 +104,8 @@ _build_oiio () {
 
 _build_embree () {
 	_cmake_setup \
-		-D'EMBREE_ISPC_SUPPORT'='OFF'
+		-D'EMBREE_ISPC_SUPPORT'='OFF' \
+		-D'EMBREE_TUTORIALS'='OFF'
 
 	_cmake_compile_install
 }
@@ -114,7 +115,8 @@ _build_clhpp () {
 		-D'OPENCL_INCLUDE_DIR'="${install_dir}/include" \
 		-D'OPENCL_LIB_DIR'="${install_dir}/lib" \
 		-D'BUILD_EXAMPLES'='OFF' \
-		-D'BUILD_TESTS'='OFF'
+		-D'BUILD_TESTS'='OFF' \
+		-D'BUILD_DOCS'='OFF'
 
 	_cmake_compile_install
 }
