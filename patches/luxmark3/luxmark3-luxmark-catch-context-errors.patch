@@ -1,5 +1,11 @@
+commit bc5df32a335c63f74acbd8f1e5a13c27a3cfedfa
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:22:16 2022 +0200
+
+    patch: luxmark3/luxmark3-luxmark-catch-context-errors.patch
+
 diff --git a/src/hardwaretree.cpp b/src/hardwaretree.cpp
-index f9dce45..1abf818 100644
+index 05c9037..7822c36 100644
 --- a/src/hardwaretree.cpp
 +++ b/src/hardwaretree.cpp
 @@ -97,9 +97,18 @@ static void LuxRaysErrorHandler(const char *msg) {

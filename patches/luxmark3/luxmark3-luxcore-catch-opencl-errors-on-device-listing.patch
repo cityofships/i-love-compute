@@ -1,3 +1,9 @@
+commit 7d2c613e76d76f5c9544c8b0b66ce5994fe142c1
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:21:11 2022 +0200
+
+    patch: luxmark3/luxmark3-luxcore-catch-opencl-errors-on-device-listing.patch
+
 diff --git a/include/luxrays/core/ocldevice.h b/include/luxrays/core/ocldevice.h
 index fb7f00774..05df99956 100644
 --- a/include/luxrays/core/ocldevice.h
@@ -13,10 +19,10 @@ index fb7f00774..05df99956 100644
  
  	size_t deviceIndex;
 diff --git a/src/luxrays/core/context.cpp b/src/luxrays/core/context.cpp
-index 7dada9a8e..a530b6b51 100644
+index 7703ffbdd..30f9166b9 100644
 --- a/src/luxrays/core/context.cpp
 +++ b/src/luxrays/core/context.cpp
-@@ -59,7 +59,7 @@ Context::Context(LuxRaysDebugHandler handler, const int openclPlatformIndex) {
+@@ -58,7 +58,7 @@ Context::Context(LuxRaysDebugHandler handler, const int openclPlatformIndex) {
  			// Just use all the platforms available
  			for (size_t i = 0; i < platforms.size(); ++i)
  				OpenCLDeviceDescription::AddDeviceDescs(
@@ -25,7 +31,7 @@ index 7dada9a8e..a530b6b51 100644
  					deviceDescriptions);
  		} else
  			LR_LOG(this, "No OpenCL platform available");
-@@ -68,7 +68,7 @@ Context::Context(LuxRaysDebugHandler handler, const int openclPlatformIndex) {
+@@ -67,7 +67,7 @@ Context::Context(LuxRaysDebugHandler handler, const int openclPlatformIndex) {
  			throw std::runtime_error("Unable to find an appropriate OpenCL platform");
  		else {
  			OpenCLDeviceDescription::AddDeviceDescs(

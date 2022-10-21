@@ -1,3 +1,9 @@
+commit cc6a000cb7f65356a1a41cd8a96664cabb16c306
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:22:16 2022 +0200
+
+    patch: luxmark3/luxmark3-luxmark-port-to-qt5.patch
+
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
 index e9fb5ba..0e8bad2 100644
 --- a/src/CMakeLists.txt
@@ -59,7 +65,7 @@ index e9fb5ba..0e8bad2 100644
 +	target_link_libraries(luxmark Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets)
  ENDIF(APPLE)
 diff --git a/src/luxmarkapp.h b/src/luxmarkapp.h
-index fb562c2..0d351bb 100644
+index 78c9ab4..f3d568e 100644
 --- a/src/luxmarkapp.h
 +++ b/src/luxmarkapp.h
 @@ -23,7 +23,7 @@
@@ -112,7 +118,7 @@ index 2ee5ae5..7a93275 100644
  			exit = true;
  			break;
 diff --git a/src/submitdialog.cpp b/src/submitdialog.cpp
-index 5ba9f75..aec081d 100644
+index a688cd9..d929060 100644
 --- a/src/submitdialog.cpp
 +++ b/src/submitdialog.cpp
 @@ -21,6 +21,7 @@
@@ -123,7 +129,7 @@ index 5ba9f75..aec081d 100644
  
  #include "luxrays/core/utils.h"
  
-@@ -147,67 +148,67 @@ void SubmitDialog::genericButton() {
+@@ -130,67 +131,67 @@ void SubmitDialog::genericButton() {
  		request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
  
  		// Create the http request parameters

@@ -1,3 +1,9 @@
+commit 7c3464f4b8113a250da73abe1e58b73c9cd3fc7f
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:21:11 2022 +0200
+
+    patch: luxmark3/luxmark3-luxcore-no-pyluxcore.patch
+
 diff --git a/src/luxcore/CMakeLists.txt b/src/luxcore/CMakeLists.txt
 index 2a7ebc453..69bef27c9 100644
 --- a/src/luxcore/CMakeLists.txt
@@ -5,7 +11,7 @@ index 2a7ebc453..69bef27c9 100644
 @@ -133,24 +133,24 @@ link_directories (${SLG_LIB_DIR} ${LuxRays_LIB_DIR})
  #
  ################################################################################
-
+ 
 -set(PYLUXCORE_SRCS
 -	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcore.cpp
 -	${LuxRays_SOURCE_DIR}/src/luxcore/pyluxcoreforblender.cpp
@@ -42,6 +48,6 @@ index 2a7ebc453..69bef27c9 100644
 +# if(MSVC)
 +# 	set_target_properties(pyluxcore PROPERTIES SUFFIX ".pyd")
 +# endif(MSVC)
-
+ 
  ################################################################################
  #

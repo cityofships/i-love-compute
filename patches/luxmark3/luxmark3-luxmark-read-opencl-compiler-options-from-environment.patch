@@ -1,8 +1,14 @@
+commit a87f184ac0e81aefbcd3c0eb5505e4a19657bd43
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:22:16 2022 +0200
+
+    patch: luxmark3/luxmark3-luxmark-read-opencl-compiler-options-from-environment.patch
+
 diff --git a/src/luxmarkapp.cpp b/src/luxmarkapp.cpp
-index 92e1edd..ceac3d1 100644
+index 50a0fbc..dbaefde 100644
 --- a/src/luxmarkapp.cpp
 +++ b/src/luxmarkapp.cpp
-@@ -260,6 +260,13 @@ void LuxMarkApp::EngineInitThreadImpl(LuxMarkApp *app) {
+@@ -251,6 +251,13 @@ void LuxMarkApp::EngineInitThreadImpl(LuxMarkApp *app) {
  			oclCompilerOpts += "-cl-no-signed-zeros";
  		}
  

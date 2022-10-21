@@ -1,3 +1,9 @@
+commit cccc562a3aaeae887c8f6e093117a6b4fce35779
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:21:11 2022 +0200
+
+    patch: luxmark3/luxmark3-luxcore-do-not-crash-on-kernel-build-failure.patch
+
 diff --git a/include/luxrays/core/oclintersectiondevice.h b/include/luxrays/core/oclintersectiondevice.h
 index f8de35615..4c6aa8003 100644
 --- a/include/luxrays/core/oclintersectiondevice.h

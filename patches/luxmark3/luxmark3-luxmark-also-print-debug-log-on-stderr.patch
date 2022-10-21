@@ -1,5 +1,11 @@
+commit ee6e8aee5d5d52dad930d34c20d6fe6fa9c60b1a
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:22:16 2022 +0200
+
+    patch: luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch
+
 diff --git a/src/luxmarkapp.cpp b/src/luxmarkapp.cpp
-index 922482c..9f832fa 100644
+index dbaefde..ceac3d1 100644
 --- a/src/luxmarkapp.cpp
 +++ b/src/luxmarkapp.cpp
 @@ -110,16 +110,23 @@ LuxMarkApp::~LuxMarkApp() {
@@ -29,7 +35,7 @@ index 922482c..9f832fa 100644
  
  	// Initialize hardware information
  	hardwareTreeModel = new HardwareTreeModel(mainWin);
-@@ -157,7 +164,9 @@ void  LuxMarkApp::SetOpenCLCompilerOpts(const OCLCompilerOpts opt, const bool en
+@@ -151,7 +158,9 @@ void  LuxMarkApp::SetOpenCLCompilerOpts(const OCLCompilerOpts opt, const bool en
  			oclOptNoSignedZeros = enable;
  			break;
  		default:
@@ -40,7 +46,7 @@ index 922482c..9f832fa 100644
  			break;
  	}
  }
-@@ -352,7 +361,9 @@ void LuxMarkApp::RenderRefreshTimeout() {
+@@ -343,7 +352,9 @@ void LuxMarkApp::RenderRefreshTimeout() {
  		case BENCHMARK_NATIVE:
  			break;
  		default:
@@ -52,10 +58,10 @@ index 922482c..9f832fa 100644
  	}
  
 diff --git a/src/mainwindow.h b/src/mainwindow.h
-index fb0b455..3539efc 100644
+index e15fe72..9abf6a7 100644
 --- a/src/mainwindow.h
 +++ b/src/mainwindow.h
-@@ -138,11 +138,41 @@ private:
+@@ -136,11 +136,41 @@ private:
  	QString message;
  };
  
@@ -104,10 +110,10 @@ index fb0b455..3539efc 100644
  
  #endif	/* _MAINWINDOW_H */
 diff --git a/src/submitdialog.cpp b/src/submitdialog.cpp
-index a98b615..5ba9f75 100644
+index d929060..2350cd4 100644
 --- a/src/submitdialog.cpp
 +++ b/src/submitdialog.cpp
-@@ -29,9 +29,23 @@
+@@ -30,9 +30,23 @@
  
  using namespace luxrays;
  

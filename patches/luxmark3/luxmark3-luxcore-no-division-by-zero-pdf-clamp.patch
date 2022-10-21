@@ -1,3 +1,9 @@
+commit 80aa0059971cae1e5eb90cef47b7c16e1908271d
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:21:11 2022 +0200
+
+    patch: luxmark3/luxmark3-luxcore-no-division-by-zero-pdf-clamp.patch
+
 diff --git a/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl b/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl
 index 5a7547e49..b21530ed8 100644
 --- a/include/slg/engines/biaspathocl/kernels/biaspathocl_funcs.cl
@@ -33,3 +39,38 @@ index 9d15fc36c..fd6c6385c 100644
  		throughputFactor *= bsdfSample * pdfFactor;
  
  		VSTORE3F(throughputFactor * VLOAD3F(taskState->throughput.c), taskState->throughput.c);
+diff --git a/src/slg/kernels/biaspathocl_funcs_kernel.cpp b/src/slg/kernels/biaspathocl_funcs_kernel.cpp
+index fe5d39575..aac785398 100644
+--- a/src/slg/kernels/biaspathocl_funcs_kernel.cpp
++++ b/src/slg/kernels/biaspathocl_funcs_kernel.cpp
+@@ -1086,7 +1086,7 @@ std::string KernelSource_biaspathocl_funcs =
+ "\n"
+ "		// Continue to trace the path\n"
+ "		const float3 throughputFactor = bsdfSample *\n"
+-"			((lastBSDFEvent & SPECULAR) ? 1.f : min(1.f, lastPdfW / PARAM_PDF_CLAMP_VALUE));\n"
++"			((lastBSDFEvent & SPECULAR) ? 1.f : min(1.f, lastPdfW / (PARAM_PDF_CLAMP_VALUE == 0.f ? lastPdfW : PARAM_PDF_CLAMP_VALUE)));\n"
+ "		pathThroughput *= throughputFactor;\n"
+ "#if defined(PARAM_FILM_CHANNELS_HAS_IRRADIANCE)\n"
+ "		// Update also irradiance AOV path throughput\n"
+@@ -1189,7 +1189,7 @@ std::string KernelSource_biaspathocl_funcs =
+ "#endif\n"
+ "\n"
+ "			// Continue to trace the path\n"
+-"			const float pdfFactor = scaleFactor * ((event & SPECULAR) ? 1.f : min(1.f, pdfW / PARAM_PDF_CLAMP_VALUE));\n"
++"			const float pdfFactor = scaleFactor * ((event & SPECULAR) ? 1.f : min(1.f, pdfW / (PARAM_PDF_CLAMP_VALUE == 0.f ? pdfW : PARAM_PDF_CLAMP_VALUE)));\n"
+ "			const float3 continuePathThroughput = throughputPathVertex1 * bsdfSample * pdfFactor;\n"
+ "\n"
+ "#if defined(PARAM_FILM_CHANNELS_HAS_IRRADIANCE)\n"
+diff --git a/src/slg/kernels/pathocl_kernels_micro_kernel.cpp b/src/slg/kernels/pathocl_kernels_micro_kernel.cpp
+index 71329e02f..e5d57e633 100644
+--- a/src/slg/kernels/pathocl_kernels_micro_kernel.cpp
++++ b/src/slg/kernels/pathocl_kernels_micro_kernel.cpp
+@@ -642,7 +642,7 @@ std::string KernelSource_pathocl_kernels_micro =
+ "		// RR increases path contribution\n"
+ "		throughputFactor /= rrProb;\n"
+ "		// PDF clamping (or better: scaling)\n"
+-"		const float pdfFactor = (event & SPECULAR) ? 1.f : min(1.f, lastPdfW / PARAM_PDF_CLAMP_VALUE);\n"
++"		const float pdfFactor = (event & SPECULAR) ? 1.f : min(1.f, lastPdfW / (PARAM_PDF_CLAMP_VALUE == 0.f ? lastPdfW : PARAM_PDF_CLAMP_VALUE));\n"
+ "		throughputFactor *= bsdfSample * pdfFactor;\n"
+ "\n"
+ "		VSTORE3F(throughputFactor * VLOAD3F(taskState->throughput.c), taskState->throughput.c);\n"

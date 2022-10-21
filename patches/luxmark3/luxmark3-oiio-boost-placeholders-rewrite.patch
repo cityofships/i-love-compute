@@ -1,3 +1,9 @@
+commit 6c42497df567a92e8b804cc690d4f01a2af745f8
+Author: Thomas Debesse <dev@illwieckz.net>
+Date:   Fri Oct 21 18:18:02 2022 +0200
+
+    patch: luxmark3/luxmark3-oiio-boost-placeholders-rewrite.patch
+
 diff --git a/src/libOpenImageIO/color_ocio.cpp b/src/libOpenImageIO/color_ocio.cpp
 index 0b70d89e..bc9bdc57 100644
 --- a/src/libOpenImageIO/color_ocio.cpp
