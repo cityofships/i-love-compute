@@ -1,9 +1,3 @@
-commit 2033b18eb9e98c8e17d75423ac59acb4ec0ec840
-Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Thu Oct 20 17:33:19 2022 +0200
-
-    patch: luxmark3/luxmark3-luxcore-catch-opencl-errors-on-device-listing.patch
-
 diff --git a/include/luxrays/core/ocldevice.h b/include/luxrays/core/ocldevice.h
 index fb7f00774..05df99956 100644
 --- a/include/luxrays/core/ocldevice.h

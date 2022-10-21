@@ -1,9 +1,3 @@
-commit 9f247a671fab3badb6fb8e61cd26c36e86250a3b
-Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Thu Sep 29 23:16:19 2022 +0200
-
-    Enable cpu, gpu, all or none from environment
-
 diff --git a/src/hardwaretree.cpp b/src/hardwaretree.cpp
 index 05c9037..347a1be 100644
 --- a/src/hardwaretree.cpp

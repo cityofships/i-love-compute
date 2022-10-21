@@ -1,9 +1,3 @@
-commit 06faf7e14e9f514153bda6735936bcadf286e42b
-Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Thu Oct 20 19:12:31 2022 +0200
-
-    patch: luxmark3/luxmark3-luxcore-optionally-disable-image.patch
-
 diff --git a/src/luxrays/idevices/openclidevice.cpp b/src/luxrays/idevices/openclidevice.cpp
 index b8b23bbf3..93c2a6ef8 100644
 --- a/src/luxrays/idevices/openclidevice.cpp

@@ -1,9 +1,3 @@
-commit 71b4e6f5fa80eaf9bff1d1e4a7a35661199439a4
-Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Thu Oct 20 18:37:50 2022 +0200
-
-    patch: luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch
-
 diff --git a/src/slg/engines/pathoclbase/pathoclbasethread.cpp b/src/slg/engines/pathoclbase/pathoclbasethread.cpp
 index db29d6ecf..b4b6b5842 100644
 --- a/src/slg/engines/pathoclbase/pathoclbasethread.cpp
