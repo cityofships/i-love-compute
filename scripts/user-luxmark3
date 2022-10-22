@@ -20,6 +20,26 @@ required_file='/opt/luxmark/luxmark'
 help_preset='basic_application'
 build_preset='basic_project'
 
+case "$(uname -m)" in
+	'aarch64')
+		embree_repository='https://github.com/marty1885/embree-arm.git'
+		embree_reference='master'
+		embree_tasking_system='INTERNAL'
+		embree_max_isa='SSE2'
+		embree_ispc_support='OFF'
+		;;
+	*)
+		embree_repository='https://github.com/embree/embree.git'
+		embree_reference='v2.17.7'
+		embree_tasking_system='TBB'
+		embree_max_isa='AVX2'
+		# Can be ON if ISPC is installed, untested.
+		# See https://github.com/embree/embree/blob/master/doc/src/compilation.md
+		# and https://github.com/ispc/ispc
+		embree_ispc_support='OFF'
+		;;
+esac
+
 packages=(
 	# package name
 	#	directory name
@@ -34,8 +54,8 @@ packages=(
 		'oiio'
 	'Embree'
 		'embree'
-		'https://github.com/embree/embree.git'
-		'v2.17.7'
+		"${embree_repository}"
+		"${embree_reference}"
 		'embree'
 	'OpenCL Headers'
 		'OpenCL-Headers'
@@ -116,7 +136,9 @@ _build_oiio () {
 
 _build_embree () {
 	_cmake_setup \
-		-D'EMBREE_ISPC_SUPPORT'='OFF' \
+		-D'EMBREE_TASKING_SYSTEM'="${embree_tasking_system}" \
+		-D'EMBREE_MAX_ISA'="${embree_max_isa}" \
+		-D'EMBREE_ISPC_SUPPORT'="${embree_ispc_support}" \
 		-D'EMBREE_TUTORIALS'='OFF' \
 		-D'EMBREE_TUTORIALS_LIBJPEG'='OFF' \
 		-D'EMBREE_TUTORIALS_LIBPNG'='OFF'
