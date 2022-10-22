@@ -5,8 +5,10 @@
 # You may need to install:
 # For oiio:
 #   libilmbase-dev libopenexr-dev libtiff-dev
+# For embree (on i686 or amd64):
+#   libtbb2-dev (or libtbb-dev) 
 # For luxcore and luxmark:
-#   libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libtbb2-dev (or libtbb-dev)
+#   bison flex doxygen libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libglew-dev freeglut3-dev ocl-icd-libopencl1
 # For luxmark:
 #   qtbase5-dev
 
