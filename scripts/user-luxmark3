@@ -193,9 +193,17 @@ _build_luxcore () {
 
 	# LuxCore doesn't build with ninja:
 	# ninja: error: build.ninja:829: lexing error
+
+	# On Debian 11 for aarch64 (raspbian), the explicit -pthread flag
+	# was required, it's not needed on Ubuntu 22.04 for amd64 but
+	# doesn't prevent to build.
+	luxcore_extra_flags='-pthread'
+
 	_cmake_setup \
 		-G'Unix Makefiles' \
-		-D'CMAKE_CXX_FLAGS'='-std=c++11 -Wno-narrowing' \
+		-D'CMAKE_C_FLAGS'="${luxcore_extra_flags}" \
+		-D'CMAKE_CXX_FLAGS'="-std=c++11 -Wno-narrowing ${luxcore_extra_flags}" \
+		-D'CMAKE_EXE_LINKER_FLAGS'="${luxcore_extra_flags}" \
 		-D'USE_SSE'="${luxcore_use_sse}"
 
 	_cmake_target
