@@ -4,11 +4,11 @@
 
 # You may need to install:
 # For oiio:
-#   libilmbase-dev libopenexr-dev libtiff-dev libpython2.7-dev
+#   libilmbase-dev libopenexr-dev libtiff-dev
 # For luxcore and luxmark:
-#   libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libboost-python-dev libtbb2-dev
+#   libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libtbb2-dev (or libtbb-dev)
 # For luxmark:
-#   qt5-qmake and others
+#   qtbase5-dev
 
 script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
@@ -92,12 +92,24 @@ _build_oiio () {
 		'luxmark3/luxmark3-oiio-boost-placeholders-rewrite.patch'
 
 	_cmake_setup \
-		-D'USE_LIBRAW'='OFF' \
+		-D'BUILD_TESTING'='OFF' \
+		-D'INSTALL_DOCS'='OFF' \
+		-D'INSTALL_FONTS'='OFF' \
+		-D'OIIO_BUILD_TESTS'='OFF' \
+		-D'OIIO_BUILD_TOOLS'='OFF' \
+		-D'STOP_ON_WARNING'='OFF' \
 		-D'USE_FFMPEG'='OFF' \
-		-D'CMAKE_CXX_FLAGS'='-Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new= -Wno-error=mismatched-new-delete'
+		-D'USE_FIELD3D'='OFF' \
+		-D'USE_FREETYPE'='OFF' \
+		-D'USE_LIBRAW'='OFF' \
+		-D'USE_NUKE'='OFF' \
+		-D'USE_OCIO'='OFF' \
+		-D'USE_QT'='OFF' \
+		-D'CMAKE_CXX_FLAGS'='-std=c++11 -Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
 
 		# For more recent compilers:
 		# -D'CMAKE_CXX_FLAGS'='-Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
+		# -Wno-error=mismatched-new-delete
 
 	_cmake_compile_install
 }
@@ -105,7 +117,9 @@ _build_oiio () {
 _build_embree () {
 	_cmake_setup \
 		-D'EMBREE_ISPC_SUPPORT'='OFF' \
-		-D'EMBREE_TUTORIALS'='OFF'
+		-D'EMBREE_TUTORIALS'='OFF' \
+		-D'EMBREE_TUTORIALS_LIBJPEG'='OFF' \
+		-D'EMBREE_TUTORIALS_LIBPNG'='OFF'
 
 	_cmake_compile_install
 }
@@ -136,7 +150,8 @@ _build_luxcore () {
 	# LuxCore doesn't build with ninja:
 	# ninja: error: build.ninja:829: lexing error
 	_cmake_setup \
-		-G'Unix Makefiles'
+		-G'Unix Makefiles' \
+		-D'CMAKE_CXX_FLAGS'='-std=c++11 -Wno-narrowing'
 
 	_cmake_target
 
