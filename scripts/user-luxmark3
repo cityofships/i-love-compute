@@ -29,6 +29,8 @@ case "$(uname -m)" in
 		embree_tasking_system='INTERNAL'
 		embree_max_isa='SSE2'
 		embree_ispc_support='OFF'
+		luxcore_use_sse='OFF'
+		simde_repository_directory='simde'
 		;;
 	*)
 		embree_repository='https://github.com/embree/embree.git'
@@ -39,6 +41,8 @@ case "$(uname -m)" in
 		# See https://github.com/embree/embree/blob/master/doc/src/compilation.md
 		# and https://github.com/ispc/ispc
 		embree_ispc_support='OFF'
+		luxcore_use_sse='ON'
+		simde_repository_directory='-'
 		;;
 esac
 
@@ -71,6 +75,11 @@ packages=(
 		# We must build before 432b551429b362a877ed9b647b7114022b332be0
 		'v2.0.11'
 		'clhpp'
+	'SIMD Everywhere'
+		"${simde_repository_directory}"
+		'https://github.com/simd-everywhere/simde.git'
+		'-'
+		'simde'
 	'LuxCore'
 		'LuxCore'
 		'https://github.com/LuxCoreRender/LuxCore.git'
@@ -159,6 +168,16 @@ _build_clhpp () {
 	_cmake_compile_install
 }
 
+_build_simde () {
+	if [ "${luxcore_use_sse}" != 'ON' ]
+	then
+		_meson_setup \
+			-D'tests'='false'
+
+		_meson_compile_install
+	fi
+}
+
 _build_luxcore () {
 	_apply_patches \
 		'luxmark3/luxmark3-luxcore-no-samples.patch' \
@@ -169,13 +188,15 @@ _build_luxcore () {
 		'luxmark3/luxmark3-luxcore-catch-opencl-errors-on-device-listing.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-prefer-bvh.patch' \
-		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch'
+		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch' \
+		'luxmark3/luxmark3-luxcore-use-simde-on-non-i686.patch'
 
 	# LuxCore doesn't build with ninja:
 	# ninja: error: build.ninja:829: lexing error
 	_cmake_setup \
 		-G'Unix Makefiles' \
-		-D'CMAKE_CXX_FLAGS'='-std=c++11 -Wno-narrowing'
+		-D'CMAKE_CXX_FLAGS'='-std=c++11 -Wno-narrowing' \
+		-D'USE_SSE'="${luxcore_use_sse}"
 
 	_cmake_target
 
@@ -197,10 +218,13 @@ _build_luxmark () {
 		'luxmark3/luxmark3-luxmark-read-opencl-compiler-options-from-environment.patch' \
 		'luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch' \
 		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
-		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch'
+		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch' \
+		'luxmark3/luxmark3-luxmark-use-simde-on-non-i686.patch'
+
 
 	_cmake_setup \
-		-D'LuxRays_HOME'="${install_dir}"
+		-D'LuxRays_HOME'="${install_dir}" \
+		-D'USE_SSE'="${luxcore_use_sse}"
 
 	_cmake_target
 
