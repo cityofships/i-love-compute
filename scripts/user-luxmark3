@@ -189,6 +189,7 @@ _build_luxcore () {
 		'luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-prefer-bvh.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch' \
+		'luxmark3/luxmark3-luxcore-do-not-ship-cmake-files.patch' \
 		'luxmark3/luxmark3-luxcore-use-simde-on-non-i686.patch'
 
 	# LuxCore doesn't build with ninja:
@@ -219,6 +220,9 @@ _build_luxcore () {
 }
 
 _build_luxmark () {
+	# Do not apply this one for now or LuxMark fails to link against OpenCL.
+	#	'luxmark3/luxmark3-luxmark-do-not-ship-cmake-files.patch'
+
 	_apply_patches \
 		'luxmark3/luxmark3-luxmark-port-to-qt5.patch' \
 		'luxmark3/luxmark3-luxmark-lowercase-false.patch' \
