@@ -188,9 +188,9 @@ _fetch () {
 
 				if [ "${branch}" = '-' ]
 				then
-					git clone --recurse-submodules "${repository}"
+					git clone --recurse-submodules "${repository}" "${directory}"
 				else
-					git clone --recurse-submodules --branch "${branch}" "${repository}"
+					git clone --recurse-submodules --branch "${branch}" "${repository}" "${directory}"
 				fi
 			} | _prefix "Clone ${name}"
 		fi
