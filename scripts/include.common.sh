@@ -153,7 +153,7 @@ _fetch () {
 		# slug
 		i="$((${i} + 1))"
 
-		if [ "${name}" = '-' ]
+		if [ "${directory}" = '-' ]
 		then
 			continue
 		fi
@@ -494,7 +494,7 @@ _build_basic_project () {
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
 
-		if [ "${name}" = '-' ]
+		if [ "${directory}" = '-' ]
 		then
 			continue
 		fi
@@ -693,7 +693,7 @@ _build_featured_project () {
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
 
-		if [ "${name}" = '-' ]
+		if [ "${directory}" = '-' ]
 		then
 			continue
 		fi
@@ -763,7 +763,7 @@ _clean () {
 			# slug
 			i="$((${i} + 1))"
 
-			if [ "${name}" = '-' ]
+			if [ "${directory}" = '-' ]
 			then
 				continue
 			fi
