@@ -276,7 +276,7 @@ _meson_setup_wrapper () {
 _meson_setup () {
 	_meson_setup_wrapper \
 		-D'prefix'="${install_dir}" \
-		-D'buildtype'='debugoptimized' \
+		-D'buildtype'="${meson_build_type}" \
 		"${@}"
 }
 
@@ -286,7 +286,7 @@ _cmake_setup () {
 		-B'build' \
 		-G'Ninja' \
 		-D'CMAKE_INSTALL_PREFIX'="${install_dir}" \
-		-D'CMAKE_BUILD_TYPE'='RelWithDebInfo' \
+		-D'CMAKE_BUILD_TYPE'="${cmake_build_type}" \
 		-D'BUILD_SHARED_LIBS'='ON' \
 		"${@}"
 
@@ -399,9 +399,32 @@ _write_custom_patches () {
 	true
 }
 
+# FIXME: Set generic configure build type.
+meson_build_type='debugoptimized'
+cmake_build_type='RelWithDebInfo'
+
+_set_build_type () {
+	case "${1}" in
+		'Debug')
+			cmake_build_type="${1}"
+			meson_build_type='debug'
+			;;
+		'RelWithDebInfo')
+			cmake_build_type="${1}"
+			meson_build_type='debugoptimized'
+			;;
+		'Release')
+			cmake_build_type="${1}"
+			meson_build_type='release'
+			;;
+	esac
+}
+
 _build_basic_project () {
 	local job_count="$(nproc)"
 	local do_force='false'
+
+	local build_type='Debug'
 
 	while ! [ -z "${1:-}" ]
 	do
@@ -425,6 +448,9 @@ _build_basic_project () {
 			'-j'*)
 				job_count="${1:2}"
 				;;
+			'--type='*)
+				build_type="${1:7}"
+				;;
 			'-h'|'--help'|'')
 				_help
 				;;
@@ -438,6 +464,8 @@ _build_basic_project () {
 
 		shift
 	done
+
+	_set_build_type "${build_type}"
 
 	local llvm_job_count="$(_get_llvm_job_count "${do_force}" "${job_count}")"
 
@@ -515,6 +543,8 @@ _build_featured_project () {
 	local job_count="$(nproc)"
 	local do_force='false'
 
+	local build_type='Debug'
+
 	local feature_list=''
 	local enable_list=''
 	local disable_list=''
@@ -541,6 +571,9 @@ _build_featured_project () {
 			'-j'*)
 				job_count="${1:2}"
 				;;
+			'--type='*)
+				build_type="${1:8}"
+				;;
 			'--features='*)
 				feature_list="${1:11}"
 				feature_list="${feature_list//,/ }"
@@ -566,6 +599,8 @@ _build_featured_project () {
 
 		shift
 	done
+
+	_set_build_type "${build_type}"
 
 	local llvm_job_count="$(_get_llvm_job_count "${do_force}" "${job_count}")"
 
@@ -861,6 +896,9 @@ _help_basic_application () {
 	${tab}${tab}Pull updates before building.
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs (default: Availables core count).
+	${tab}--type=[TYPE]
+	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
+	${tab}${tab}other options are Debug and Release.
 
 	Run options:
 	${tab}--force
@@ -964,6 +1002,9 @@ _help_basic_platform () {
 	${tab}${tab}Pull updates before building.
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs, default: Availables core count.
+	${tab}--type=[TYPE]
+	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
+	${tab}${tab}other options are Debug and Release.
 
 	Run options:
 	${tab}--force
@@ -1019,6 +1060,9 @@ _help_featured_platform () {
 	${tab}${tab}Build with N parallel jobs, default: Availables core count.
 	${tab}--force
 	${tab}${tab}Force using as much parallel jobs even when there may not be enough memory.
+	${tab}--type=[TYPE]
+	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
+	${tab}${tab}other options are Debug and Release.
 	${tab}--features=[FEATURES]
 	${tab}${tab}Build those features, comma separated list, default: ${default_feature_list}.
 	${tab}${tab}Special name: all, build all known features.
