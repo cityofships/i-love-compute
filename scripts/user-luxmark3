@@ -168,11 +168,14 @@ _build_embree () {
 			;;
 	esac
 
+	# Set to INTERNAL if TBB is not compatible or not available on your system.
+	local embree_tasking_system='TBB'
+
 	_cmake_setup \
 		-D'USE_CPU_ARCH'="${cpu_arch}" \
 		-D'EMBREE_ISPC_SUPPORT'="${embree_ispc_support}" \
 		-D'EMBREE_MAX_ISA'="${embree_max_isa}" \
-		-D'EMBREE_TASKING_SYSTEM'='TBB' \
+		-D'EMBREE_TASKING_SYSTEM'="${embree_tasking_system}" \
 		-D'EMBREE_TUTORIALS'='OFF' \
 		-D'EMBREE_TUTORIALS_LIBJPEG'='OFF' \
 		-D'EMBREE_TUTORIALS_LIBPNG'='OFF'
