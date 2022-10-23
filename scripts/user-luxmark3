@@ -193,13 +193,10 @@ _build_clhpp () {
 }
 
 _build_simde () {
-	if [ "${luxcore_use_sse}" != 'ON' ]
-	then
-		_meson_setup \
-			-D'tests'='false'
+	_meson_setup \
+		-D'tests'='false'
 
-		_meson_compile_install
-	fi
+	_meson_compile_install
 }
 
 _build_luxcore () {
