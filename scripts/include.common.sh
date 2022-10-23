@@ -195,7 +195,13 @@ _fetch () {
 				then
 					git clone --recurse-submodules "${repository}" "${directory}"
 				else
-					git clone --recurse-submodules --branch "${branch}" "${repository}" "${directory}"
+					if [ "${branch:0:7}" = 'commit:' ]
+					then
+						git clone --recurse-submodules "${repository}" "${directory}"
+						git -C "${directory}" checkout "${branch:7}"
+					else
+						git clone --recurse-submodules --branch "${branch}" "${repository}" "${directory}"
+					fi
 				fi
 			} | _prefix "Clone ${name}"
 		fi
