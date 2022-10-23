@@ -1,11 +1,11 @@
-commit be52ad791817e330301bc754f459528ff0868a76
+commit d35c37fb657ecd03667a7160d39ba51801cdb865
 Author: Thomas Debesse <dev@illwieckz.net>
 Date:   Sat Oct 22 18:05:46 2022 +0200
 
     patch: luxmark3/luxmark3-luxmark-use-simde-on-non-i686.patch
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index fc22b58..087b5b4 100644
+index fc22b58..1e37569 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -148,7 +148,10 @@ if (NOT GLUT_FOUND)
@@ -14,23 +14,23 @@ index fc22b58..087b5b4 100644
  if(NOT WIN32)
 -	ADD_DEFINITIONS(-msse2 -mfpmath=sse -ftree-vectorize -funroll-loops -Wall -fPIC -DHAVE_PTHREAD_H)
 +	ADD_DEFINITIONS(-ftree-vectorize -funroll-loops -Wall -fPIC -DHAVE_PTHREAD_H)
-+	if (USE_SSE)
++	if (NOT USE_SIMDE)
 +		add_definitions(-msse2 -mfpmath=sse)
 +	endif()
  endif()
  
  
 diff --git a/cmake/PlatformSpecific.cmake b/cmake/PlatformSpecific.cmake
-index f4085fd..76ab183 100644
+index f4085fd..f90c63e 100644
 --- a/cmake/PlatformSpecific.cmake
 +++ b/cmake/PlatformSpecific.cmake
 @@ -19,6 +19,11 @@
  #   LuxMark website: http://www.luxrender.net                             #
  ###########################################################################
  
-+set(USE_SSE ON CACHE STRING "Use SSE intrinsics")
-+if(USE_SSE)
-+	add_definitions(-DLUXCORE_USE_SSE=1)
++option(USE_SIMDE "Use SIMDE to provide SSE intrinsics" OFF)
++if(USE_SIMDE)
++    add_definitions(-DLUXCORE_USE_SIMDE)
 +endif()
 +
  # Use relative paths
@@ -41,7 +41,7 @@ index f4085fd..76ab183 100644
    # Update if necessary
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
 -  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2 -msse3 -mssse3")
-+  if(USE_SSE)
++  if(NOT USE_SIMDE)
 +    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2 -msse3 -mssse3")
 +  endif()
    IF(NOT CYGWIN)
@@ -55,7 +55,7 @@ index f4085fd..76ab183 100644
 -	set(CMAKE_CXX_FLAGS_DEBUG "-fvisibility=hidden -fvisibility-inlines-hidden -fPIC -O0 -g -msse -msse2 -msse3 -mssse3")
 +	set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -fvisibility=hidden -fvisibility-inlines-hidden -fPIC -O3 -ftree-vectorize")
 +	set(CMAKE_CXX_FLAGS_DEBUG "-fvisibility=hidden -fvisibility-inlines-hidden -fPIC -O0 -g")
-+	if (USE_SSE)
++	if (NOT USE_SIMDE)
 +		set(MAKE_CXX_FLAGS_RELEASE "${MAKE_CXX_FLAGS_RELEASE} -msse -msse2 -msse3 -mssse3")
 +		set(MAKE_CXX_FLAGS_DEBUG "${MAKE_CXX_FLAGS_DEBUG} -msse -msse2 -msse3 -mssse3")
 +	endif()

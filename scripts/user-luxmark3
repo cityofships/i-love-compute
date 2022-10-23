@@ -26,14 +26,14 @@ cpu_arch="$(uname -m)"
 
 case "${cpu_arch}" in
 	'x86'|'x86_64')
-		luxcore_use_sse='ON'
 		sse2neon_repository_directory='-'
 		simde_repository_directory='-'
+		luxcore_use_simde='OFF'
 		;;
 	*)
-		luxcore_use_sse='OFF'
 		sse2neon_repository_directory='sse2neon'
 		simde_repository_directory='simde'
+		luxcore_use_simde='ON'
 		;;
 esac
 
@@ -227,7 +227,7 @@ _build_luxcore () {
 		-D'CMAKE_C_FLAGS'="${luxcore_extra_flags}" \
 		-D'CMAKE_CXX_FLAGS'="-std=c++11 -Wno-narrowing ${luxcore_extra_flags}" \
 		-D'CMAKE_EXE_LINKER_FLAGS'="${luxcore_extra_flags}" \
-		-D'USE_SSE'="${luxcore_use_sse}"
+		-D'USE_SIMDE'="${luxcore_use_simde}"
 
 	_cmake_target
 
@@ -258,7 +258,7 @@ _build_luxmark () {
 
 	_cmake_setup \
 		-D'LuxRays_HOME'="${install_dir}" \
-		-D'USE_SSE'="${luxcore_use_sse}"
+		-D'USE_SIMDE'="${luxcore_use_simde}"
 
 	_cmake_target
 
