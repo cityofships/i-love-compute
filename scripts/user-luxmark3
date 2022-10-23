@@ -22,27 +22,18 @@ required_file='/opt/luxmark/luxmark'
 help_preset='basic_application'
 build_preset='basic_project'
 
-case "$(uname -m)" in
-	'aarch64')
-		embree_repository='https://github.com/marty1885/embree-arm.git'
-		embree_reference='master'
-		embree_tasking_system='INTERNAL'
-		embree_max_isa='SSE2'
-		embree_ispc_support='OFF'
-		luxcore_use_sse='OFF'
-		simde_repository_directory='simde'
+cpu_arch="$(uname -m)"
+
+case "${cpu_arch}" in
+	'x86'|'x86_64')
+		luxcore_use_sse='ON'
+		sse2neon_repository_directory='-'
+		simde_repository_directory='-'
 		;;
 	*)
-		embree_repository='https://github.com/embree/embree.git'
-		embree_reference='v2.17.7'
-		embree_tasking_system='TBB'
-		embree_max_isa='AVX2'
-		# Can be ON if ISPC is installed, untested.
-		# See https://github.com/embree/embree/blob/master/doc/src/compilation.md
-		# and https://github.com/ispc/ispc
-		embree_ispc_support='OFF'
-		luxcore_use_sse='ON'
-		simde_repository_directory='-'
+		luxcore_use_sse='OFF'
+		sse2neon_repository_directory='sse2neon'
+		simde_repository_directory='simde'
 		;;
 esac
 
@@ -58,10 +49,16 @@ packages=(
 		# We must build before 47c33add2463989d0a23a0b27adc57f273304cbc
 		'Release-1.6.3dev'
 		'oiio'
+	'sse2neon'
+		"${sse2neon_repository_directory}"
+		'https://github.com/DLTcollab/sse2neon.git'
+		# Validated commit, no release tag tried yet.
+		'c0a1262d4d797d3fd19177a7c7149f4507c44aa3'
+		'sse2neon'
 	'Embree'
 		'embree'
-		"${embree_repository}"
-		"${embree_reference}"
+		'https://github.com/embree/embree.git'
+		'v2.17.7'
 		'embree'
 	'OpenCL Headers'
 		'OpenCL-Headers'
@@ -145,8 +142,35 @@ _build_oiio () {
 	_cmake_compile_install
 }
 
+_build_sse2neon () {
+	cp -av 'sse2neon.h' "${install_dir}/include/sse2neon.h"
+}
+
 _build_embree () {
+	_apply_patches \
+		'luxmark3/luxmark3-embree-build-aarch64-with-sse2neon.patch'
+
+	case "${cpu_arch}" in
+		'x86'|'x86_64')
+			local embree_tasking_system='TBB'
+			local embree_max_isa='AVX2'
+			# Can be ON if ISPC is installed, untested.
+			# See https://github.com/embree/embree/blob/master/doc/src/compilation.md
+			# and https://github.com/ispc/ispc
+			local embree_ispc_support='OFF'
+			;;
+		'aarch64')
+			local embree_tasking_system='INTERNAL'
+			local embree_max_isa='SSE2'
+			local embree_ispc_support='OFF'
+			;;
+		*)
+			_error "Unsupported architecture for embree: ${cpu_arch}."
+			;;
+	esac
+
 	_cmake_setup \
+		-D'USE_CPU_ARCH'="${cpu_arch}" \
 		-D'EMBREE_TASKING_SYSTEM'="${embree_tasking_system}" \
 		-D'EMBREE_MAX_ISA'="${embree_max_isa}" \
 		-D'EMBREE_ISPC_SUPPORT'="${embree_ispc_support}" \
