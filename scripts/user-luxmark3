@@ -75,7 +75,8 @@ packages=(
 	'SIMD Everywhere'
 		"${simde_repository_directory}"
 		'https://github.com/simd-everywhere/simde.git'
-		'-'
+		# Validated commit, no release tag tried yet.
+		'dd0b662fd8cf4b1617dbbb4d08aa053e512b08e4'
 		'simde'
 	'LuxCore'
 		'LuxCore'
