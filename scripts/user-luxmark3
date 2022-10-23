@@ -153,7 +153,6 @@ _build_embree () {
 
 	case "${cpu_arch}" in
 		'x86'|'x86_64')
-			local embree_tasking_system='TBB'
 			local embree_max_isa='AVX2'
 			# Can be ON if ISPC is installed, untested.
 			# See https://github.com/embree/embree/blob/master/doc/src/compilation.md
@@ -161,7 +160,6 @@ _build_embree () {
 			local embree_ispc_support='OFF'
 			;;
 		'aarch64')
-			local embree_tasking_system='INTERNAL'
 			local embree_max_isa='SSE2'
 			local embree_ispc_support='OFF'
 			;;
@@ -172,9 +170,9 @@ _build_embree () {
 
 	_cmake_setup \
 		-D'USE_CPU_ARCH'="${cpu_arch}" \
-		-D'EMBREE_TASKING_SYSTEM'="${embree_tasking_system}" \
-		-D'EMBREE_MAX_ISA'="${embree_max_isa}" \
 		-D'EMBREE_ISPC_SUPPORT'="${embree_ispc_support}" \
+		-D'EMBREE_MAX_ISA'="${embree_max_isa}" \
+		-D'EMBREE_TASKING_SYSTEM'='TBB' \
 		-D'EMBREE_TUTORIALS'='OFF' \
 		-D'EMBREE_TUTORIALS_LIBJPEG'='OFF' \
 		-D'EMBREE_TUTORIALS_LIBPNG'='OFF'
