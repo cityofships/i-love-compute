@@ -1,4 +1,4 @@
-commit 99ba1c0ae48b0cc398581269d623acd18720a945
+commit 83e5fe1098ea8890cf3fcca060d49da349fb7f20
 Author: Thomas Debesse <dev@illwieckz.net>
 Date:   Sun Oct 23 03:52:54 2022 +0200
 
@@ -272,7 +272,7 @@ index d59a16e0e..acebdee33 100644
  
    __forceinline int32_t atomic_cmpxchg(int32_t volatile* value, int32_t comparand, const int32_t input) {
 diff --git a/common/sys/sysinfo.cpp b/common/sys/sysinfo.cpp
-index 3cac37027..2339816dd 100644
+index 3cac37027..cee8ea697 100644
 --- a/common/sys/sysinfo.cpp
 +++ b/common/sys/sysinfo.cpp
 @@ -87,6 +87,9 @@ namespace embree
@@ -308,18 +308,16 @@ index 3cac37027..2339816dd 100644
    }
  
    std::string stringOfCPUModel(CPUModel model)
-@@ -183,6 +191,10 @@ namespace embree
+@@ -183,6 +191,8 @@ namespace embree
    /* cpuid[eax=7,ecx=0].ecx */
    static const int CPU_FEATURE_BIT_AVX512VBMI = 1 << 1;   // AVX512VBMI (vector bit manipulation instructions)
  
-+  static const int CPU_FEATURE_BIT_NEON = 1 << 10;
-+
 +#if defined(__ARM_NEON__)
 +#else
    __noinline int64_t get_xcr0() 
    {
  #if defined (__WIN32__)
-@@ -195,9 +207,13 @@ namespace embree
+@@ -195,9 +205,13 @@ namespace embree
      return xcr0;
  #endif
    }
@@ -328,12 +326,12 @@ index 3cac37027..2339816dd 100644
    int getCPUFeatures()
    {
 +#if defined(__ARM_NEON__)
-+    return CPU_FEATURE_NEON|CPU_FEATURE_SSE2|CPU_FEATURE_SSE;
++    return CPU_FEATURE_SSE2|CPU_FEATURE_SSE;
 +#else
      /* cache CPU features access */
      static int cpu_features = 0;
      if (cpu_features) 
-@@ -269,6 +285,7 @@ namespace embree
+@@ -269,6 +283,7 @@ namespace embree
        cpu_features &= ~CPU_FEATURE_PSEUDO_HIFREQ256BIT;
  
      return cpu_features;
@@ -341,48 +339,11 @@ index 3cac37027..2339816dd 100644
    }
  
    std::string stringOfCPUFeatures(int features)
-@@ -298,6 +315,7 @@ namespace embree
-     if (features & CPU_FEATURE_AVX512VL) str += "AVX512VL ";
-     if (features & CPU_FEATURE_AVX512IFMA) str += "AVX512IFMA ";
-     if (features & CPU_FEATURE_AVX512VBMI) str += "AVX512VBMI ";
-+    if (features & CPU_FEATURE_NEON) str += "NEON ";
-     return str;
-   }
-   
-@@ -313,6 +331,7 @@ namespace embree
-     if (isa == AVX2) return "AVX2";
-     if (isa == AVX512KNL) return "AVX512KNL";
-     if (isa == AVX512SKX) return "AVX512SKX";
-+    if (isa == NEON) return "NEON";
-     return "UNKNOWN";
-   }
- 
-@@ -334,6 +353,7 @@ namespace embree
-     if (hasISA(features,AVX2)) v += "AVX2 ";
-     if (hasISA(features,AVX512KNL)) v += "AVX512KNL ";
-     if (hasISA(features,AVX512SKX)) v += "AVX512SKX ";
-+    if (hasISA(features,NEON)) v += "NEON";
-     return v;
-   }
- }
 diff --git a/common/sys/sysinfo.h b/common/sys/sysinfo.h
-index bce6f6213..77784d1d4 100644
+index bce6f6213..4fd1d0c00 100644
 --- a/common/sys/sysinfo.h
 +++ b/common/sys/sysinfo.h
-@@ -28,7 +28,11 @@
- #include "platform.h"
- 
- /* define isa namespace and ISA bitvector */
--#if defined (__AVX512VL__)
-+#if defined(__ARM_NEON__)
-+#define isa neon
-+#define ISA NEON
-+#define ISA_STR "NEON"
-+#elif defined (__AVX512VL__)
- #  define isa avx512skx
- #  define ISA AVX512SKX
- #  define ISA_STR "AVX512SKX"
-@@ -72,7 +76,7 @@
+@@ -72,7 +72,7 @@
  #  define isa sse
  #  define ISA SSE
  #  define ISA_STR "SSE"
@@ -391,7 +352,7 @@ index bce6f6213..77784d1d4 100644
  #error Unknown ISA
  #endif
  
-@@ -86,7 +90,8 @@ namespace embree
+@@ -86,7 +86,8 @@ namespace embree
      CPU_CORE_SANDYBRIDGE,
      CPU_HASWELL,
      CPU_KNIGHTS_LANDING,
@@ -401,23 +362,15 @@ index bce6f6213..77784d1d4 100644
    };
  
    /*! get the full path to the running executable */
-@@ -134,6 +139,8 @@ namespace embree
+@@ -134,7 +135,7 @@ namespace embree
    static const int CPU_FEATURE_AVX512VBMI = 1 << 24;
   
    static const int CPU_FEATURE_PSEUDO_HIFREQ256BIT = 1 << 30;
+- 
 +
-+  static const int CPU_FEATURE_NEON = 1 << 31;
-  
    /*! get CPU features */
    int getCPUFeatures();
-@@ -159,6 +166,7 @@ namespace embree
  
-   static const int AVX_FAST = AVX | CPU_FEATURE_PSEUDO_HIFREQ256BIT;
-   static const int AVX2_FAST = AVX2 | CPU_FEATURE_PSEUDO_HIFREQ256BIT;
-+  static const int NEON = CPU_FEATURE_NEON|CPU_FEATURE_SSE|CPU_FEATURE_SSE2;
- 
-   /*! converts ISA bitvector into a string */
-   std::string stringOfISA(int features);
 diff --git a/common/sys/thread.cpp b/common/sys/thread.cpp
 index 04157b3b7..a3afdad6e 100644
 --- a/common/sys/thread.cpp
