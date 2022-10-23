@@ -53,7 +53,7 @@ packages=(
 		"${sse2neon_repository_directory}"
 		'https://github.com/DLTcollab/sse2neon.git'
 		# Validated commit, no release tag tried yet.
-		'c0a1262d4d797d3fd19177a7c7149f4507c44aa3'
+		'commit:c0a1262d4d797d3fd19177a7c7149f4507c44aa3'
 		'sse2neon'
 	'Embree'
 		'embree'
@@ -76,7 +76,7 @@ packages=(
 		"${simde_repository_directory}"
 		'https://github.com/simd-everywhere/simde.git'
 		# Validated commit, no release tag tried yet.
-		'dd0b662fd8cf4b1617dbbb4d08aa053e512b08e4'
+		'commit:dd0b662fd8cf4b1617dbbb4d08aa053e512b08e4'
 		'simde'
 	'LuxCore'
 		'LuxCore'
