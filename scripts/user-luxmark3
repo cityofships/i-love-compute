@@ -209,6 +209,7 @@ _build_luxcore () {
 		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch' \
 		'luxmark3/luxmark3-luxcore-fix-build-with-system-opencl-cmake.patch' \
 		'luxmark3/luxmark3-luxcore-do-not-ship-cmake-files.patch' \
+		'luxmark3/luxmark3-luxcore-link-slg4-with-opencl.patch' \
 		'luxmark3/luxmark3-luxcore-use-simde-on-non-i686.patch' \
 		'luxmark3/luxmark3-luxcore-fix-luxcorerender-website-url.patch'
 
