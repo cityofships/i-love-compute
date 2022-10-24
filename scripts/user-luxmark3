@@ -24,16 +24,15 @@ build_preset='basic_project'
 
 cpu_arch="$(uname -m)"
 
+sse2neon_repository_directory='-'
+simde_repository_directory='-'
+
 case "${cpu_arch}" in
 	'x86'|'x86_64')
-		sse2neon_repository_directory='-'
-		simde_repository_directory='-'
-		luxcore_use_simde='OFF'
 		;;
 	*)
 		sse2neon_repository_directory='sse2neon'
 		simde_repository_directory='simde'
-		luxcore_use_simde='ON'
 		;;
 esac
 
@@ -227,7 +226,7 @@ _build_luxcore () {
 		-D'CMAKE_C_FLAGS'="${luxcore_extra_flags}" \
 		-D'CMAKE_CXX_FLAGS'="-std=c++11 -Wno-narrowing ${luxcore_extra_flags}" \
 		-D'CMAKE_EXE_LINKER_FLAGS'="${luxcore_extra_flags}" \
-		-D'USE_SIMDE'="${luxcore_use_simde}"
+		-D'USE_CPU_ARCH'="${cpu_arch}"
 
 	_cmake_target
 
@@ -256,10 +255,9 @@ _build_luxmark () {
 		'luxmark3/luxmark3-luxmark-use-simde-on-non-i686.patch' \
 		'luxmark3/luxmark3-luxmark-fix-luxcorerender-website-url.patch'
 
-
 	_cmake_setup \
 		-D'LuxRays_HOME'="${install_dir}" \
-		-D'USE_SIMDE'="${luxcore_use_simde}"
+		-D'USE_CPU_ARCH'="${cpu_arch}"
 
 	_cmake_target
 
