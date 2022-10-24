@@ -173,9 +173,7 @@ _build_embree () {
 		-D'USE_CPU_ARCH'="${cpu_arch}" \
 		-D'EMBREE_ISPC_SUPPORT'="${embree_ispc_support}" \
 		-D'EMBREE_TASKING_SYSTEM'="${embree_tasking_system}" \
-		-D'EMBREE_TUTORIALS'='OFF' \
-		-D'EMBREE_TUTORIALS_LIBJPEG'='OFF' \
-		-D'EMBREE_TUTORIALS_LIBPNG'='OFF'
+		-D'EMBREE_TUTORIALS'='OFF'
 
 	_cmake_compile_install
 }
