@@ -255,8 +255,8 @@ _build_luxmark () {
 		'luxmark3/luxmark3-luxmark-fix-luxcorerender-website-url.patch'
 
 	_cmake_setup \
-		-D'LuxRays_HOME'="${install_dir}" \
-		-D'USE_CPU_ARCH'="${cpu_arch}"
+		-D'USE_CPU_ARCH'="${cpu_arch}" \
+		-D'LuxRays_HOME'="${install_dir}"
 
 	_cmake_target
 
