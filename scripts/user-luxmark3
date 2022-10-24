@@ -248,6 +248,7 @@ _build_luxmark () {
 		'luxmark3/luxmark3-luxmark-port-to-qt5.patch' \
 		'luxmark3/luxmark3-luxmark-lowercase-false.patch' \
 		'luxmark3/luxmark3-luxmark-catch-context-errors.patch' \
+		'luxmark3/luxmark3-luxmark-decode-opencl-errors.patch' \
 		'luxmark3/luxmark3-luxmark-read-opencl-compiler-options-from-environment.patch' \
 		'luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch' \
 		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
