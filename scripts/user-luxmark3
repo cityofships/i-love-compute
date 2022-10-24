@@ -207,6 +207,7 @@ _build_luxcore () {
 		'luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-prefer-bvh.patch' \
 		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch' \
+		'luxmark3/luxmark3-luxcore-fix-build-with-system-opencl-cmake.patch' \
 		'luxmark3/luxmark3-luxcore-do-not-ship-cmake-files.patch' \
 		'luxmark3/luxmark3-luxcore-use-simde-on-non-i686.patch' \
 		'luxmark3/luxmark3-luxcore-fix-luxcorerender-website-url.patch'
@@ -251,6 +252,7 @@ _build_luxmark () {
 		'luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch' \
 		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
 		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch' \
+		'luxmark3/luxmark3-luxmark-fix-build-with-system-opencl-cmake.patch' \
 		'luxmark3/luxmark3-luxmark-do-not-ship-cmake-files.patch' \
 		'luxmark3/luxmark3-luxmark-use-simde-on-non-i686.patch' \
 		'luxmark3/luxmark3-luxmark-fix-luxcorerender-website-url.patch'
