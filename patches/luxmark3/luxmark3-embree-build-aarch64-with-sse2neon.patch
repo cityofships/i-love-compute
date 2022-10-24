@@ -1,4 +1,4 @@
-commit 83e5fe1098ea8890cf3fcca060d49da349fb7f20
+commit a28206191e31e835679a97da3289a9d993bbf249
 Author: Thomas Debesse <dev@illwieckz.net>
 Date:   Sun Oct 23 03:52:54 2022 +0200
 
@@ -8,15 +8,16 @@ Date:   Sun Oct 23 03:52:54 2022 +0200
     See https://github.com/marty1885/embree-arm
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index afa704d35..501723807 100644
+index afa704d35..d5b54d86d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -14,6 +14,11 @@
+@@ -14,6 +14,12 @@
  ## limitations under the License.                                           ##
  ## ======================================================================== ##
  
 +set(USE_CPU_ARCH "" CACHE STRING "Processor architecture")
 +if("${USE_CPU_ARCH}" STREQUAL "aarch64")
++  set(EMBREE_MAX_ISA "SSE2")
 +  add_definitions(-D__ARM_NEON__ -D__SSE__ -D__SSE2__ -D__X86_64__)
 +endif()
 +
