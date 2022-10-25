@@ -122,6 +122,12 @@ _build_llvm () {
 			"${spirv_headers_embedded_folder}"
 	fi
 
+	local llvm_enable_assertions='OFF'
+	if [ "${common_build_type}" = "Debug" ]
+	then
+		llvm_enable_assertions='ON'
+	fi
+
 	# Use -D'LLVM_ENABLE_PROJECTS'='clang' or:
 	# The dependency target "clang" of target "check-all" does not exist
 	# The dependency target "clang" of target "check-llvm-spirv" does not exist.
@@ -133,7 +139,7 @@ _build_llvm () {
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
 		-D'LLVM_BUILD_TOOLS'='ON' \
-		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
+		-D'LLVM_ENABLE_ASSERTIONS'="${llvm_enable_assertions}" \
 		-D'LLVM_ENABLE_PROJECTS'='clang' \
 		-D'LLVM_ENABLE_RTTI'='ON' \
 		-D'LLVM_BUILD_RUNTIME'='OFF' \
@@ -295,6 +301,12 @@ _build_mesa () {
 	export CXXFLAGS+=" -ludev"
 	export LDFLAGS+=" -ludev"
 
+	local mesa_enable_assertions='false'
+	if [ "${common_build_type}" = "Debug" ]
+	then
+		mesa_enable_assertions='true'
+	fi
+
 	# Clover requires LLVM RTTI to be enabled.
 
 	# rusticl requires shader-cache to be enabled.
@@ -306,7 +318,7 @@ _build_mesa () {
 	#  static-libclc
 	#  shader-cache
 	_meson_setup \
-		-D'b_ndebug'='false' \
+		-D'b_ndebug'="${mesa_enable_assertions}" \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
 		-D'dri-drivers'='[]' \
