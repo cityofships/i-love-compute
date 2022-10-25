@@ -237,6 +237,8 @@ _apply_patches () {
 		'patched/'*)
 			;;
 		*)
+			git tag 'unpatched' || true
+
 			git checkout -b 'patched'
 
 			for patch_file in "${@}"
