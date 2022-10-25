@@ -285,6 +285,8 @@ Orca requires an X11 server being up and running.
 
 - [CLara](https://gitlab.com/illwieckz/clara) is a project by Björn König for a framework to access OpenCL devies over the network. The project is unfortunately stalled since year 2010 and is still in alpha state. If you're an OpenCL wizard and can see the interest of such project, you're welcome to improve it!
 
+- [compute-runtime/clgl-fork](https://github.com/kallaballa/compute-runtime/tree/clgl-fork), a fork adding `cl_khr_gl_sharing` to Intel Compute Runtime, as upstream [has not implemented it yet](https://github.com/intel/compute-runtime/issues/166).
+
 
 ### Frameworks
 
