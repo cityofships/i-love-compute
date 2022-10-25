@@ -1,0 +1,430 @@
+#! /usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Copyright 2022 Thomas “illwieckz“ Debesse
+
+# You may need to install:
+# For gcc7:
+#   gcc-10 libgmp-dev libmpfr-dev libmpc-dev
+# For oiio:
+#   libilmbase-dev libopenexr-dev libtiff-dev
+# For embree (on i686 or amd64):
+#   libtbb2-dev (or libtbb-dev) 
+# For luxcore and luxmark:
+#   bison flex doxygen libboost-thread-dev libboost-program-options-dev libboost-filesystem-dev libboost-serialization-dev libboost-iostreams-dev libboost-regex-dev libboost-system-dev libglew-dev freeglut3-dev ocl-icd-libopencl1
+
+# GCC10 is needed to build GCC7 (GCC11 and later can't build GCC7).
+# GCC7 is needed to build Qt4 (GCC8 and later can't build Qt4).
+
+script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+script_name="$(basename "$(realpath "${BASH_SOURCE[0]}")")"
+
+. "${script_dir}/include.common.sh"
+
+project_name='LuxMark v3.1'
+required_file='/opt/luxmark/luxmark'
+help_preset='basic_application'
+build_preset='basic_project'
+
+cpu_arch="$(uname -m)"
+
+sse2neon_repository_directory='-'
+simde_repository_directory='-'
+
+case "${cpu_arch}" in
+	'x86'|'x86_64')
+		;;
+	*)
+		sse2neon_repository_directory='sse2neon'
+		simde_repository_directory='simde'
+		;;
+esac
+
+packages=(
+	# package name
+	#	directory name
+	#	repository or archive url
+	#	branch or archive name
+	#	build slug
+	'OpenImageIO'
+		'oiio'
+		'https://github.com/OpenImageIO/oiio.git'
+		# We must build before 47c33add2463989d0a23a0b27adc57f273304cbc
+		'Release-1.6.3dev'
+		'oiio'
+	'GCC 7.5.0'
+		'gcc-7.5.0'
+		'https://bigsearcher.com/mirrors/gcc/releases/gcc-7.5.0/gcc-7.5.0.tar.xz'
+		'fe716cc19f2e3255d3a8b1b8290777bf769c6d98e6e0b07b81a3d6ad43f8af74cb170dfa18b1555dbfcd3f55ae582b91a286ccef496b9b65c1579902f96a1f60'
+		'gcc7'
+	'Qt 4.8.7'
+		'qt-everywhere-opensource-src-4.8.7'
+		'https://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz'
+		'f9f81a2e7205e1fd05c8d923dc73244f29aa33f951fa6b7c5c8193449328b37084796b9b71ad0c317e4e6fd00017c10ea5d67b1b2032551cde00548522218125'
+		'qt4'
+	'sse2neon'
+		"${sse2neon_repository_directory}"
+		'https://github.com/DLTcollab/sse2neon.git'
+		# Validated commit, no release tag tried yet.
+		'commit:c0a1262d4d797d3fd19177a7c7149f4507c44aa3'
+		'sse2neon'
+	'Embree'
+		'embree'
+		'https://github.com/embree/embree.git'
+		'v2.17.7'
+		'embree'
+	'OpenCL Headers'
+		'OpenCL-Headers'
+		'https://github.com/KhronosGroup/OpenCL-Headers.git'
+		# Validated up to 3568763309367bc7d7088a1d3f82f2d32c76a7f8
+		'v2022.01.04'
+		'generic_cmake'
+	'OpenCL CLHPP'
+		'OpenCL-CLHPP'
+		'https://github.com/KhronosGroup/OpenCL-CLHPP.git'
+		# We must build before 432b551429b362a877ed9b647b7114022b332be0
+		'v2.0.11'
+		'clhpp'
+	'SIMD Everywhere'
+		"${simde_repository_directory}"
+		'https://github.com/simd-everywhere/simde.git'
+		# Validated commit, no release tag tried yet.
+		'commit:dd0b662fd8cf4b1617dbbb4d08aa053e512b08e4'
+		'simde'
+	'LuxCore'
+		'LuxCore'
+		'https://github.com/LuxCoreRender/LuxCore.git'
+		'luxmark_v3.1'
+		'luxcore'
+	'LuxMark'
+		'LuxMark'
+		'https://github.com/LuxCoreRender/LuxMark.git'
+		'luxmark_v3.1'
+		'luxmark'
+	'scenes'
+		'scenes'
+		'https://github.com/LuxCoreRender/LuxMark/releases/download/luxmark_v3.1/scenes-v3.1.zip'
+		'1b1288fb171e663e5892031be2e544de4d11b86594a7a3f754987fd7b636a6a3cf0a6c2775331a9e7e67ac1263839027592fbb2e4b4baba6c9522869076432bd'
+		'scenes'
+)
+
+_set_custom_env () {
+	# Needed by OpenCL-ICD-Loader
+	export C_INCLUDE_PATH="${install_dir}/include:${C_INCLUDE_PATH:-}"
+	export CPLUS_INCLUDE_PATH="${install_dir}/include:${CPLUS_INCLUDE_PATH:-}"
+
+	# See also DYLD_LIBRARY_PATH (that can break as well)
+}
+
+_set_custom_run_env () {
+	export PATH="${install_dir}/opt/luxmark:${PATH:-}"
+
+	cd "${install_dir}/opt/luxmark"
+}
+
+_build_gcc7 () {
+	if _is_done
+	then
+		return
+	fi
+
+	(
+		# *** LIBRARY_PATH shouldn't contain the current directory when
+		# *** building gcc. Please change the environment variable
+		# *** and run configure again.
+		LIBRARY_PATH=''
+
+		# Those other variables must be unset:
+		# ../.././gcc/statistics.h:25:2: error: #error GATHER_STATISTICS must be defined
+		#    25 | #error GATHER_STATISTICS must be defined
+		C_INCLUDE_PATH=''
+		CPLUS_INCLUDE_PATH=''
+
+		# GCC11 cannot build GCC7:
+		export CC="gcc-10"
+		export CXX="g++-10"
+
+		# Disable nls because:
+		# msgfmt: gcc-7.5.0/x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /usr/lib/x86_64-linux-gnu/libicuuc.so.70)
+
+		# Disable libsanitizer because:
+		# ../../.././libsanitizer/sanitizer_common/sanitizer_internal_defs.h:261:72: error: size of array «assertion_failed__1150» is negative
+		#     typedef char IMPL_PASTE(assertion_failed_##_, line)[2*(int)(pred)-1]
+		_build_generic_configure \
+			--program-suffix='-7' \
+			--with-gcc-major-version-only \
+			--disable-nls \
+			--disable-libsanitizer
+
+		unset CC
+		unset CXX
+
+		unset LIBRARY_PATH
+		unset C_INCLUDE_PATH
+		unset CPLUS_INCLUDE_PATH
+	)
+
+	_set_done
+}
+
+_build_qt4 () {
+	if _is_done
+	then
+		return
+	fi
+
+	# itemviews.cpp: In member function ‘virtual bool QAccessibleTable2::unselectColumn(int)’:
+	# itemviews.cpp:396:105: error: conversion from ‘int’ to ‘QItemSelectionModel::SelectionFlags {aka QFlags<QItemSelectionModel::SelectionFlag>}’ is ambiguous
+	#      view()->selectionModel()->select(index, QItemSelectionModel::Columns & QItemSelectionModel::Deselect);
+	#                                                                                                          ^
+	_apply_patches \
+		'luxmark3/luxmark3-qt4-type-conversion.patch'
+
+	(
+		export CC="${install_dir}/bin/gcc-7"
+		export CXX="${install_dir}/bin/g++-7"
+
+		# It still uses system's GCC for some steps
+		# including configure steps.
+		mkdir -pv 'path'
+		ln -sfv "${install_dir}/bin/gcc-7" 'path/gcc'
+		ln -sfv "${install_dir}/bin/g++-7" 'path/g++'
+		export PATH="$(pwd)/path:${PATH}"
+
+		# Disable javascript because:
+		# ../3rdparty/javascriptcore/JavaScriptCore/wtf/HashTable.h:272:89: error: call of overloaded ‘swap(std::pair<QTWTF::RefPtr<QTJSC::UStringImpl>, QTJSC::SymbolTableEntry>&, std::pair<QTWTF::RefPtr<QTJSC::UStringImpl>, QTJSC::SymbolTableEntry>&)’ is ambiguous
+		#      template<typename T> struct Mover<T, true> { static void move(T& from, T& to) { swap(from, to); } };
+		#                                                                                      ~~~~^~~~~~~~~~
+
+		# Build PNG as LuxMark displays some PNG
+		# file in the about window. It can
+		# be safely disabled anyway and LuxMark
+		# will run without displaying the image.
+		# For some unknown reason it doesn't
+		# return 0 on success.
+		yes | ./configure --prefix="${install_dir}" \
+			-opensource \
+			-no-openssl \
+			-no-qt3support \
+			-gtkstyle \
+			-no-cups \
+			-no-multimedia \
+			-no-audio-backend \
+			-no-phonon \
+			-no-webkit \
+			-no-javascript-jit \
+			-no-script \
+			-no-scripttools \
+			-system-libpng \
+			-no-svg \
+			-no-gif \
+			-no-libtiff \
+			-no-libmng \
+			-no-libjpeg \
+			-no-xvideo \
+			-no-sql-mysql \
+			-no-sql-sqlite \
+			-no-sql-sqlite2 \
+		|| true
+
+		make -j"${usable_job_count}"
+
+		make install
+
+		unset CC
+		unset CXX
+	)
+
+	_set_done
+}
+
+_build_oiio () {
+	# Newer versions
+	#	if [ -f 'src/build-scripts/build_pybind11.bash' ]
+	#	then
+	#		'src/build-scripts/build_pybind11.bash'
+	#	fi
+
+	_apply_patches \
+		'luxmark3/luxmark3-oiio-gpstag-redefinition.patch' \
+		'luxmark3/luxmark3-oiio-boost-placeholders-rewrite.patch'
+
+	_cmake_setup \
+		-D'BUILD_TESTING'='OFF' \
+		-D'INSTALL_DOCS'='OFF' \
+		-D'INSTALL_FONTS'='OFF' \
+		-D'OIIO_BUILD_TESTS'='OFF' \
+		-D'OIIO_BUILD_TOOLS'='OFF' \
+		-D'STOP_ON_WARNING'='OFF' \
+		-D'USE_FFMPEG'='OFF' \
+		-D'USE_FIELD3D'='OFF' \
+		-D'USE_FREETYPE'='OFF' \
+		-D'USE_LIBRAW'='OFF' \
+		-D'USE_NUKE'='OFF' \
+		-D'USE_OCIO'='OFF' \
+		-D'USE_QT'='OFF' \
+		-D'CMAKE_CXX_FLAGS'='-std=c++11 -Wno-error=stringop-truncation -Wno-error=class-memaccess -Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
+
+		# For more recent compilers:
+		# -D'CMAKE_CXX_FLAGS'='-Wno-error=sizeof-pointer-memaccess -Wno-error=unused-function -Wno-error=deprecated-declarations -Wno-error=maybe-uninitialized -Wno-error=stringop-overflow= -Wno-error=misleading-indentation -Wno-error=format-truncation= -Wno-error=aligned-new='
+		# -Wno-error=mismatched-new-delete
+
+	_cmake_compile_install
+}
+
+_build_sse2neon () {
+	cp -av 'sse2neon.h' "${install_dir}/include/sse2neon.h"
+}
+
+_build_embree () {
+	_apply_patches \
+		'luxmark3/luxmark3-embree-build-aarch64-with-sse2neon.patch'
+
+	case "${cpu_arch}" in
+		'x86'|'x86_64')
+			;;
+		'aarch64')
+			;;
+		*)
+			_error "Unsupported architecture for Embree: ${cpu_arch}."
+			;;
+	esac
+
+	# Can be ON if ISPC is installed. This is untested.
+	# It probably only works on Intel architectures.
+	# See https://github.com/embree/embree/blob/master/doc/src/compilation.md
+	# and https://github.com/ispc/ispc
+	local embree_ispc_support='OFF'
+
+	# Set to INTERNAL if TBB is not compatible or not available on your system.
+	local embree_tasking_system='TBB'
+
+	_cmake_setup \
+		-D'USE_CPU_ARCH'="${cpu_arch}" \
+		-D'EMBREE_ISPC_SUPPORT'="${embree_ispc_support}" \
+		-D'EMBREE_TASKING_SYSTEM'="${embree_tasking_system}" \
+		-D'EMBREE_TUTORIALS'='OFF'
+
+	_cmake_compile_install
+}
+
+_build_clhpp () {
+	_cmake_setup \
+		-D'OPENCL_INCLUDE_DIR'="${install_dir}/include" \
+		-D'OPENCL_LIB_DIR'="${install_dir}/lib" \
+		-D'BUILD_EXAMPLES'='OFF' \
+		-D'BUILD_TESTS'='OFF' \
+		-D'BUILD_DOCS'='OFF'
+
+	_cmake_compile_install
+}
+
+_build_simde () {
+	_meson_setup \
+		-D'tests'='false'
+
+	_meson_compile_install
+}
+
+_build_luxcore () {
+	_apply_patches \
+		'luxmark3/luxmark3-luxcore-no-samples.patch' \
+		'luxmark3/luxmark3-luxcore-no-pyluxcore.patch' \
+		'luxmark3/luxmark3-luxcore-no-division-by-zero-pdf-clamp.patch' \
+		'luxmark3/luxmark3-luxcore-do-not-crash-on-kernel-build-failure.patch' \
+		'luxmark3/luxmark3-luxcore-catch-opencl-errors-on-platform-listing.patch' \
+		'luxmark3/luxmark3-luxcore-catch-opencl-errors-on-device-listing.patch' \
+		'luxmark3/luxmark3-luxcore-decode-more-opencl-errors.patch' \
+		'luxmark3/luxmark3-luxcore-optionally-print-opencl-build-log.patch' \
+		'luxmark3/luxmark3-luxcore-optionally-prefer-bvh.patch' \
+		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch' \
+		'luxmark3/luxmark3-luxcore-fix-build-with-system-opencl-cmake.patch' \
+		'luxmark3/luxmark3-luxcore-do-not-ship-cmake-files.patch' \
+		'luxmark3/luxmark3-luxcore-link-slg4-with-opencl.patch' \
+		'luxmark3/luxmark3-luxcore-enable-slg4-build.patch' \
+		'luxmark3/luxmark3-luxcore-use-simde-on-non-i686.patch' \
+		'luxmark3/luxmark3-luxcore-fix-luxcorerender-website-url.patch'
+
+	# LuxCore doesn't build with ninja:
+	# ninja: error: build.ninja:829: lexing error
+
+	# Building LuxCore with Debian 11 on aarch64 required -pthread for unknown reasons.
+	# Building SLG4 with Flatpak on amd64 required -lglut for unknown reasons.
+	luxcore_extra_flags='-pthread -lglut'
+
+	_cmake_setup \
+		-G'Unix Makefiles' \
+		-D'CMAKE_C_FLAGS'="${luxcore_extra_flags}" \
+		-D'CMAKE_CXX_FLAGS'="-std=c++11 -Wno-narrowing ${luxcore_extra_flags}" \
+		-D'CMAKE_EXE_LINKER_FLAGS'="${luxcore_extra_flags}" \
+		-D'USE_CPU_ARCH'="${cpu_arch}"
+
+	_cmake_target
+
+	# No install target.
+	#	_cmake_compile_install
+
+	mkdir -pv "${install_dir}/include"
+	cp -av 'include/.' "${install_dir}/include/."
+
+	mkdir -pv "${install_dir}/lib"
+	cp -av 'build/lib/.' "${install_dir}/lib/."
+
+	mkdir -pv "${install_dir}/opt/luxmark"
+	cp -av 'build/bin/slg4' "${install_dir}/opt/luxmark/slg4"
+}
+
+_build_luxmark () {
+	# Do not apply this one for now or LuxMark fails to link against OpenCL.
+	#	'luxmark3/luxmark3-luxmark-do-not-ship-cmake-files.patch'
+
+	# Excluded patch:
+	#	'luxmark3/luxmark3-luxmark-port-to-qt5.patch'
+
+	_apply_patches \
+		'luxmark3/luxmark3-luxmark-lowercase-false.patch' \
+		'luxmark3/luxmark3-luxmark-catch-context-errors.patch' \
+		'luxmark3/luxmark3-luxmark-decode-opencl-errors.patch' \
+		'luxmark3/luxmark3-luxmark-read-opencl-compiler-options-from-environment.patch' \
+		'luxmark3/luxmark3-luxmark-also-print-debug-log-on-stderr.patch' \
+		'luxmark3/luxmark3-luxmark-luxmark-device-type-enable.patch' \
+		'luxmark3/luxmark3-luxmark-fill-submission-form-from-environment.patch' \
+		'luxmark3/luxmark3-luxmark-fix-build-with-system-opencl-cmake.patch' \
+		'luxmark3/luxmark3-luxmark-do-not-ship-cmake-files.patch' \
+		'luxmark3/luxmark3-luxmark-use-simde-on-non-i686.patch' \
+		'luxmark3/luxmark3-luxmark-fix-luxcorerender-website-url.patch'
+
+	_cmake_setup \
+		-D'USE_CPU_ARCH'="${cpu_arch}" \
+		-D'LuxRays_HOME'="${install_dir}"
+
+	_cmake_target
+
+	# No install target.
+	#	_cmake_compile_install
+
+	mkdir -pv "${install_dir}/opt/luxmark"
+	cp -av 'build/bin/luxmark' "${install_dir}/opt/luxmark/luxmark"
+}
+
+_build_scenes () {
+	mkdir -pv "${install_dir}/opt/luxmark/scenes"
+	cp -av . "${install_dir}/opt/luxmark/scenes/."
+}
+
+_run_custom_command () {
+	"${install_dir}${required_file}" --mode='PAUSE'
+}
+
+_help_custom_run () {
+	cat <<-EOF
+	${tab}${script_name} run luxmark --mode=PAUSE
+
+	${tab}${script_name} run slg4 -D opencl.platform.index 0 scenes/luxball/render.cfg
+
+	${tab}${script_name} run slg4 -D renderengine.type PATHCPU scenes/luxball/render.cfg
+
+	${tag}${script_name} run slg4 -D opencl.cpu.use 1 -D renderengine.type PATHOCL scenes/luxball/render.cfg
+	EOF
+}
+
+_spawn "${@}"
