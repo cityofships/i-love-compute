@@ -374,9 +374,6 @@ _build_luxcore () {
 }
 
 _build_luxmark () {
-	# Do not apply this one for now or LuxMark fails to link against OpenCL.
-	#	'luxmark3/luxmark3-luxmark-do-not-ship-cmake-files.patch'
-
 	# Excluded patch:
 	#	'luxmark3/luxmark3-luxmark-port-to-qt5.patch'
 
