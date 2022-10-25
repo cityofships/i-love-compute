@@ -408,20 +408,24 @@ _write_custom_patches () {
 }
 
 # FIXME: Set generic configure build type.
-meson_build_type='debugoptimized'
-cmake_build_type='RelWithDebInfo'
+common_build_type='Release'
+meson_build_type='release'
+cmake_build_type='Release'
 
 _set_build_type () {
 	case "${1}" in
 		'Debug')
+			common_build_type="${1}"
 			cmake_build_type="${1}"
 			meson_build_type='debug'
 			;;
 		'RelWithDebInfo')
+			common_build_type="${1}"
 			cmake_build_type="${1}"
 			meson_build_type='debugoptimized'
 			;;
 		'Release')
+			common_build_type="${1}"
 			cmake_build_type="${1}"
 			meson_build_type='release'
 			;;
@@ -432,7 +436,7 @@ _build_basic_project () {
 	local job_count="$(nproc)"
 	local do_force='false'
 
-	local build_type='Debug'
+	local build_type='Release'
 
 	while ! [ -z "${1:-}" ]
 	do
@@ -551,7 +555,7 @@ _build_featured_project () {
 	local job_count="$(nproc)"
 	local do_force='false'
 
-	local build_type='Debug'
+	local build_type='Release'
 
 	local feature_list=''
 	local enable_list=''
