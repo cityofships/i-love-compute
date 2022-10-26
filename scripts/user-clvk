@@ -33,7 +33,21 @@ _set_custom_env () {
 _build_clvk () {
 	"${workspace_dir}/clvk/external/clspv/utils/fetch_sources.py"
 
-	_build_generic_cmake
+	# Do not build with shared libs, otherwise:
+	#
+	# CMake Error at external/clspv/cmake/util.cmake:65 (file):
+	#   Error evaluating generator expression:
+	#
+	#     $<TARGET_FILE:>
+	#
+	#   Expression syntax not recognized.
+	# Call Stack (most recent call first):
+	#   external/clspv/lib/CMakeLists.txt:158 (clspv_combine_static_lib)
+
+	_cmake_setup \
+		-D'BUILD_SHARED_LIBS'='OFF'
+
+	_cmake_compile_install
 }
 
 _help_custom_run () {
