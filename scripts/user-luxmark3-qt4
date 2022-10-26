@@ -31,7 +31,7 @@ sse2neon_repository_directory='-'
 simde_repository_directory='-'
 
 case "${cpu_arch}" in
-	'x86'|'x86_64')
+	'i686'|'x86_64')
 		;;
 	*)
 		sse2neon_repository_directory='sse2neon'
@@ -284,12 +284,12 @@ _build_embree () {
 		'luxmark3/luxmark3-embree-build-aarch64-with-sse2neon.patch'
 
 	case "${cpu_arch}" in
-		'x86'|'x86_64')
+		'i686'|'x86_64')
 			;;
 		'aarch64')
 			;;
 		*)
-			_error "Unsupported architecture for Embree: ${cpu_arch}."
+			_error "Unsupported CPU architecture for Embree: ${cpu_arch}."
 			;;
 	esac
 
