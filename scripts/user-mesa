@@ -33,6 +33,8 @@ feature_vdpau='false'
 feature_xa='false'
 feature_egl='false'
 
+cpu_arch="$(uname -m)"
+
 packages=(
 	# package name
 	#	directory name
@@ -137,6 +139,8 @@ _build_llvm () {
 
 	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
+
+	# The native architecture is required by llvmpipe.
 	_cmake_setup \
 		-D'LLVM_BUILD_TOOLS'='ON' \
 		-D'LLVM_ENABLE_ASSERTIONS'="${llvm_enable_assertions}" \
@@ -153,6 +157,7 @@ _build_llvm () {
  		-D'LLVM_INCLUDE_TESTS'='OFF' \
 		-D'LLVM_INCLUDE_UTILS'='OFF' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF' \
+		-D'LLVM_TARGETS_TO_BUILD'="AMDGPU;Native" \
 		-D'CLANG_ENABLE_ARCMT'='OFF' \
 		-D'CLANG_ENABLE_STATIC_ANALYZER'='OFF' \
 		-D'CLANG_TOOL_DICTIONARY_BUILD'='OFF' \
@@ -175,7 +180,7 @@ _build_spirv_tools () {
 
 _build_libclc () {
 	_cmake_setup \
-		-D'LIBCLC_TARGETS_TO_BUILD'='amdgcn-mesa-mesa3d;r600--;spirv-mesa3d-;spirv64-mesa3d-'
+    	-D'LIBCLC_TARGETS_TO_BUILD'='amdgcn-mesa-mesa3d;r600--;spirv-mesa3d-;spirv64-mesa3d-'
 
 	_cmake_compile_install
 }
