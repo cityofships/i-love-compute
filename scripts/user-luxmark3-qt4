@@ -424,7 +424,7 @@ _help_custom_run () {
 
 	${tab}${script_name} run slg4 -D renderengine.type PATHCPU scenes/luxball/render.cfg
 
-	${tag}${script_name} run slg4 -D opencl.cpu.use 1 -D renderengine.type PATHOCL scenes/luxball/render.cfg
+	${tab}${script_name} run slg4 -D opencl.cpu.use 1 -D renderengine.type PATHOCL scenes/luxball/render.cfg
 	EOF
 }
 
