@@ -143,6 +143,8 @@ _build_gcc7 () {
 		export CC="gcc-10"
 		export CXX="g++-10"
 
+		local without_mold='1'
+
 		# Disable nls because:
 		# msgfmt: gcc-7.5.0/x86_64-pc-linux-gnu/libstdc++-v3/src/.libs/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /usr/lib/x86_64-linux-gnu/libicuuc.so.70)
 
