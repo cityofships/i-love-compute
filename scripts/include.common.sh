@@ -252,7 +252,7 @@ _apply_patches () {
 }
 
 _mold () {
-	if [ -n "${self_mold:-}" ]
+	if [ -n "${without_mold:-}" ]
 	then
 		"${@}"
 		return

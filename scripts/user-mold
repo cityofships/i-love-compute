@@ -29,7 +29,7 @@ packages=(
 )
 
 _build_mold () {
-	local self_mold='1'
+	local without_mold='1'
 
 	_build_generic_cmake
 }
