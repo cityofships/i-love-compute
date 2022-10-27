@@ -143,6 +143,7 @@ _build_gcc7 () {
 		export CC="gcc-10"
 		export CXX="g++-10"
 
+		# Mold cannot link GCC7:
 		local without_mold='1'
 
 		# Disable nls because:
