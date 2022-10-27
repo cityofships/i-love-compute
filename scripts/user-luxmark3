@@ -123,7 +123,7 @@ _build_oiio () {
 	#   oiio/src/libutil/ustring.cpp:336: failed assertion 'str.c_str() == c_str() && str.size() == length'
 
 	_cmake_setup \
-		-D'CMAKE_BUILD_TYPE'='Release'
+		-D'CMAKE_BUILD_TYPE'='Release' \
 		-D'BUILD_TESTING'='OFF' \
 		-D'INSTALL_DOCS'='OFF' \
 		-D'INSTALL_FONTS'='OFF' \
