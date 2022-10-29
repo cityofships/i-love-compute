@@ -21,7 +21,7 @@ provides_egl='true'
 builds_llvm='true'
 
 known_feature_list='opencl,rusticl,vulkan,opengl,gles,nine,va,vdpau,xa,egl'
-default_feature_list='opencl,rusticl,vulkan'
+default_feature_list='opencl,rusticl,vulkan,opengl'
 feature_opencl='false'
 feature_rusticl='false'
 feature_vulkan='false'
