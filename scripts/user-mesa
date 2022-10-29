@@ -180,7 +180,7 @@ _build_spirv_tools () {
 
 _build_libclc () {
 	_cmake_setup \
-    	-D'LIBCLC_TARGETS_TO_BUILD'='amdgcn-mesa-mesa3d;r600--;spirv-mesa3d-;spirv64-mesa3d-'
+		-D'LIBCLC_TARGETS_TO_BUILD'='amdgcn-mesa-mesa3d;r600--;spirv-mesa3d-;spirv64-mesa3d-'
 
 	_cmake_compile_install
 }
