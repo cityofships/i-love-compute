@@ -823,9 +823,12 @@ _run_custom_command () {
 }
 
 _run_common () {
+	local do_shift='false'
+
 	if [ "${1:-}" = '--force' ]
 	then
 		shift
+		do_shift='true'
 	elif ! [ -f "${install_dir}${required_file}" ]
 	then
 		_error "${project_name} is not built."
@@ -834,10 +837,15 @@ _run_common () {
 	_set_env
 
 	_set_custom_run_env
+
+	"${do_shift}"
 }
 
 _run () {
-	_run_common
+	if _run_common "${1:-}"
+	then
+		shift
+	fi
 
 	if [ -z "${1:-}" ]
 	then
@@ -855,7 +863,10 @@ _run () {
 }
 
 _run_flatpak () {
-	_run_common
+	if _run_common "${1:-}"
+	then
+		shift
+	fi
 
 	if [ -z "${1:-}" ]
 	then
