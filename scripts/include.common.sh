@@ -357,13 +357,15 @@ _build_generic_autogen () {
 }
 
 _build_generic_cmake () {
-	_cmake_setup
+	_cmake_setup \
+		"${@}"
 
 	_cmake_compile_install
 }
 
 _build_generic_meson () {
-	_meson_setup
+	_meson_setup \
+		"${@}"
 
 	_meson_compile_install
 }
@@ -378,7 +380,7 @@ _get_llvm_job_count () {
 		return
 	fi
 
-	local mem_available_k="$(grep '^MemAvailable:' /proc/meminfo | awk '{ print $2 }')"
+	local mem_available_k="$(grep -E '^MemAvailable:' /proc/meminfo | awk '{ print $2 }')"
 	local mem_available_g="$((${mem_available_k} / 1024 / 1024))"
 	local mem_per_core="$((${mem_available_g} / ${job_count}))"
 	local min_llvm_mem_per_core='8'
@@ -387,15 +389,39 @@ _get_llvm_job_count () {
 	then
 		if ! "${do_force}"
 		then
-			llvm_job_count="$((${mem_available_g} / ${min_llvm_mem_per_core}))"
-
 			cat >&2 <<-EOF
 			WARNING: The computer has less than ${min_llvm_mem_per_core}G of available memory per CPU core.
-			LLVM will be compiled will ${llvm_job_count} jobs instead of ${job_count} to prevent the computer
-			to run out of memory when linking LLVM.
+			EOF
+
+			llvm_job_count="$((${mem_available_g} / ${min_llvm_mem_per_core}))"
+
+			if [ "${llvm_job_count}" = '0' ]
+			then
+				llvm_job_count=1
+			fi
+
+			if [ "${llvm_job_count}" = 1 ]
+			then
+				cat >&2 <<-EOF
+				The computer may run out of memory when linking LLVM.
+				EOF
+			else
+				cat >&2 <<-EOF
+				LLVM will be compiled will ${llvm_job_count} jobs instead of ${job_count} to prevent the computer
+				to run out of memory when linking LLVM.
+				EOF
+			fi
+
+			cat >&2 <<-EOF
 
 			Use --force to force using ${job_count} jobs when compiling LLVM.
 			EOF
+
+			if [ "${mem_per_core}" = 1 ]
+			then
+				false
+			fi
+
 			sleep 5s
 		fi
 	fi
