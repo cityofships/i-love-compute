@@ -3,9 +3,7 @@
 set -u -e -o pipefail
 
 workspace_parent_dir="${script_dir}/workspace"
-workspace_dir="${workspace_parent_dir}/${script_name}"
 patch_dir="${script_dir}/../patches"
-install_dir="${workspace_dir}/install"
 
 provides_hip='false'
 provides_opencl='false'
@@ -1170,22 +1168,35 @@ _mention () {
 }
 
 _spawn () {
-	case "${1:-}" in
-		'pull'|'build'|'clean'|'shell'|'run'|'run-flatpak')
-			action="${1}"
-			;;
-		'-h'|'--help'|'')
-			_help
-			;;
-		'-'*|'--'*)
-			_error 'Unknown option.'
-			;;
-		*)
-			_error 'Unknown action.'
-			;;
-	esac
+	local workspace_name="${script_name}"
 
-	shift
+	while [ -n "${1:-}" ]
+	do
+		case "${1}" in
+			'pull'|'build'|'clean'|'shell'|'run'|'run-flatpak')
+				action="${1}"
+				shift
+				break
+				;;
+			'-h'|'--help'|'')
+				_help
+				;;
+			'--workspace='*)
+					workspace_name="${1:12}"
+				;;
+			'-'*|'--'*)
+				_error 'Unknown option.'
+				;;
+			*)
+				_error 'Unknown action.'
+				;;
+		esac
+
+		shift
+	done
+
+	workspace_dir="${workspace_parent_dir}/${workspace_name}"
+	install_dir="${workspace_dir}/install"
 
 	"_${action//-/_}" "${@}"
 
