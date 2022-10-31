@@ -584,7 +584,7 @@ _build_featured_project () {
 				job_count="${1:2}"
 				;;
 			'--type='*)
-				build_type="${1:8}"
+				build_type="${1:7}"
 				;;
 			'--features='*)
 				feature_list="${1:11}"
