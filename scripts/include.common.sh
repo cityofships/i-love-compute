@@ -456,11 +456,89 @@ _set_build_type () {
 	esac
 }
 
+_is_word_in_list () {
+	if [ -z "${2}" ]
+	then
+		false
+	fi
+
+	local word
+	for word in ${2//,/ }
+	do
+		if [ "${word}" = "${1}" ]
+		then
+			return
+		fi
+	done
+
+	false
+}
+
+default_directory_list=''
+
+_set_default_directory_list () {
+	local separator=''
+	local i=0
+	while [ "${i}" -lt "${#packages[@]}" ]
+	do
+		local name="${packages[${i}]}"
+		i="$((${i} + 1))"
+		local directory="${packages[${i}]}"
+		i="$((${i} + 1))"
+		# repository
+		i="$((${i} + 1))"
+		# branch
+		i="$((${i} + 1))"
+		local slug="${packages[${i}]}"
+		i="$((${i} + 1))"
+
+		if [ "${directory}" = '-' ]
+		then
+			continue
+		fi
+
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
+
+		default_directory_list+="${separator}${directory}"
+
+		if [ -z "${separator}" ]
+		then
+			separator=','
+		fi
+	done
+}
+
+enabled_directory_list=''
+
+_set_enabled_directory_list () {
+	enabled_directory_list=''
+
+	local separator=''
+	local directory
+	for directory in ${default_directory_list//,/ }
+	do
+		if _is_word_in_list "${directory}" "${1}"
+		then
+			enabled_directory_list+="${separator}${directory}"
+
+			if [ -z "${separator}" ]
+			then
+				separator=','
+			fi
+		fi
+	done
+}
+
 _build_basic_project () {
 	local job_count="$(nproc)"
 	local do_force='false'
 
 	local build_type='Release'
+
+	enabled_directory_list="${default_directory_list}"
 
 	while ! [ -z "${1:-}" ]
 	do
@@ -484,6 +562,9 @@ _build_basic_project () {
 			'-j'*)
 				job_count="${1:2}"
 				;;
+			'--directories='*)
+				_set_enabled_directory_list "${1:14}"
+				;;
 			'--type='*)
 				build_type="${1:7}"
 				;;
@@ -500,6 +581,8 @@ _build_basic_project () {
 
 		shift
 	done
+
+	printf 'Building directories: %s\n' "${enabled_directory_list}"
 
 	_set_build_type "${build_type}"
 
@@ -530,12 +613,7 @@ _build_basic_project () {
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
 
-		if [ "${directory}" = '-' ]
-		then
-			continue
-		fi
-
-		if [ "${slug}" = '-' ]
+		if ! _is_word_in_list "${directory}" "${enabled_directory_list}"
 		then
 			continue
 		fi
@@ -585,6 +663,8 @@ _build_featured_project () {
 	local enable_list=''
 	local disable_list=''
 
+	enabled_directory_list="${default_directory_list}"
+
 	while ! [ -z "${1:-}" ]
 	do
 		case "${1:-}" in
@@ -609,6 +689,9 @@ _build_featured_project () {
 				;;
 			'--type='*)
 				build_type="${1:7}"
+				;;
+			'--directories='*)
+				_set_enabled_directory_list "${1:14}"
 				;;
 			'--features='*)
 				feature_list="${1:11}"
@@ -635,6 +718,8 @@ _build_featured_project () {
 
 		shift
 	done
+
+	printf 'Building directories: %s\n' "${enabled_directory_list}"
 
 	_set_build_type "${build_type}"
 
@@ -729,12 +814,7 @@ _build_featured_project () {
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
 
-		if [ "${directory}" = '-' ]
-		then
-			continue
-		fi
-
-		if [ "${slug}" = '-' ]
+		if ! _is_word_in_list "${directory}" "${enabled_directory_list}"
 		then
 			continue
 		fi
@@ -946,6 +1026,8 @@ _help_basic_application () {
 	${tab}--type=[TYPE]
 	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
 	${tab}${tab}other options are Debug and Release.
+	${tab}--directories=[DIRECTORIES]
+	${tab}${tab}Build those directories, comma separated list, default: ${default_directory_list}.
 
 	Run options:
 	${tab}--force
@@ -1052,6 +1134,8 @@ _help_basic_platform () {
 	${tab}--type=[TYPE]
 	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
 	${tab}${tab}other options are Debug and Release.
+	${tab}--directories=[DIRECTORIES]
+	${tab}${tab}Build those directories, comma separated list, default: ${default_directory_list}.
 
 	Run options:
 	${tab}--force
@@ -1110,6 +1194,8 @@ _help_featured_platform () {
 	${tab}--type=[TYPE]
 	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
 	${tab}${tab}other options are Debug and Release.
+	${tab}--directories=[DIRECTORIES]
+	${tab}${tab}Build those directories, comma separated list, default: ${default_directory_list}.
 	${tab}--features=[FEATURES]
 	${tab}${tab}Build those features, comma separated list, default: ${default_feature_list}.
 	${tab}${tab}Special name: all, build all known features.
@@ -1169,6 +1255,8 @@ _mention () {
 
 _spawn () {
 	local workspace_name="${script_name}"
+
+	_set_default_directory_list
 
 	while [ -n "${1:-}" ]
 	do
