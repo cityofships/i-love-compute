@@ -1034,7 +1034,7 @@ _help_basic_application () {
 	${tab}${tab}Run the command even if ${project_name} isn't installed yet.
 
 	Commands:
-	${tab}Anything you want to run in thei ${project_name} environment.
+	${tab}Anything you want to run in the ${project_name} environment.
 
 	Examples:
 	${tab}${script_name} build
