@@ -1238,7 +1238,13 @@ _spawn () {
 		shift
 	done
 
-	workspace_dir="${workspace_parent_dir}/${workspace_name}"
+	if [ "${workspace_name:0:1}" = '/' ]
+	then
+		workspace_dir="${workspace_name}"
+	else
+		workspace_dir="${workspace_parent_dir}/${workspace_name}"
+	fi
+
 	install_dir="${workspace_dir}/install"
 
 	"_${action//-/_}" "${@}"
