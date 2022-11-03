@@ -1208,9 +1208,14 @@ _mention () {
 	EOF
 }
 
+_nop () {
+	true
+}
+
 _spawn () {
 	local workspace_name="${script_name}"
 	local prefix_dir=''
+	local action='nop'
 
 	_set_default_directory_list
 
