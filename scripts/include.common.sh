@@ -660,8 +660,6 @@ _build_featured_project () {
 	local build_type='Release'
 
 	local feature_list=''
-	local enable_list=''
-	local disable_list=''
 
 	enabled_directory_list="${default_directory_list}"
 
@@ -697,14 +695,6 @@ _build_featured_project () {
 				feature_list="${1:11}"
 				feature_list="${feature_list//,/ }"
 				;;
-			'--enable='*)
-				enable_list="${1:9}"
-				enable_list="${enable_list//,/ }"
-				;;
-			'--disable='*)
-				disable_list="${1:10}"
-				disable_list="${disable_list//,/ }"
-				;;
 			'-h'|'--help'|'')
 				_help
 				;;
@@ -738,45 +728,14 @@ _build_featured_project () {
 	local feature_is_unknown
 	local feature_value
 
-	local iteratable_known_feature_list="${known_feature_list//,/ }"
-	local iteratable_feature_list="${feature_list//,/ }"
-
-	for feature_name in ${iteratable_feature_list}
+	for feature_name in ${feature_list//,/ }
 	do
 		eval "feature_${feature_name}='true'"
 	done
 
-	for feature_mode in 'enable' 'disable'
-	do
-		if [ "${feature_mode}" = 'enable' ]
-		then
-			feature_value='true'
-		else
-			feature_value='false'
-		fi
-
-		for feature_name in $(eval 'echo ${'"${feature_mode}"'_list}')
-		do
-			feature_is_unknown='true'
-			for known_feature in ${iteratable_known_feature_list}
-			do
-				if [ "${feature_name}" = "${known_feature}" ]
-				then
-					eval "feature_${feature_name}='${feature_value}'"
-					feature_is_unknown='false'
-				fi
-			done
-
-			if "${feature_is_unknown}"
-			then
-				_error "Unknown feature: ${feature_name}"
-			fi
-		done
-	done
-
 	local enabled_feature_list=''
 	local disabled_feature_list=''
-	for feature_name in ${iteratable_known_feature_list}
+	for feature_name in ${known_feature_list//,/ }
 	do
 		if eval '${feature_'"${feature_name}"'}'
 		then
@@ -1199,10 +1158,6 @@ _help_featured_platform () {
 	${tab}--features=[FEATURES]
 	${tab}${tab}Build those features, comma separated list, default: ${default_feature_list}.
 	${tab}${tab}Special name: all, build all known features.
-	${tab}--enable=[FEATURES]
-	${tab}${tab}Add features to feature build list, comma separated list.
-	${tab}--disable=[FEATURES]
-	${tab}${tab}Remove features from feature build list, comma separated list.
 
 	Run options:
 	${tab}--force
