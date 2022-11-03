@@ -1210,6 +1210,7 @@ _mention () {
 
 _spawn () {
 	local workspace_name="${script_name}"
+	local prefix_dir=''
 
 	_set_default_directory_list
 
@@ -1226,6 +1227,9 @@ _spawn () {
 				;;
 			'--workspace='*)
 					workspace_name="${1:12}"
+				;;
+			'--prefix='*)
+					prefix_dir="${1:9}"
 				;;
 			'-'*|'--'*)
 				_error 'Unknown option.'
@@ -1245,7 +1249,12 @@ _spawn () {
 		workspace_dir="${workspace_parent_dir}/${workspace_name}"
 	fi
 
-	install_dir="${workspace_dir}/install"
+	if [ -z "${prefix_dir}" ]
+	then
+		install_dir="${workspace_dir}/install"
+	else
+		install_dir="${prefix_dir}"
+	fi
 
 	"_${action//-/_}" "${@}"
 
