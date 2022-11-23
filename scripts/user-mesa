@@ -298,12 +298,6 @@ _build_mesa () {
 	mesa_vulkan_drivers="${mesa_vulkan_drivers//$'\n'/,}"
 	mesa_vulkan_drivers="${mesa_vulkan_drivers:-[]}"
 
-	# Workaround lack of libudev linker flag.
-	# https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/18761
-	export CFLAGS+=" -ludev"
-	export CXXFLAGS+=" -ludev"
-	export LDFLAGS+=" -ludev"
-
 	local mesa_enable_assertions='false'
 	if [ "${common_build_type}" = "Debug" ]
 	then
