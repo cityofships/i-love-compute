@@ -204,7 +204,6 @@ _build_mesa () {
 	local mesa_gallium_drivers=''
 	local mesa_vulkan_beta='false'
 	local mesa_vulkan_drivers=''
-	local mesa_vulkan_rt_drivers=''
 	local mesa_intel_clc='disabled'
 	local mesa_llvm='disabled'
 	local mesa_shared_llvm='disabled'
@@ -243,7 +242,6 @@ _build_mesa () {
 		mesa_gallium_drivers+=",${gallium_vulkan_drivers}"
 		# mesa_vulkan_beta='true'
 		mesa_vulkan_drivers="${vulkan_drivers}"
-		mesa_vulkan_rt_drivers='auto'
 		mesa_intel_clc='enabled'
 	fi
 
@@ -346,7 +344,6 @@ _build_mesa () {
 		-D'gles1'="${mesa_gles1}" \
 		-D'gles2'="${mesa_gles2}" \
 		-D'vulkan-drivers'="${mesa_vulkan_drivers}" \
-		-D'vulkan-rt-drivers'="${mesa_vulkan_rt_drivers}" \
 		-D'vulkan-beta'="${mesa_vulkan_beta}" \
 		-D'intel-clc'="${mesa_intel_clc}" \
 		-D'shader-cache'='true' \
