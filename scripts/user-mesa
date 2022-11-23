@@ -104,9 +104,9 @@ packages=(
 )
 
 _set_custom_env () {
-	export CFLAGS='-fno-lto'
-	export CXXFLAGS="${CFLAGS}"
-	export LDFLAGS="${CFLAGS}"
+	export CFLAGS="${CFLAGS:-} -fno-lto"
+	export CXXFLAGS="${CXXFLAGS:-} -fno-lto"
+	export LDFLAGS="${LDFLAGS:-} -fno-lto"
 }
 
 _build_llvm () {
