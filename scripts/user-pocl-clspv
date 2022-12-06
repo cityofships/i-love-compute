@@ -66,4 +66,12 @@ _set_custom_run_env () {
 	export POCL_DEVICES="${POCL_DEVICES:-pthread vulkan}"
 }
 
+_help_custom_run () {
+	cat <<-EOF
+	${tab}POCL_DEVICES=pthread ${script_name} run clinfo --list
+
+	${tab}POCL_DEVICES=vulkan ${script_name} run clinfo --list
+	EOF
+}
+
 _spawn "${@}"
