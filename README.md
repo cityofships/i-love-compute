@@ -131,22 +131,12 @@ A script to download, build clvk and run software using clvk.
 
 ### [`user-pocl`](scripts/user-pocl)
 
-A script to download, build and run PoCL (Portable Computing Language) and run software using it.
+A script to download, build and run PoCL (Portable Computing Language) and run software using it. Vulkan support is enabled using clspv.
 
 - The user can download build and install PoCL by doing `./user-pocl build`.
 - The installation is done as user in `workspace/user-pocl` and provided software is not made available in default environment.
 - The user can run `COMMAND` with built PoCL by doing `./user-pocl run [COMMAND]`.
-
-
-### [`user-pocl-clspv`](scripts/user-pocl-clspv)
-
-A script to download, build and run PoCL (Portable Computing Language) and run software using it.
-
-This is a variant of `user-pocl` building the experimental vulkan backend using clspv.
-
-- The user can download build and install PoCL by doing `./user-pocl-spv build`.
-- The installation is done as user in `workspace/user-pocl-clspv` and provided software is not made available in default environment.
-- The user can run `COMMAND` with built PoCL by doing `./user-pocl-spv run [COMMAND]`.
+- By default `POCL_DEVICES` is set to `pthread vulkan`, the user can only run an OpenCL application with PoCL on pthread or vulkan by doing `POCL_DEVICES=pthread ./user-pocl run [COMMAND]` or `POCL_DEVICES=vulkan ./user-pocl run [COMMAND]`.
 
 
 ### [`user-chip-spv`](scripts/user-chip-spv)
@@ -404,7 +394,7 @@ Orca requires an X11 server being up and running.
 - Intel Beignet OpenCL:
   - https://www.freedesktop.org/wiki/Software/Beignet/
   - https://github.com/intel/beignet
-- Legacy Intel OpenCL:
+- Legacy Intel OpenCL (SRB):
   - https://software.intel.com/content/www/us/en/develop/articles/legacy-opencl-drivers.html
 - Intel OneAPI:
   - https://www.intel.com/content/www/us/en/developer/tools/oneapi/toolkits.html
