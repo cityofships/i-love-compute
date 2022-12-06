@@ -57,9 +57,7 @@ _build_clspv () {
 
 _build_pocl () {
 	_cmake_setup \
-		-D'ENABLE_VULKAN'='ON' \
-#		-D'ENABLE_EXPERIMENTAL_DRIVERS'='ON' \
-#		-D'CLSPV_DIR'="${install_dir}/bin"
+		-D'ENABLE_VULKAN'='ON'
 
 	_cmake_compile_install
 }
