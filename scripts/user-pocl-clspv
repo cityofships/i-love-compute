@@ -62,4 +62,8 @@ _build_pocl () {
 	_cmake_compile_install
 }
 
+_set_custom_run_env () {
+	export POCL_DEVICES="${POCL_DEVICES:-pthread vulkan}"
+}
+
 _spawn "${@}"
