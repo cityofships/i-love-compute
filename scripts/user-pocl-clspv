@@ -37,8 +37,20 @@ packages=(
 _build_clspv () {
 	python 'utils/fetch_sources.py'
 
+	# Do not build with shared libs, otherwise:
+	#
+	# CMake Error at external/clspv/cmake/util.cmake:65 (file):
+	#   Error evaluating generator expression:
+	#
+	#     $<TARGET_FILE:>
+	#
+	#   Expression syntax not recognized.
+	# Call Stack (most recent call first):
+	#   external/clspv/lib/CMakeLists.txt:158 (clspv_combine_static_lib)
+
 	_cmake_setup \
-		-D'CLSPV_BUILD_TESTS'='OFF' \
+		-D'BUILD_SHARED_LIBS'='OFF' \
+		-D'CLSPV_BUILD_TESTS'='OFF'
 
 	_cmake_compile_install
 }
