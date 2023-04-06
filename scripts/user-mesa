@@ -129,13 +129,6 @@ _build_llvm () {
 			"${llvm_spirv_embedded_folder}"
 	fi
 
-	local spirv_headers_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers"
-	if ! [ -e "${spirv_headers_embedded_folder}" ]
-	then
-		ln -s "${workspace_dir}/SPIRV-Headers" \
-			"${spirv_headers_embedded_folder}"
-	fi
-
 	local llvm_enable_assertions='OFF'
 	if [ "${common_build_type}" = "Debug" ]
 	then
@@ -170,6 +163,7 @@ _build_llvm () {
 		-D'LLVM_INCLUDE_UTILS'='OFF' \
 		-D'LLVM_SPIRV_INCLUDE_TESTS'='OFF' \
 		-D'LLVM_TARGETS_TO_BUILD'="AMDGPU;Native" \
+		-D'LLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR'="${workspace_dir}/SPIRV-Headers" \
 		-D'CLANG_ENABLE_ARCMT'='OFF' \
 		-D'CLANG_ENABLE_STATIC_ANALYZER'='OFF' \
 		-D'CLANG_TOOL_DICTIONARY_BUILD'='OFF' \
@@ -180,14 +174,10 @@ _build_llvm () {
 }
 
 _build_spirv_tools () {
-	local spirv_headers_embedded_folder="${workspace_dir}/SPIRV-Tools/external/SPIRV-Headers"
-	if ! [ -e "${spirv_headers_embedded_folder}" ]
-	then
-		ln -s "${workspace_dir}/SPIRV-Headers" \
-			"${spirv_headers_embedded_folder}"
-	fi
+	_cmake_setup \
+		-D'SPIRV-Headers_SOURCE_DIR'="${workspace_dir}/SPIRV-Headers"
 
-	_build_generic_cmake
+	_cmake_compile_install
 }
 
 _build_libclc () {
