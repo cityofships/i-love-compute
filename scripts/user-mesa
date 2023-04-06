@@ -327,7 +327,6 @@ _build_mesa () {
 		-D'b_ndebug'="${mesa_enable_assertions}" \
 		-D'cpp_rtti'='true' \
 		-D'rust_std'='2021' \
-		-D'dri-drivers'='[]' \
 		-D'dri3'='enabled' \
 		-D'egl'="${mesa_egl}" \
 		-D'gbm'="${mesa_gbm}" \
@@ -349,7 +348,7 @@ _build_mesa () {
 		-D'vulkan-drivers'="${mesa_vulkan_drivers}" \
 		-D'vulkan-beta'="${mesa_vulkan_beta}" \
 		-D'intel-clc'="${mesa_intel_clc}" \
-		-D'shader-cache'='true' \
+		-D'shader-cache'='enabled' \
 		-D'platforms'='auto' \
 		-D'llvm'="${mesa_llvm}" \
 		-D'shared-llvm'="${mesa_shared_llvm}" \
