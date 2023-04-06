@@ -1,6 +1,6 @@
-commit e0699297af005ca9fe08463e7f828a2977777401
+commit e566aa8b3093350f735ea1409583c404d7dc8a0e
 Author: Thomas Debesse <dev@illwieckz.net>
-Date:   Sat Oct 22 08:43:11 2022 +0200
+Date:   Tue Oct 25 05:01:11 2022 +0200
 
     patch: luxmark3/luxmark3-luxcore-do-not-ship-cmake-files.patch
 
@@ -234,3 +234,19 @@ index 179cf582b..000000000
 -FIND_PACKAGE_HANDLE_STANDARD_ARGS(OPENCL  DEFAULT_MSG  OPENCL_LIBRARIES OPENCL_INCLUDE_DIR OPENCL_C_INCLUDE_DIR)
 -
 -MARK_AS_ADVANCED(OPENCL_LIBRARIES OPENCL_INCLUDE_DIR OPENCL_C_INCLUDE_DIR)
+diff --git a/samples/smallluxgpu4/CMakeLists.txt b/samples/smallluxgpu4/CMakeLists.txt
+index 599671e70..ec5f87e9f 100644
+--- a/samples/smallluxgpu4/CMakeLists.txt
++++ b/samples/smallluxgpu4/CMakeLists.txt
+@@ -30,9 +30,9 @@ set(SMALLLUXGPU_SRCS
+ add_executable(slg4 ${SMALLLUXGPU_SRCS})
+ 
+ if(APPLE)
+-	TARGET_LINK_LIBRARIES(slg4 luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${OPENGL_LIBRARIES} ${OpenCL_LIBRARIES} ${GLEW_LIBRARY} ${GLUT_LIBRARY} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
++	TARGET_LINK_LIBRARIES(slg4 luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${OPENGL_LIBRARIES} ${OpenCL_LIBRARIES} ${GLEW_LIBRARIES} ${GLUT_LIBRARIES} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
+ else(APPLE)
+-	TARGET_LINK_LIBRARIES(slg4 luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${OPENGL_LIBRARIES} ${OpenCL_LIBRARIES} ${GLEW_LIBRARY} ${GLUT_LIBRARY} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
++	TARGET_LINK_LIBRARIES(slg4 luxcore smallluxgpu luxrays ${EMBREE_LIBRARY} ${OPENGL_LIBRARIES} ${OpenCL_LIBRARIES} ${GLEW_LIBRARIES} ${GLUT_LIBRARIES} ${TIFF_LIBRARIES} ${OPENEXR_LIBRARIES} ${PNG_LIBRARIES} ${JPEG_LIBRARIES})
+ endif(APPLE)
+ 
+ # This instructs FREEGLUT to emit a pragma for the static version
