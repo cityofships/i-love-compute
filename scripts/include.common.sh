@@ -613,6 +613,11 @@ _build_basic_project () {
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
 
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
+
 		if ! _is_word_in_list "${directory}" "${enabled_directory_list}"
 		then
 			continue
@@ -772,6 +777,11 @@ _build_featured_project () {
 		i="$((${i} + 1))"
 		local slug="${packages[${i}]}"
 		i="$((${i} + 1))"
+
+		if [ "${slug}" = '-' ]
+		then
+			continue
+		fi
 
 		if ! _is_word_in_list "${directory}" "${enabled_directory_list}"
 		then
