@@ -45,6 +45,21 @@ packages=(
 	#	repository or archive url
 	#	branch or archive name
 	#	build slug
+	'OpenEXR-repository'
+		'openexr'
+		'https://github.com/AcademySoftwareFoundation/openexr.git'
+		'v2.2.0'
+		'-'
+	'IlmBase'
+		'openexr/IlmBase'
+		'-'
+		'-'
+		'ilmbase'
+	'OpenEXR'
+		'openexr/OpenEXR'
+		'-'
+		'-'
+		'openexr'
 	'OpenImageIO'
 		'oiio'
 		'https://github.com/OpenImageIO/oiio.git'
@@ -240,6 +255,21 @@ _build_qt4 () {
 	_set_done
 }
 
+_build_ilmbase () {
+	_cmake_setup \
+		-G 'Unix Makefiles' \
+		-D'CMAKE_CXX_FLAGS'='-std=c++11'
+
+	_cmake_compile_install
+}
+
+_build_openexr () {
+	_cmake_setup \
+		-D'CMAKE_CXX_FLAGS'="-std=c++11 -I '${install_dir}/include/OpenEXR'"
+
+	_cmake_compile_install
+}
+
 _build_oiio () {
 	# Newer versions
 	#	if [ -f 'src/build-scripts/build_pybind11.bash' ]
@@ -346,7 +376,6 @@ _build_luxcore () {
 		'luxmark3/luxmark3-luxcore-optionally-disable-image.patch' \
 		'luxmark3/luxmark3-luxcore-fix-build-with-system-opencl-cmake.patch' \
 		'luxmark3/luxmark3-luxcore-do-not-ship-cmake-files.patch' \
-		'luxmark3/luxmark3-luxcore-link-slg4-with-opencl.patch' \
 		'luxmark3/luxmark3-luxcore-enable-slg4-build.patch' \
 		'luxmark3/luxmark3-luxcore-use-simde-on-non-i686.patch' \
 		'luxmark3/luxmark3-luxcore-fix-luxcorerender-website-url.patch'
@@ -355,8 +384,7 @@ _build_luxcore () {
 	# ninja: error: build.ninja:829: lexing error
 
 	# Building LuxCore with Debian 11 on aarch64 required -pthread for unknown reasons.
-	# Building SLG4 with Flatpak on amd64 required -lglut for unknown reasons.
-	luxcore_extra_flags='-pthread -lglut'
+	luxcore_extra_flags='-pthread'
 
 	_cmake_setup \
 		-G'Unix Makefiles' \
