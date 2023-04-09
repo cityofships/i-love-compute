@@ -993,7 +993,7 @@ _help_basic_application () {
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs (default: Availables core count).
 	${tab}--type=[TYPE]
-	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
+	${tab}${tab}Build as <Type> build type. Default is RelWithDebInfo,
 	${tab}${tab}other options are Debug and Release.
 	${tab}--directories=[DIRECTORIES]
 	${tab}${tab}Build those directories, comma separated list, default: ${default_directory_list}.
@@ -1101,7 +1101,7 @@ _help_basic_platform () {
 	${tab}-jN,--jobs N
 	${tab}${tab}Build with N parallel jobs, default: Availables core count.
 	${tab}--type=[TYPE]
-	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
+	${tab}${tab}Build as <Type> build type. Default is RelWithDebInfo,
 	${tab}${tab}other options are Debug and Release.
 	${tab}--directories=[DIRECTORIES]
 	${tab}${tab}Build those directories, comma separated list, default: ${default_directory_list}.
@@ -1161,7 +1161,7 @@ _help_featured_platform () {
 	${tab}--force
 	${tab}${tab}Force using as much parallel jobs even when there may not be enough memory.
 	${tab}--type=[TYPE]
-	${tab}${tab}Build as <Type> build type. Default is DebWithRelInfo,
+	${tab}${tab}Build as <Type> build type. Default is RelWithDebInfo,
 	${tab}${tab}other options are Debug and Release.
 	${tab}--directories=[DIRECTORIES]
 	${tab}${tab}Build those directories, comma separated list, default: ${default_directory_list}.
