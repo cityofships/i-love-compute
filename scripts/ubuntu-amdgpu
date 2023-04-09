@@ -61,14 +61,14 @@ pal_tarball_sum='9b064a3b02d2a1ec18fdd6c098b70f4a8c6f93e4bfdc4e9a032ca387bdf7223
 pal_deb_file_list='opencl-amdgpu-pro-comgr_20.40-1147286_amd64.deb opencl-amdgpu-pro-icd_20.40-1147286_amd64.deb'
 pal_tarball_dir="$(basename "${pal_tarball_file}" '.tar.xz')"
 
-rocm_version='5.3'
+rocm_version='5.4.3'
 rocm_distro='jammy'
 
 amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${rocm_version}/ubuntu/${rocm_distro}"
 
-amdgpupro_deb_version='5.3.50300-1'
+amdgpupro_deb_version='5.4.50403-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
-amdgpupro_deb_sum='6555a8dceac01b57c77cea1cd98a6bc1c7d0d465c835ece49714633914262cc90e49e657f200e2fdb1067bdce79a51a92f3c245d1371c7b25354b77d40fb7038'
+amdgpupro_deb_sum='87c046933d546488c44652b085e238ee86c63619e251b3a714511bf924d501d57c419e30f8aa44cd00ac4ba4a42e18de08ce4682c92c270eba3a8b13306de084'
 
 old_rocm_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocm_package_name_list='rocm-opencl'
