@@ -121,7 +121,7 @@ _fetch_archive () {
 	fi
 	
 	case "${archive}" in
-		*'.tar.gz')
+		*'.tar.gz'|*'.tgz')
 			tar xzvf "${archive}"
 			;;
 		*'.tar.bz2')
@@ -168,7 +168,7 @@ _fetch () {
 			# Archive url is stored in ${repository}.
 			# Archive checksum is stored in ${branch}.
 			case "${repository}" in
-				*'.tar.gz')
+				*'.tar.gz'|*'.tgz')
 					_fetch_archive "${repository}" "${branch}"
 					continue
 					;;
