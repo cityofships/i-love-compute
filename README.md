@@ -90,7 +90,7 @@ A script to install amdgpu-pro OpenCL on Ubuntu. This was based on many scripts 
 
 It makes possible to install Orca (GCN 2.0 to 4.0), PAL (GCN 5.0), ROCr and Clover (TeraScale 2 and 3, GCN 1 and later).
 
-- The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install stream orca`.
+- The user can downloads and install all OpenCL drivers by doing `sudo ./ubuntu-amdgpu install all`, or only a select of them. For example the user can only install AMD APP for CPUs from Radeon Crimson (fglrx) and AMD APP for GPUs from Orca (AMDGPU-PRO) by doing `sudo ./ubuntu-amdgpu install fglrx orca`.
 - The installation is done as root and system-wide, provided software is made available to default environment.
 
 This script is known to work on Ubuntu 22.04 LTS.
@@ -273,7 +273,7 @@ Orca requires an X11 server being up and running.
 
 ### Interesting projects to look at
 
-- [CLara](https://gitlab.com/illwieckz/clara) is a project by Björn König for a framework to access OpenCL devies over the network. The project is unfortunately stalled since year 2010 and is still in alpha state. If you're an OpenCL wizard and can see the interest of such project, you're welcome to improve it!
+- [CLara](https://gitlab.com/illwieckz/clara) is a project by Björn König for a framework to access OpenCL devices over the network. The project is unfortunately stalled since year 2010 and is still in alpha state. If you're an OpenCL wizard and can see the interest of such project, you're welcome to improve it!
 
 - [compute-runtime/clgl-fork](https://github.com/kallaballa/compute-runtime/tree/clgl-fork), a fork adding `cl_khr_gl_sharing` to Intel Compute Runtime, as upstream [has not implemented it yet](https://github.com/intel/compute-runtime/issues/166).
 
