@@ -64,6 +64,9 @@ pal_tarball_dir="$(basename "${pal_tarball_file}" '.tar.xz')"
 rocm_version='5.5'
 rocm_distro='jammy'
 
+# Workaround
+amdgpupro_repository_version='5.4.5'
+
 amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${rocm_version}/ubuntu/${rocm_distro}"
 
 amdgpupro_deb_version='5.5.50500-1'
@@ -424,7 +427,9 @@ _install () {
 		dpkg -i "${amdgpupro_deb_file}"
 
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
-		sed -e 's/@AMDGPUVER@/'"${rocm_version}/" -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
+
+		# workaround
+		sed -e 's/@AMDGPUVER@/'"${amdgpupro_repository_version}/" -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
 	if _is clover || _is orca || _is pal || _is rocm
