@@ -1202,7 +1202,7 @@ _help() {
 
 _mention () {
 	cat >&2 <<-EOF
-	This tool is provided by the I love compute! initiative.
+	This setup tool is provided by the I love compute! initiative.
 
 	Always backup this script for future uninstallation, future versions
 	of this script may not uninstall what was installed with this one.
