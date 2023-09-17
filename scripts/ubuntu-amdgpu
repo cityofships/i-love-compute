@@ -71,7 +71,7 @@ amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
 amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c1552013187fd2c382c42819186ad162be9d838c65ef7e09fead3e1b5b991adc6a8daf4'
 
 old_rocm_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
-rocm_package_name_list='rocm-opencl'
+rocm_package_name_list='rocm-opencl rocm-ocl-icd'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
