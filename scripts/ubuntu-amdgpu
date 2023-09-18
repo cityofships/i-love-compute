@@ -70,8 +70,8 @@ amdgpupro_deb_version='5.7.50700-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
 amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c1552013187fd2c382c42819186ad162be9d838c65ef7e09fead3e1b5b991adc6a8daf4'
 
-old_rocm_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
-rocm_package_name_list='rocm-opencl rocm-ocl-icd'
+old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
+rocr_opencl_package_name_list='rocm-opencl-runtime'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -79,28 +79,28 @@ _error () {
 	exit 1
 }
 
-is_clover='false'
-is_fglrx='false'
-is_orca='false'
-is_pal='false'
-is_rocm='false'
+is_clover_opencl='false'
+is_fglrx_opencl='false'
+is_orca_opencl='false'
+is_pal_opencl='false'
+is_rocr_opencl='false'
 
 _is () {
 	case "${1}" in
-		'clover')
-			"${is_clover}"
+		'clover-opencl')
+			"${is_clover_opencl}"
 			;;
-		'fglrx')
-			"${is_fglrx}"
+		'fglrx-opencl')
+			"${is_fglrx_opencl}"
 			;;
-		'orca')
-			"${is_orca}"
+		'orca-opencl')
+			"${is_orca_opencl}"
 			;;
-		'pal')
-			"${is_pal}"
+		'pal-opencl')
+			"${is_pal_opencl}"
 			;;
-		'rocm')
-			"${is_rocm}"
+		'rocr-opencl')
+			"${is_rocr_opencl}"
 			;;
 	esac
 }
@@ -173,7 +173,7 @@ _cd () {
 _download () {
 	_cd
 
-	if _is clover
+	if _is clover-opencl
 	then
 		if ! _checksum 'clover'
 		then
@@ -193,7 +193,7 @@ _download () {
 		fi
 	fi
 
-	if _is fglrx
+	if _is fglrx-opencl
 	then
 		if ! _checksum 'fglrx'
 		then
@@ -208,7 +208,7 @@ _download () {
 		fi
 	fi
 
-	if _is orca || _is pal || _is rocm
+	if _is orca-opencl || _is pal-opencl || _is rocr-opencl
 	then
 		if ! _checksum 'amdgpupro'
 		then
@@ -222,7 +222,7 @@ _download () {
 		fi
 	fi
 
-	if _is orca || _is pal
+	if _is orca-opencl || _is pal-opencl
 	then
 		if ! _checksum 'orca'
 		then
@@ -237,7 +237,7 @@ _download () {
 		fi
 	fi
 
-	if _is pal
+	if _is pal-opencl
 	then
 		if ! _checksum 'pal'
 		then
@@ -258,7 +258,7 @@ _extract () {
 
 	_download
 
-	if _is fglrx
+	if _is fglrx-opencl
 	then
 		if ! [ -d "${fglrx_tarball_dir}" ]
 		then
@@ -268,7 +268,7 @@ _extract () {
 		fi
 	fi
 
-	if _is orca || _is pal
+	if _is orca-opencl || _is pal-opencl
 	then
 		if ! [ -d "${orca_tarball_dir}" ]
 		then
@@ -278,7 +278,7 @@ _extract () {
 		fi
 	fi
 
-	if _is pal
+	if _is pal-opencl
 	then
 		if ! [ -d "${pal_tarball_dir}" ]
 		then
@@ -316,7 +316,7 @@ _clean () {
 
 _purge () {
 	case "${1}" in
-		'clover')
+		'clover-opencl')
 			for clover_deb_file in \
 				$(echo "${clover_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }' | tac)
 			do
@@ -327,7 +327,7 @@ _purge () {
 				apt-get remove --yes --purge "${clover_package_name}" || true
 			done
 			;;
-		'fglrx')
+		'fglrx-opencl')
 			rm --force --verbose \
 				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
 			rm --force --verbose \
@@ -350,7 +350,7 @@ _purge () {
 			rm --force --verbose \
 				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 			;;
-		'orca')
+		'orca-opencl')
 			for orca_deb_file in \
 				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | tac)
 			do
@@ -362,7 +362,7 @@ _purge () {
 			# Alternate name for opencl-orca-amdgpu-pro-icd package.
 			apt-get remove --yes --purge 'opencl-legacy-amdgpu-pro-icd' || true
 			;;
-		'pal')
+		'pal-opencl')
 			for pal_deb_file in \
 				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | tac)
 			do
@@ -371,22 +371,22 @@ _purge () {
 				apt-get remove --yes --purge "${pal_package_name}" || true
 			done
 			;;
-		'rocm')
-			for rocm_package_name in \
-				$(echo "${old_rocm_package_name_list}" "${rocm_package_name_list}" | tr ' ' '\n' | tac)
+		'rocr-opencl')
+			for rocr_opencl_package_name in \
+				$(echo "${old_rocr_opencl_package_name_list}" "${rocr_opencl_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${rocm_package_name}" || true
+				apt-get remove --yes --purge "${rocr_opencl_package_name}" || true
 			done
 			;;
 	esac
 }
 
 _uninstall () {
-	_purge clover
-	_purge pal
-	_purge orca
-	_purge rocm
-	_purge fglrx
+	_purge clover-opencl
+	_purge pal-opencl
+	_purge orca-opencl
+	_purge rocr-opencl
+	_purge fglrx-opencl
 
 	dpkg-divert \
 		--rename \
@@ -409,7 +409,7 @@ _uninstall () {
 _install () {
 	_extract
 
-	if _is orca || _is pal
+	if _is orca-opencl || _is pal-opencl
 	then
 		apt-get update
 
@@ -417,7 +417,7 @@ _install () {
 		apt-get install -y 'gdebi-core'
 	fi
 
-	if _is orca || _is pal || _is rocm
+	if _is orca-opencl || _is pal-opencl || _is rocr-opencl
 	then
 		echo "Install ${amdgpupro_deb_file} package."
 
@@ -426,12 +426,12 @@ _install () {
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
-	if _is clover || _is orca || _is pal || _is rocm
+	if _is clover-opencl || _is orca-opencl || _is pal-opencl || _is rocr-opencl
 	then
 		apt-get update
 	fi
 
-	if _is clover
+	if _is clover-opencl
 	then
 		for clover_deb_file in \
 			$(echo "${clover_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
@@ -446,7 +446,7 @@ _install () {
 		done
 	fi
 
-	if _is fglrx
+	if _is fglrx-opencl
 	then
 		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
 
@@ -475,7 +475,7 @@ _install () {
 			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
-	if _is orca || _is pal
+	if _is orca-opencl || _is pal-opencl
 	then
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
@@ -485,7 +485,7 @@ _install () {
 		do
 			local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
 
-			if _is orca || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
+			if _is orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
 				echo "Install ${orca_deb_file} package."
 
@@ -503,7 +503,7 @@ _install () {
 		# /etc/OpenCL/vendors/amdocl-orca64.icd
 	fi
 
-	if _is pal
+	if _is pal-opencl
 	then
 		dpkg-divert \
 			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
@@ -522,16 +522,16 @@ _install () {
 		echo 'libamdocl-pal64.so' > '/etc/OpenCL/vendors/amdocl-pal64.icd'
 	fi
 
-	if _is rocm
+	if _is rocr-opencl
 	then
 		# Already correct (icd may be renamed):
 		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
-		for rocm_package_name in ${rocm_package_name_list}
+		for rocr_opencl_package_name in ${rocr_opencl_package_name_list}
 		do
-			echo "Install ${rocm_package_name} package."
+			echo "Install ${rocr_opencl_package_name} package."
 
-			apt-get install --yes "${rocm_package_name}"
+			apt-get install --yes "${rocr_opencl_package_name}"
 		done
 
 		# Already correct (icd may be renamed):
@@ -588,21 +588,21 @@ _help () {
 	Names:
 	${tab}all
 	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
-	${tab}clover (default)
-	${tab}${tab}Mesa Clover for Terascale2-3 and GCN+ GPUs.
-	${tab}fglrx
-	${tab}${tab}AMD APP fglrx from Radeon Crimson for CPUs.
-	${tab}orca
-	${tab}${tab}AMD APP Orca from AMDGPU-PRO for GCN1-3 GPUs.
-	${tab}pal
-	${tab}${tab}AMD APP PAL from AMDGPU-PRO for GCN4+ GPUs.
-	${tab}rocm
-	${tab}${tab}AMD APP ROCm for Radeon Pro GPUs.
+	${tab}clover-opencl (default)
+	${tab}${tab}Mesa Clover OpenCL for Terascale2+ and GCN+ GPUs.
+	${tab}fglrx-opencl
+	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
+	${tab}orca-opencl
+	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
+	${tab}pal-opencl
+	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
+	${tab}rocr-opencl
+	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
 
 	Examples:
 	${tab}${script_name} install all
 
-	${tab}${script_name} install fglrx orca pal
+	${tab}${script_name} install orca-opencl pal-opencl rocr-opencl
 
 	${tab}${script_name} uninstall
 
@@ -634,33 +634,33 @@ case "${action}" in
 	'download'|'extract'|'clean'|'install')
 		if [ -z "${1:-}" ]
 		then
-			is_clover='true'
+			is_clover_opencl='true'
 		fi
 
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
 				'all')
-					is_clover='true'
-					is_fglrx='true'
-					is_orca='true'
-					is_pal='true'
-					is_rocm='true'
+					is_clover_opencl='true'
+					is_fglrx_opencl='true'
+					is_orca_opencl='true'
+					is_pal_opencl='true'
+					is_rocr_opencl='true'
 					;;
-				'clover')
-					is_clover='true'
+				'clover-opencl')
+					is_clover_opencl='true'
 					;;
-				'fglrx')
-					is_fglrx='true'
+				'fglrx-opencl')
+					is_fglrx_opencl='true'
 					;;
-				'orca')
-					is_orca='true'
+				'orca-opencl')
+					is_orca_opencl='true'
 					;;
-				'pal')
-					is_pal='true'
+				'pal-opencl')
+					is_pal_opencl='true'
 					;;
-				'rocm')
-					is_rocm='true'
+				'rocr-opencl')
+					is_rocr_opencl='true'
 					;;
 				*)
 					_error 'Unkown name.'
