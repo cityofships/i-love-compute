@@ -72,6 +72,7 @@ amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c155
 
 old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocr_opencl_package_name_list='rocm-opencl-runtime'
+rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -84,6 +85,7 @@ is_fglrx_opencl='false'
 is_orca_opencl='false'
 is_pal_opencl='false'
 is_rocr_opencl='false'
+is_rocm_hip='false'
 
 _is () {
 	case "${1}" in
@@ -101,6 +103,9 @@ _is () {
 			;;
 		'rocr-opencl')
 			"${is_rocr_opencl}"
+			;;
+		'rocm-hip')
+			"${is_rocm_hip}"
 			;;
 	esac
 }
@@ -208,7 +213,7 @@ _download () {
 		fi
 	fi
 
-	if _is orca-opencl || _is pal-opencl || _is rocr-opencl
+	if _is orca-opencl || _is pal-opencl || _is rocr-opencl || _is rocm-hip
 	then
 		if ! _checksum 'amdgpupro'
 		then
@@ -378,6 +383,13 @@ _purge () {
 				apt-get remove --yes --purge "${rocr_opencl_package_name}" || true
 			done
 			;;
+		'rocm-hip')
+			for rocm_hip_package_name in \
+				$(echo "${rocm_hip_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${rocm_hip_package_name}" || true
+			done
+			;;
 	esac
 }
 
@@ -386,6 +398,7 @@ _uninstall () {
 	_purge pal-opencl
 	_purge orca-opencl
 	_purge rocr-opencl
+	_purge rocm-hip
 	_purge fglrx-opencl
 
 	dpkg-divert \
@@ -539,6 +552,16 @@ _install () {
 		# /etc/OpenCL/vendors/amdocl64.icd
 	fi
 
+	if _is rocm-hip
+	then
+		for rocm_hip_package_name in ${rocm_hip_package_name_list}
+		do
+			echo "Install ${rocm_hip_package_name} package."
+
+			apt-get install --yes "${rocm_hip_package_name}"
+		done
+	fi
+
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
 }
@@ -598,6 +621,8 @@ _help () {
 	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}rocr-opencl
 	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
+	${tab}rocm-hip
+	${tab}${tab}AMD APP ROCm HIP for Radeon Pro GPUs.
 
 	Examples:
 	${tab}${script_name} install all
@@ -646,6 +671,7 @@ case "${action}" in
 					is_orca_opencl='true'
 					is_pal_opencl='true'
 					is_rocr_opencl='true'
+					is_rocm_hip='true'
 					;;
 				'clover-opencl')
 					is_clover_opencl='true'
@@ -661,6 +687,9 @@ case "${action}" in
 					;;
 				'rocr-opencl')
 					is_rocr_opencl='true'
+					;;
+				'rocm-hip')
+					is_rocm_hip='true'
 					;;
 				*)
 					_error 'Unkown name.'
