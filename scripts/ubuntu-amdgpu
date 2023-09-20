@@ -73,6 +73,7 @@ amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c155
 old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
+amdgpu_dkms_package_name_list='amdgpu-dkms'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -86,6 +87,7 @@ is_orca_opencl='false'
 is_pal_opencl='false'
 is_rocr_opencl='false'
 is_rocm_hip='false'
+is_amdgpu_dkms='false'
 
 _is () {
 	case "${1}" in
@@ -106,6 +108,9 @@ _is () {
 			;;
 		'rocm-hip')
 			"${is_rocm_hip}"
+			;;
+		'amdgpu-dkms')
+			"${is_amdgpu_dkms}"
 			;;
 	esac
 }
@@ -390,6 +395,13 @@ _purge () {
 				apt-get remove --yes --purge "${rocm_hip_package_name}" || true
 			done
 			;;
+		'amdgpu-dkms')
+			for amdgpu_dkms_package_name in \
+				$(echo "${amdgpu_dkms_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpu_dkms_package_name}" || true
+			done
+			;;
 	esac
 }
 
@@ -399,6 +411,7 @@ _uninstall () {
 	_purge orca-opencl
 	_purge rocr-opencl
 	_purge rocm-hip
+	_purge amdgpu-dkms
 	_purge fglrx-opencl
 
 	dpkg-divert \
@@ -562,6 +575,16 @@ _install () {
 		done
 	fi
 
+	if _is amdgpu-dkms
+	then
+		for amdgpu_dkms_package_name in ${amdgpu_dkms_package_name_list}
+		do
+			echo "Install ${amdgpu_dkms_package_name} package."
+
+			apt-get install --yes "${amdgpu_dkms_package_name}"
+		done
+	fi
+
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
 }
@@ -623,6 +646,8 @@ _help () {
 	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
 	${tab}rocm-hip
 	${tab}${tab}AMD APP ROCm HIP for Radeon Pro GPUs.
+	${tab}amdgpu-dkms
+	${tab}${tab}AMD amdgpu DKMS modules and firmwares.
 
 	Examples:
 	${tab}${script_name} install all
@@ -690,6 +715,9 @@ case "${action}" in
 					;;
 				'rocm-hip')
 					is_rocm_hip='true'
+					;;
+				'amdgpu-dkms')
+					is_amdgpu_dkms='true'
 					;;
 				*)
 					_error 'Unkown name.'
