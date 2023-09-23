@@ -47,9 +47,7 @@ f276430f9f1d70d75692857dc7aa79365d6ef5dc1fd4ad816319e6f375e86f8eb29f49288d4f51d5
 
 amdgpupro_version='5.7'
 amdgpupro_distro='jammy'
-
 amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${amdgpupro_version}/ubuntu/${amdgpupro_distro}"
-
 amdgpupro_deb_version='5.7.50700-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
 amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c1552013187fd2c382c42819186ad162be9d838c65ef7e09fead3e1b5b991adc6a8daf4'
@@ -198,7 +196,6 @@ _checksum () {
 
 			return
 			;;
-
 		'amdgpupro')
 			sum="${amdgpupro_deb_sum}"
 			file="${amdgpupro_deb_file}"
