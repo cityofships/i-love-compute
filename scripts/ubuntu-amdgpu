@@ -504,6 +504,14 @@ _hold_packages () {
 }
 
 _install_packages () {
+	local folder_name='.'
+	case "${1}" in
+		'--folder='*)
+			folder_name="${1:9}"
+			shift
+			;;
+	esac
+
 	local package_name
 	for package_name in $(echo "${@}" | tr ' ' '\n' | tac)
 	do
@@ -514,7 +522,7 @@ _install_packages () {
 			*'.deb')
 				_install_gdebi_package
 
-				gdebi --non-interactive "${package_name}"
+				gdebi --non-interactive "${folder_name}/${package_name}"
 				;;
 			*)
 				apt-get install --yes "${package_name}"
@@ -590,14 +598,8 @@ _install_driver () {
 			# Already correct:
 			# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
 
-			local amdgpupro_old_orca_deb_file
-			for amdgpupro_old_orca_deb_file in ${amdgpupro_old_orca_deb_file_list}
-			do
-				local orca_package_name="$(echo "${amdgpupro_old_orca_deb_file}" | cut -f1 -d'_')"
-
-				_install_packages "${amdgpupro_old_orca_tarball_dir}/${amdgpupro_old_orca_deb_file}"
-				_hold_packages "${orca_package_name}"
-			done
+			_install_packages --folder="${amdgpupro_old_orca_tarball_dir}" "${amdgpupro_old_orca_deb_file_list}"
+			_hold_packages "${amdgpupro_old_orca_deb_file_list}"
 
 			# Already correct:
 			# libamdocl-rocm64.so
@@ -613,11 +615,7 @@ _install_driver () {
 				--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
 				--rename '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
 
-			local amdgpupro_pal_deb_file
-			for amdgpupro_pal_deb_file in ${amdgpupro_pal_deb_file_list}
-			do
-				_install_packages "${amdgpupro_pal_tarball_dir}/${amdgpupro_pal_deb_file}"
-			done
+			_install_packages --folder="${amdgpupro_pal_tarball_dir}" "${amdgpupro_pal_deb_file_list}"
 
 			rm --force --verbose '/etc/OpenCL/vendors/amdocl64.icd'
 
