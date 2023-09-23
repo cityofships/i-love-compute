@@ -70,8 +70,16 @@ fglrx_tarball_dir='fglrx-15.302'
 fglrx_script_file='amd-driver-installer-15.302-x86.x86_64.run'
 fglrx_install_dir='/opt/amd-fglrx'
 
-amdvlk_key_file='http://repo.radeon.com/amdvlk/apt/debian/amdvlk.gpg.key'
-amdvlk_dep_repo='http://repo.radeon.com/amdvlk/apt/debian'
+amdvlk_deb_repo='http://repo.radeon.com/amdvlk/apt/debian'
+amdvlk_distro='bionic'
+amdvlk_channel='main'
+amdvlk_arch='amd64,i386'
+amdvlk_key_file='amdvlk.gpg.key'
+amdvlk_key_url="${amdvlk_deb_repo}/${amdvlk_key_file}"
+amdvlk_key_sum='508f853506692f636380953bacd7625022bf4d536c5824383b9f7a12a61ce2877cfa923c8cadfa054795ade83580f3c5fbf50564c2aada9a23d197ecfddd6c90'
+amdvlk_gpg_path='/etc/apt/trusted.gpg.d/amdvlk.gpg'
+amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
+
 
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
@@ -85,6 +93,7 @@ amdgpupro_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
 amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
 amdgpupro_amdgpu_vulkan_name_list='vulkan-amdgpu'
 amdgpupro_amdgpu_pro_vulkan_name_list='vulkan-amdgpu-pro'
+amdvlk_vulkan_package_name_list='amdvlk'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -106,6 +115,7 @@ is_amdgpupro_mesa_vdpau='false'
 is_amdgpupro_oglp_opengl='false'
 is_amdgpupro_amdgpu_vulkan='false'
 is_amdgpupro_amdgpu_pro_vulkan='false'
+is_amdvlk_vulkan='false'
 is_fglrx_cpu_opencl='false'
 
 _is () {
@@ -152,6 +162,9 @@ _is () {
 		'amdgpupro-amdgpu-pro-vulkan')
 			"${is_amdgpupro_amdgpu_pro_vulkan}"
 			;;
+		'amdvlk-vulkan')
+			"${is_amdvlk_vulkan}"
+			;;
 		'fglrx-cpu-opencl')
 			"${is_fglrx_cpu_opencl}"
 			;;
@@ -185,6 +198,7 @@ _checksum () {
 
 			return
 			;;
+
 		'amdgpupro')
 			sum="${amdgpupro_deb_sum}"
 			file="${amdgpupro_deb_file}"
@@ -196,6 +210,10 @@ _checksum () {
 		'pal')
 			sum="${amdgpupro_pal_tarball_sum}"
 			file="${amdgpupro_pal_tarball_file}"
+			;;
+		'amdvlk')
+			sum="${amdvlk_key_sum}"
+			file="${amdvlk_key_file}"
 			;;
 		'fglrx')
 			sum="${fglrx_tarball_sum}"
@@ -287,6 +305,20 @@ _download () {
 				"${tarball_repo}/${amdgpupro_pal_tarball_file}"
 
 			_checksum 'pal'
+		fi
+	fi
+
+	if _is amdvlk-vulkan
+	then
+		if ! _checksum 'amdvlk'
+		then
+			echo "Download ${amdvlk_key_file}."
+
+			rm -f "${amdvlk_key_file}"
+
+			wget "${amdvlk_key_url}"
+
+			_checksum 'amdvlk'
 		fi
 	fi
 
@@ -478,6 +510,16 @@ _purge () {
 				apt-get remove --yes --purge "${amdgpupro_amdgpu_pro_vulkan_package_name}" || true
 			done
 			;;
+		'amdvlk-vulkan')
+			for amdvlk_vulkan_package_name in \
+				$(echo "${amdvlk_vulkan_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdvlk_vulkan_package_name}" || true
+			done
+
+			rm --force --verbose "${amdvlk_list_path}"
+			rm --force --verbose "${amdvlk_gpg_path}"
+			;;
 		'fglrx-cpu-opencl')
 			rm --force --verbose \
 				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
@@ -557,6 +599,15 @@ _install () {
 		dpkg -i "${amdgpupro_deb_file}"
 
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
+	fi
+
+	if _is amdvlk-vulkan
+	then
+		apt-get update
+
+		local amdvlk_source_line="deb [arch=${amdvlk_arch}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
+		echo "${amdvlk_source_line}" > "${amdvlk_list_path}"
+		gpg --dearmor < "${amdvlk_key_file}" > "${amdvlk_gpg_path}"
 	fi
 
 	apt-get update
@@ -748,6 +799,16 @@ _install () {
 		done
 	fi
 
+	if _is amdvlk-vulkan
+	then
+		for amdvlk_vulkan_package_name in ${amdvlk_vulkan_package_name_list}
+		do
+			echo "Install ${amdvlk_vulkan_package_name} package."
+
+			apt-get install --yes "${amdvlk_vulkan_package_name}"
+		done
+	fi
+
 	if _is fglrx-cpu-opencl
 	then
 		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
@@ -852,6 +913,8 @@ _help () {
 	${tab}${tab}AMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan.
 	${tab}amdgpupro-amdgpu-vulkan
 	${tab}${tab}AMD AMDGPU-PRO amdgpu amdgpu Vulkan.
+	${tab}amdvlk-vulkan
+	${tab}${tab}AMD amdvlk Vulkan.
 	${tab}fglrx-cpu-opencl
 	${tab}${tab}AMD Radeon Crimson fglrx OpenCL for CPUs.
 
@@ -937,6 +1000,9 @@ case "${action}" in
 					;;
 				'amdgpupro-amdgpu-pro-vulkan')
 					is_amdgpupro_amdgpu_pro_vulkan='true'
+					;;
+				'amdvlk-vulkan')
+					is_amdvlk_vulkan='true'
 					;;
 				'fglrx-cpu-opencl')
 					is_fglrx_cpu_opencl='true'
