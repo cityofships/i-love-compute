@@ -770,7 +770,7 @@ _help () {
 	${tab}amdgpu-mesa-vdpau
 	${tab}${tab}AMD amdgpu Mesa VDPAU.
 	${tab}amdgpu-oglp-opengl
-	${tab}${tab}AMD amdgpu OGLP OpenGL.
+	${tab}${tab}AMD amdgpu OGLP OpenGL and OpenGL ES.
 
 	Examples:
 	${tab}${script_name} install all
