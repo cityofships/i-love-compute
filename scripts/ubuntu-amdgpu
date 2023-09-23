@@ -883,35 +883,35 @@ _help () {
 
 	Names:
 	\tmesa-old-clover-opencl
-	\t\tMesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
+	\t\tMesa old Clover OpenCL for Terascale2+ and GCN4- GPUs (only on Ubuntu 20.04)
 	\tmesa-all-opencl
-	\t\tMesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
+	\t\tMesa Clover OpenCL for Terascale2+ and GCN4- and (if available) RustiCL OpenCL for GCN and RDNA GPUs.
 	\trocm-rocr-opencl
 	\t\tAMD ROCm ROCr OpenCL for Radeon Pro GPUs.
 	\trocm-hip
 	\t\tAMD ROCm HIP for Radeon Pro GPUs.
 	\tamdgpupro-dkms
-	\t\tAMD AMDGPU-PRO amdgpu DKMS modules and firmwares for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu DKMS modules and firmwares for GCN and RDNA GPUs.
 	\tamdgpupro-old-orca-opencl
-	\t\tAMD AMDGPU-PRO old Orca OpenCL for GCN1-3 GPUs.
+	\t\tAMD AMDGPU-PRO old Orca OpenCL for GCN3- GPUs.
 	\tamdgpupro-orca-opencl
 	\t\tAMD AMDGPU-PRO Orca OpenCL for GCN5 GPUs.
 	\tamdgpupro-pal-opencl
 	\t\tAMD AMDGPU-PRO PAL OpenCL for GCN4+ GPUs.
 	\tamdgpupro-mesa-opengl
-	\t\tAMD AMDGPU-PRO amdgpu Mesa OpenGL for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu Mesa OpenGL for GCN and RDNA GPUs.
 	\tamdgpupro-mesa-va
-	\t\tAMD AMDGPU-PRO amdgpu Mesa VA for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu Mesa VA for GCN and RDNA GPUs.
 	\tamdgpupro-mesa-vdpau
-	\t\tAMD AMDGPU-PRO amdgpu Mesa VDPAU for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu Mesa VDPAU for GCN and RDNA GPUs.
 	\tamdgpupro-oglp-opengl
-	\t\tAMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES for GCN and RDNA GPUs.
 	\tamdgpupro-amdgpu-pro-vulkan
-	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan for GCN and RDNA GPUs.
 	\tamdgpupro-amdgpu-vulkan
-	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan for GCN+ GPUs.
+	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan for GCN and RDNA GPUs.
 	\tamdvlk-vulkan
-	\t\tAMD amdvlk Vulkan for GCN GCN3+ GPUs.
+	\t\tAMD amdvlk Vulkan for GCN GCN3+ and RDNA GPUs.
 	\tfglrx-cpu-opencl
 	\t\tAMD Radeon Crimson fglrx OpenCL for CPUs.
 
