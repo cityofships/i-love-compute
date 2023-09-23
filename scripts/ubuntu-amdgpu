@@ -571,6 +571,7 @@ _uninstall () {
 	_purge mesa-all-opencl
 	_purge rocm-rocr-opencl
 	_purge rocm-hip
+	_purge amdvlk-vulkan
 	_purge amdgpupro-dkms
 	_purge amdgpupro-old-orca-opencl
 	_purge amdgpupro-orca-opencl
