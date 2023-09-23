@@ -321,6 +321,8 @@ _clean () {
 
 		rm --force --verbose "${workspace_dir}/${amdgpupro_deb_file}"
 
+		rm --force --verbose "${workspace_dir}/${amdvlk_key_file}"
+
 		rmdir --verbose "${workspace_dir}"
 	fi
 
@@ -825,7 +827,7 @@ require_fglrx_tarball='false'
 declare -a driver_list=()
 
 case "${action}" in
-	'download'|'extract'|'clean'|'install')
+	'download'|'extract'|'install')
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
@@ -906,7 +908,7 @@ case "${action}" in
 esac
 
 case "${action}" in
-	'download'|'extract'|'clean'|'install')
+	'download'|'extract'|'install')
 		if [ "${#driver_list[@]}" = '0' ]
 		then
 			_error 'Missing driver name.'
