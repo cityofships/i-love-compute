@@ -466,16 +466,16 @@ _purge () {
 }
 
 _uninstall () {
-	_purge mesa-all-opencl
 	_purge mesa-old-clover-opencl
-	_purge amdgpu-pal-opencl
+	_purge mesa-all-opencl
+	_purge fglrx-cpu-opencl
 	_purge amdgpu-old-orca-opencl
+	_purge amdgpu-pal-opencl
 	_purge rocm-rocr-opencl
 	_purge rocm-hip
 	_purge amdgpu-dkms
 	_purge amdgpu-mesa-opengl
 	_purge amdgpu-oglp-opengl
-	_purge fglrx-cpu-opencl
 
 	dpkg-divert \
 		--rename \
@@ -520,16 +520,6 @@ _install () {
 		apt-get update
 	fi
 
-	if _is mesa-all-opencl
-	then
-		for mesa_all_opencl_package_name in ${mesa_all_opencl_package_name_list}
-		do
-			echo "Install ${mesa_all_opencl_package_name} package."
-
-			apt-get install --yes "${mesa_all_opencl_package_name}"
-		done
-	fi
-
 	if _is mesa-old-clover-opencl
 	then
 		for mesa_old_clover_opencl_deb_file in \
@@ -542,6 +532,16 @@ _install () {
 			gdebi --non-interactive "${mesa_old_clover_opencl_deb_file}"
 
 			apt-mark hold "${mesa_old_clover_opencl_package_name}"
+		done
+	fi
+
+	if _is mesa-all-opencl
+	then
+		for mesa_all_opencl_package_name in ${mesa_all_opencl_package_name_list}
+		do
+			echo "Install ${mesa_all_opencl_package_name} package."
+
+			apt-get install --yes "${mesa_all_opencl_package_name}"
 		done
 	fi
 
@@ -747,10 +747,10 @@ _help () {
 	Names:
 	${tab}all
 	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
-	${tab}mesa-all-opencl
-	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
 	${tab}mesa-old-clover-opencl
 	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
+	${tab}mesa-all-opencl
+	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
 	${tab}fglrx-cpu-opencl
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
 	${tab}amdgpu-old-orca-opencl
