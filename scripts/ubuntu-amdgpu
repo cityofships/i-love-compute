@@ -27,7 +27,7 @@ workspace_dir="${workspace_parent_dir}/${script_name}"
 tarball_referer='https://www.amd.com'
 tarball_repo='https://drivers.amd.com/drivers/linux'
 
-clover_deb_url_list='
+mesa_old_clover_opencl_deb_url_list='
 http://archive.ubuntu.com/ubuntu/pool/main/l/llvm-toolchain-9/libllvm9_9.0.1-12_amd64.deb
 http://archive.ubuntu.com/ubuntu/pool/universe/l/llvm-toolchain-9/libclang-common-9-dev_9.0.1-12_amd64.deb
 http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-dev_0.2.0+git20190827-4_all.deb
@@ -36,7 +36,7 @@ http://archive.ubuntu.com/ubuntu/pool/universe/libc/libclc/libclc-r600_0.2.0+git
 http://archive.ubuntu.com/ubuntu/pool/universe/m/mesa/mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
 '
 
-clover_deb_sum_list='
+mesa_old_clover_opencl_deb_sum_list='
 48bd8b89c9ca18b9360dbc04a65fea3d37b97664b4fc39202ff9006105f218dbab7fd7ce80c897e22c0e7b5e338317a361b54b726059ab74e6780e88c197b689  libllvm9_9.0.1-12_amd64.deb
 18f5008921e7b1f52e0d91b07e170b22fca1a34899fc1d4d6e6ff8ed8f93137d88dc0aecc7631aac381e9e84f2c9bf54b2f0bdfa306d10d61f1380f42e53660f  libclang-common-9-dev_9.0.1-12_amd64.deb
 800186922168ff3563a875adcd3f8084749858d64f37ffd044fbfa9f0625d466552afdbd1469f00ee6feb93b6bd33dae377c043df43d02678ae8c643f09560c5  libclc-dev_0.2.0+git20190827-4_all.deb
@@ -85,7 +85,7 @@ _error () {
 	exit 1
 }
 
-is_clover_opencl='false'
+is_mesa_old_clover_opencl='false'
 is_fglrx_opencl='false'
 is_orca_opencl='false'
 is_pal_opencl='false'
@@ -99,8 +99,8 @@ is_amdgpu_oglp_opengl='false'
 
 _is () {
 	case "${1}" in
-		'clover-opencl')
-			"${is_clover_opencl}"
+		'mesa-old-clover-opencl')
+			"${is_mesa_old_clover_opencl}"
 			;;
 		'fglrx-opencl')
 			"${is_fglrx_opencl}"
@@ -139,10 +139,10 @@ _checksum () {
 	_cd
 
 	case "${1}" in
-		'clover')
+		'old-clover')
 			local IFS=$'\n'
 			for package_sum_line in \
-				$(echo "${clover_deb_sum_list}" | grep -v '^$')
+				$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$')
 			do
 				sum="$(echo "${package_sum_line}" | awk '{ print $1 }')"
 				file="$(echo "${package_sum_line}" | awk '{ print $2 }')"
@@ -203,23 +203,23 @@ _cd () {
 _download () {
 	_cd
 
-	if _is clover-opencl
+	if _is mesa-old-clover-opencl
 	then
-		if ! _checksum 'clover'
+		if ! _checksum 'old-clover'
 		then
-			for clover_deb_url in \
-				$(echo "${clover_deb_url_list}" | grep -v '^$' )
+			for mesa_old_clover_opencl_deb_url in \
+				$(echo "${mesa_old_clover_opencl_deb_url_list}" | grep -v '^$' )
 			do
-				clover_package_file="$(echo "${clover_deb_url}" | sed -e 's|.*/||g' )"
+				mesa_old_clover_opencl_package_file="$(echo "${mesa_old_clover_opencl_deb_url}" | sed -e 's|.*/||g' )"
 
-				echo "Download ${clover_package_file}."
+				echo "Download ${mesa_old_clover_opencl_package_file}."
 
-				rm -f "${clover_package_file}"
+				rm -f "${mesa_old_clover_opencl_package_file}"
 
-				wget "${clover_deb_url}"
+				wget "${mesa_old_clover_opencl_deb_url}"
 			done
 
-			_checksum 'clover'
+			_checksum 'old-clover'
 		fi
 	fi
 
@@ -346,15 +346,15 @@ _clean () {
 
 _purge () {
 	case "${1}" in
-		'clover-opencl')
-			for clover_deb_file in \
-				$(echo "${clover_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }' | tac)
+		'mesa-old-clover-opencl')
+			for mesa_old_clover_opencl_deb_file in \
+				$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }' | tac)
 			do
-				local clover_package_name="$(echo "${clover_deb_file}" | cut -f1 -d'_' )"
+				local mesa_old_clover_opencl_package_name="$(echo "${mesa_old_clover_opencl_deb_file}" | cut -f1 -d'_' )"
 
-				apt-mark unhold "${clover_package_name}" || true
+				apt-mark unhold "${mesa_old_clover_opencl_package_name}" || true
 
-				apt-get remove --yes --purge "${clover_package_name}" || true
+				apt-get remove --yes --purge "${mesa_old_clover_opencl_package_name}" || true
 			done
 			;;
 		'fglrx-opencl')
@@ -454,7 +454,7 @@ _purge () {
 }
 
 _uninstall () {
-	_purge clover-opencl
+	_purge mesa-old-clover-opencl
 	_purge pal-opencl
 	_purge orca-opencl
 	_purge rocr-opencl
@@ -502,23 +502,23 @@ _install () {
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
-	if _is clover-opencl || _is orca-opencl || _is pal-opencl || _is rocr-opencl
+	if _is mesa-old-clover-opencl || _is orca-opencl || _is pal-opencl || _is rocr-opencl
 	then
 		apt-get update
 	fi
 
-	if _is clover-opencl
+	if _is mesa-old-clover-opencl
 	then
-		for clover_deb_file in \
-			$(echo "${clover_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
+		for mesa_old_clover_opencl_deb_file in \
+			$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
 		do
-			clover_package_name="$(echo "${clover_deb_file}" | cut -f1 -d'_' )"
+			mesa_old_clover_opencl_package_name="$(echo "${mesa_old_clover_opencl_deb_file}" | cut -f1 -d'_' )"
 
-			echo "Install ${clover_package_name} package."
+			echo "Install ${mesa_old_clover_opencl_package_name} package."
 
-			gdebi --non-interactive "${clover_deb_file}"
+			gdebi --non-interactive "${mesa_old_clover_opencl_deb_file}"
 
-			apt-mark hold "${clover_package_name}"
+			apt-mark hold "${mesa_old_clover_opencl_package_name}"
 		done
 	fi
 
@@ -724,8 +724,8 @@ _help () {
 	Names:
 	${tab}all
 	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
-	${tab}clover-opencl (default)
-	${tab}${tab}Mesa Clover OpenCL for Terascale2+ and GCN+ GPUs.
+	${tab}mesa-old-clover-opencl
+	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
 	${tab}fglrx-opencl
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
 	${tab}orca-opencl
@@ -782,22 +782,22 @@ case "${action}" in
 	'download'|'extract'|'clean'|'install')
 		if [ -z "${1:-}" ]
 		then
-			is_clover_opencl='true'
+			is_mesa_old_clover_opencl='true'
 		fi
 
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
 				'all')
-					is_clover_opencl='true'
+					is_mesa_old_clover_opencl='true'
 					is_fglrx_opencl='true'
 					is_orca_opencl='true'
 					is_pal_opencl='true'
 					is_rocr_opencl='true'
 					is_rocm_hip='true'
 					;;
-				'clover-opencl')
-					is_clover_opencl='true'
+				'mesa-old-clover-opencl')
+					is_mesa_old_clover_opencl='true'
 					;;
 				'fglrx-opencl')
 					is_fglrx_opencl='true'
