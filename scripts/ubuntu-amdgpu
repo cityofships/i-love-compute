@@ -822,7 +822,7 @@ require_amdgpu_repo='false'
 require_amdvlk_repo='false'
 require_fglrx_tarball='false'
 
-declare -a driver_list
+declare -a driver_list=()
 
 case "${action}" in
 	'download'|'extract'|'clean'|'install')
@@ -903,6 +903,15 @@ case "${action}" in
 			shift
 		done
 		;;
+esac
+
+case "${action}" in
+	'download'|'extract'|'clean'|'install')
+		if [ "${#driver_list[@]}" = '0' ]
+		then
+			_error 'Missing driver name.'
+		fi
+	;;
 esac
 
 "_${action}"
