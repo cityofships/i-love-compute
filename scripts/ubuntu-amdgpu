@@ -80,6 +80,8 @@ amdgpupro_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
 amdgpupro_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
 amdgpupro_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
 amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
+amdgpupro_amdgpu_vulkan_name_list='vulkan-amdgpu'
+amdgpupro_amdgpu_pro_vulkan_name_list='vulkan-amdgpu-pro'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -99,6 +101,8 @@ is_amdgpupro_mesa_opengl='false'
 is_amdgpupro_mesa_va='false'
 is_amdgpupro_mesa_vdpau='false'
 is_amdgpupro_oglp_opengl='false'
+is_amdgpupro_amdgpu_vulkan='false'
+is_amdgpupro_amdgpu_pro_vulkan='false'
 is_fglrx_cpu_opencl='false'
 
 _is () {
@@ -138,6 +142,12 @@ _is () {
 			;;
 		'amdgpupro-oglp-opengl')
 			"${is_amdgpupro_oglp_opengl}"
+			;;
+		'amdgpupro-amdgpu-vulkan')
+			"${is_amdgpupro_amdgpu_vulkan}"
+			;;
+		'amdgpupro-amdgpu-pro-vulkan')
+			"${is_amdgpupro_amdgpu_pro_vulkan}"
 			;;
 		'fglrx-cpu-opencl')
 			"${is_fglrx_cpu_opencl}"
@@ -451,6 +461,20 @@ _purge () {
 				apt-get remove --yes --purge "${amdgpupro_oglp_opengl_package_name}" || true
 			done
 			;;
+		'amdgpupro-amdgpu-vulkan')
+			for amdgpupro_amdgpu_vulkan_package_name in \
+				$(echo "${amdgpupro_amdgpu_vulkan_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpupro_amdgpu_vulkan_package_name}" || true
+			done
+			;;
+		'amdgpupro-amdgpu-pro-vulkan')
+			for amdgpupro_amdgpu_pro_vulkan_package_name in \
+				$(echo "${amdgpupro_amdgpu_pro_vulkan_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpupro_amdgpu_pro_vulkan_package_name}" || true
+			done
+			;;
 		'fglrx-cpu-opencl')
 			rm --force --verbose \
 				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
@@ -488,6 +512,8 @@ _uninstall () {
 	_purge amdgpupro-pal-opencl
 	_purge amdgpupro-mesa-opengl
 	_purge amdgpupro-oglp-opengl
+	_purge amdgpupro-amdgpu-vulkan
+	_purge amdgpupro-amdgpu-pro-vulkan
 	_purge fglrx-cpu-opencl
 
 	dpkg-divert \
@@ -699,6 +725,26 @@ _install () {
 		done
 	fi
 
+	if _is amdgpupro-amdgpu-vulkan
+	then
+		for amdgpupro_amdgpu_vulkan_package_name in ${amdgpupro_amdgpu_vulkan_package_name_list}
+		do
+			echo "Install ${amdgpupro_amdgpu_vulkan_package_name} package."
+
+			apt-get install --yes "${amdgpupro_amdgpu_vulkan_package_name}"
+		done
+	fi
+
+	if _is amdgpupro-amdgpu-vulkan
+	then
+		for amdgpupro_amdgpu_vulkan_package_name in ${amdgpupro_amdgpu_vulkan_package_name_list}
+		do
+			echo "Install ${amdgpupro_amdgpu_vulkan_package_name} package."
+
+			apt-get install --yes "${amdgpupro_amdgpu_vulkan_package_name}"
+		done
+	fi
+
 	if _is fglrx-cpu-opencl
 	then
 		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
@@ -801,6 +847,10 @@ _help () {
 	${tab}${tab}AMD amdgpu Mesa VDPAU.
 	${tab}amdgpupro-oglp-opengl
 	${tab}${tab}AMD amdgpu OGLP OpenGL and OpenGL ES.
+	${tab}amdgpupro-amdgpu-pro-vulkan
+	${tab}${tab}AMD amdgpu amdgpu-pro Vulkan.
+	${tab}amdgpupro-amdgpu-vulkan
+	${tab}${tab}AMD amdgpu amdgpu Vulkan.
 	${tab}fglrx-cpu-opencl
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
 
@@ -888,6 +938,12 @@ case "${action}" in
 					;;
 				'amdgpupro-oglp-opengl')
 					is_amdgpupro_oglp_opengl='true'
+					;;
+				'amdgpupro-amdgpu-pro-vulkan')
+					is_amdgpupro_amdgpu_pro_vulkan='true'
+					;;
+				'amdgpupro-amdgpu-pro-vulkan')
+					is_amdgpupro_amdgpu_pro_vulkan='true'
 					;;
 				'fglrx-cpu-opencl')
 					is_fglrx_cpu_opencl='true'
