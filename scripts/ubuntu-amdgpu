@@ -891,27 +891,27 @@ _help () {
 	\trocm-hip
 	\t\tAMD ROCm HIP for Radeon Pro GPUs.
 	\tamdgpupro-dkms
-	\t\tAMD AMDGPU-PRO amdgpu DKMS modules and firmwares.
+	\t\tAMD AMDGPU-PRO amdgpu DKMS modules and firmwares for GCN+ GPUs.
 	\tamdgpupro-old-orca-opencl
-	\t\tAMD AMDGPU-PRO old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
+	\t\tAMD AMDGPU-PRO old Orca OpenCL for GCN1-3 GPUs.
 	\tamdgpupro-orca-opencl
-	\t\tAMD AMDGPU-PRO Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
+	\t\tAMD AMDGPU-PRO Orca OpenCL for GCN5 GPUs.
 	\tamdgpupro-pal-opencl
-	\t\tAMD AMDGPU-PRO PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
+	\t\tAMD AMDGPU-PRO PAL OpenCL for GCN4+ GPUs.
 	\tamdgpupro-mesa-opengl
-	\t\tAMD AMDGPU-PRO amdgpu Mesa OpenGL.
+	\t\tAMD AMDGPU-PRO amdgpu Mesa OpenGL for GCN+ GPUs.
 	\tamdgpupro-mesa-va
-	\t\tAMD AMDGPU-PRO amdgpu Mesa VA.
+	\t\tAMD AMDGPU-PRO amdgpu Mesa VA for GCN+ GPUs.
 	\tamdgpupro-mesa-vdpau
-	\t\tAMD AMDGPU-PRO amdgpu Mesa VDPAU.
+	\t\tAMD AMDGPU-PRO amdgpu Mesa VDPAU for GCN+ GPUs.
 	\tamdgpupro-oglp-opengl
-	\t\tAMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES.
+	\t\tAMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES for GCN+ GPUs.
 	\tamdgpupro-amdgpu-pro-vulkan
-	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan.
+	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan for GCN+ GPUs.
 	\tamdgpupro-amdgpu-vulkan
-	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan.
+	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan for GCN+ GPUs.
 	\tamdvlk-vulkan
-	\t\tAMD amdvlk Vulkan.
+	\t\tAMD amdvlk Vulkan for GCN GCN3+ GPUs.
 	\tfglrx-cpu-opencl
 	\t\tAMD Radeon Crimson fglrx OpenCL for CPUs.
 
