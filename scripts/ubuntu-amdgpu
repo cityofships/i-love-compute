@@ -781,6 +781,8 @@ _help () {
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
 	${tab}amdgpu-old-orca-opencl
 	${tab}${tab}AMD APP old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
+	${tab}amdgpu-orca-opencl
+	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
 	${tab}amdgpu-pal-opencl
 	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}rocm-rocr-opencl
