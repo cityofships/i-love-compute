@@ -75,7 +75,7 @@ amdvlk_arch='amd64,i386'
 amdvlk_key_file='amdvlk.gpg.key'
 amdvlk_key_url="${amdvlk_deb_repo}/${amdvlk_key_file}"
 amdvlk_key_sum='508f853506692f636380953bacd7625022bf4d536c5824383b9f7a12a61ce2877cfa923c8cadfa054795ade83580f3c5fbf50564c2aada9a23d197ecfddd6c90'
-amdvlk_gpg_path='/etc/apt/trusted.gpg.d/amdvlk.gpg'
+amdvlk_gpg_path='/usr/share/keyrings/amdvlk-archive-keyring.gpg'
 amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
 
 
@@ -602,7 +602,7 @@ _install () {
 	then
 		apt-get update
 
-		local amdvlk_source_line="deb [arch=${amdvlk_arch}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
+		local amdvlk_source_line="deb [arch=${amdvlk_arch} signed_by=${amdvlk_gpg_path}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
 		echo "${amdvlk_source_line}" > "${amdvlk_list_path}"
 		gpg --dearmor < "${amdvlk_key_file}" > "${amdvlk_gpg_path}"
 	fi
