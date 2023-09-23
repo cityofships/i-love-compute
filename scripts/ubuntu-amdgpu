@@ -243,21 +243,6 @@ _download () {
 		fi
 	fi
 
-	if _is fglrx-cpu-opencl
-	then
-		if ! _checksum 'fglrx'
-		then
-			echo "Download ${fglrx_tarball_file}."
-
-			rm -f "${fglrx_tarball_file}"
-
-			wget --header="Referer: ${tarball_referer}" \
-				"${tarball_repo}/${fglrx_tarball_file}"
-
-			_checksum 'fglrx'
-		fi
-	fi
-
 	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl || _is rocm-rocr-opencl || _is rocm-hip
 	then
 		if ! _checksum 'amdgpupro'
@@ -299,6 +284,21 @@ _download () {
 				"${tarball_repo}/${amdgpupro_pal_tarball_file}"
 
 			_checksum 'pal'
+		fi
+	fi
+
+	if _is fglrx-cpu-opencl
+	then
+		if ! _checksum 'fglrx'
+		then
+			echo "Download ${fglrx_tarball_file}."
+
+			rm -f "${fglrx_tarball_file}"
+
+			wget --header="Referer: ${tarball_referer}" \
+				"${tarball_repo}/${fglrx_tarball_file}"
+
+			_checksum 'fglrx'
 		fi
 	fi
 }
