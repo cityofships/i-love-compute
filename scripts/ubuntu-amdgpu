@@ -588,6 +588,8 @@ _install () {
 
 	if _is amdgpu-old-orca-opencl
 	then
+		_purge amdgpu-orca-opencl
+
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
 
