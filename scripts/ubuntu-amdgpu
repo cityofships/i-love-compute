@@ -513,6 +513,8 @@ _install_packages () {
 		case "${package_name}" in
 			*'.deb')
 				_install_gdebi_package
+
+				gdebi --non-interactive "${package_name}"
 				;;
 			*)
 				apt-get install --yes "${package_name}"
@@ -527,8 +529,6 @@ _install_gdebi_package () {
 
 		_install_packages 'gdebi-core'
 	fi
-
-	gdebi --non-interactive "${package_name}"
 }
 
 _install_amdgpu_package () {
