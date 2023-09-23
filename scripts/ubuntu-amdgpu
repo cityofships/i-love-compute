@@ -429,6 +429,8 @@ _unhold_packages () {
 				;;
 		esac
 
+		echo "Unhold ${package_name} package."
+
 		apt-mark unhold "${package_name}" || true
 	done
 }
@@ -443,6 +445,8 @@ _uninstall_packages () {
 				package_name="$(echo "${package_name}" | cut -f1 -d'_')"
 				;;
 		esac
+
+		echo "Uninstall ${package_name} package."
 
 		apt-get remove --yes --purge "${package_name}" || true
 	done
@@ -570,32 +574,64 @@ _uninstall () {
 	ldconfig
 }
 
+_hold_packages () {
+	local package_name
+	for package_name in $(echo "${@}" | tr ' ' '\n' | tac)
+	do
+		# if package_name is in fact a deb file
+		case "${package_name}" in
+			*'.deb')
+				package_name="$(echo "${package_name}" | cut -f1 -d'_')"
+				;;
+		esac
+
+		echo "Hold ${package_name} package."
+
+		apt-mark hold "${package_name}" || true
+	done
+}
+
+_install_packages () {
+	local package_name
+	for package_name in $(echo "${@}" | tr ' ' '\n' | tac)
+	do
+		echo "Install $(basename "${package_name}") package."
+
+		# if package_name is in fact a deb file
+		case "${package_name}" in
+			*'.deb')
+				_install_gdebi_package
+				;;
+			*)
+				apt-get install --yes "${package_name}"
+		esac
+	done
+}
+
+_install_gdebi_package () {
+	if ! dpkg -l gdebi-core >/dev/null 2>&1
+	then
+		apt-get update
+
+		_install_packages 'gdebi-core'
+	fi
+
+	gdebi --non-interactive "${package_name}"
+}
+
+_install_amdgpu_package () {
+	_install_packages "${amdgpupro_deb_file}"
+
+	sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
+
+	apt-get update
+}
+
 _install () {
 	_extract
 
-	if _is rocm-rocr-opencl \
-	|| _is amdgpupro-old-orca-opencl \
-	|| _is amdgpupro-pal-opencl \
-	|| _is amdgpupro-mesa-opengl \
-	|| _is amdgpupro-mesa-va \
-	|| _is amdgpupro-mesa-vdpau
-	then
-		apt-get update
-
-		echo "Download gdebi-core package."
-		apt-get install -y 'gdebi-core'
-
-		echo "Install ${amdgpupro_deb_file} package."
-
-		dpkg -i "${amdgpupro_deb_file}"
-
-		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
-	fi
-
 	if _is amdvlk-vulkan
 	then
-		apt-get update
-
 		local amdvlk_source_line="deb [arch=${amdvlk_arch} signed_by=${amdvlk_gpg_path}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
 		echo "${amdvlk_source_line}" > "${amdvlk_list_path}"
 		gpg --dearmor < "${amdvlk_key_file}" > "${amdvlk_gpg_path}"
@@ -610,13 +646,8 @@ _install () {
 		for mesa_old_clover_opencl_deb_file in \
 			$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
 		do
-			mesa_old_clover_opencl_package_name="$(echo "${mesa_old_clover_opencl_deb_file}" | cut -f1 -d'_' )"
-
-			echo "Install ${mesa_old_clover_opencl_package_name} package."
-
-			gdebi --non-interactive "${mesa_old_clover_opencl_deb_file}"
-
-			apt-mark hold "${mesa_old_clover_opencl_package_name}"
+			_install_packages "${mesa_old_clover_opencl_deb_file}"
+			_hold_packages "${mesa_old_clover_opencl_deb_file}"
 		done
 	fi
 
@@ -624,65 +655,37 @@ _install () {
 	then
 		_purge mesa-old-clover-opencl
 
-		for mesa_all_opencl_package_name in ${mesa_all_opencl_package_name_list}
-		do
-			echo "Install ${mesa_all_opencl_package_name} package."
-
-			apt-get install --yes "${mesa_all_opencl_package_name}"
-		done
+		_install_packages "${mesa_all_opencl_package_name_list}"
 	fi
 
 	if _is mesa-all-vulkan
 	then
-		for mesa_all_vulkan_package_name in ${mesa_all_vulkan_package_name_list}
-		do
-			echo "Install ${mesa_all_vulkan_package_name} package."
-
-			apt-get install --yes "${mesa_all_vulkan_package_name}"
-		done
+		_install_packages "${mesa_all_vulkan_package_name_list}"
 	fi
 
 	if _is mesa-all-opengl
 	then
-		for mesa_all_opengl_package_name in ${mesa_all_opengl_package_name_list}
-		do
-			echo "Install ${mesa_all_opengl_package_name} package."
-
-			apt-get install --yes "${mesa_all_opengl_package_name}"
-		done
+		_install_packages "${mesa_all_opengl_package_name_list}"
 	fi
 
 	if _is mesa-all-va
 	then
-		for mesa_all_va_package_name in ${mesa_all_va_package_name_list}
-		do
-			echo "Install ${mesa_all_va_package_name} package."
-
-			apt-get install --yes "${mesa_all_va_package_name}"
-		done
+		_install_packages "${mesa_all_va_package_name_list}"
 	fi
 
 	if _is mesa-all-vdpau
 	then
-		for mesa_all_vdpau_package_name in ${mesa_all_vdpau_package_name_list}
-		do
-			echo "Install ${mesa_all_vdpau_package_name} package."
-
-			apt-get install --yes "${mesa_all_vdpau_package_name}"
-		done
+		_install_packages "${mesa_all_vdpau_package_name_list}"
 	fi
 
 	if _is rocm-rocr-opencl
 	then
+		_install_amdgpu_package
+
 		# Already correct (icd may be renamed):
 		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
-		for rocm_rocr_opencl_package_name in ${rocm_rocr_opencl_package_name_list}
-		do
-			echo "Install ${rocm_rocr_opencl_package_name} package."
-
-			apt-get install --yes "${rocm_rocr_opencl_package_name}"
-		done
+		_install_packages "${rocm_rocr_opencl_package_name_list}"
 
 		# Already correct (icd may be renamed):
 		# libamdocl64.so
@@ -691,27 +694,23 @@ _install () {
 
 	if _is rocm-hip
 	then
-		for rocm_hip_package_name in ${rocm_hip_package_name_list}
-		do
-			echo "Install ${rocm_hip_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${rocm_hip_package_name}"
-		done
+		_install_packages "${rocm_hip_package_name_list}"
 	fi
 
 	if _is amdgpupro-dkms
 	then
-		for amdgpupro_dkms_package_name in ${amdgpupro_dkms_package_name_list}
-		do
-			echo "Install ${amdgpupro_dkms_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_dkms_package_name}"
-		done
+		_install_packags "${amdgpupro_dkms_package_name_list}"
 	fi
 
 	if _is amdgpupro-old-orca-opencl
 	then
 		_purge amdgpupro-orca-opencl
+
+		_install_amdgpu_package
 
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
@@ -723,14 +722,12 @@ _install () {
 
 			if _is amdgpupro-old-orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
-				echo "Install ${amdgpupro_old_orca_deb_file} package."
-
-				gdebi --non-interactive "${amdgpupro_old_orca_tarball_dir}/${amdgpupro_old_orca_deb_file}"
+				_install_packages "${amdgpupro_old_orca_tarball_dir}/${amdgpupro_old_orca_deb_file}"
 			fi
 
 			if [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
-				apt-mark auto "${orca_package_name}"
+				_hold_packages "${orca_package_name}"
 			fi
 		done
 
@@ -743,12 +740,9 @@ _install () {
 	then
 		_purge amdgpupro-old-orca-opencl
 
-		for amdgpupro_orca_opencl_package_name in ${amdgpupro_orca_opencl_package_name_list}
-		do
-			echo "Install ${amdgpupro_orca_opencl_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_orca_opencl_package_name}"
-		done
+		_install_packages "${amdgpupro_orca_opencl_package_name_list}"
 	fi
 
 	if _is amdgpupro-pal-opencl
@@ -760,9 +754,7 @@ _install () {
 		local amdgpupro_pal_deb_file
 		for amdgpupro_pal_deb_file in ${amdgpupro_pal_deb_file_list}
 		do
-			echo "Install ${amdgpupro_pal_deb_file} package."
-
-			gdebi --non-interactive "${amdgpupro_pal_tarball_dir}/${amdgpupro_pal_deb_file}"
+			_install_packages "${amdgpupro_pal_tarball_dir}/${amdgpupro_pal_deb_file}"
 		done
 
 		rm --force --verbose '/etc/OpenCL/vendors/amdocl64.icd'
@@ -772,72 +764,51 @@ _install () {
 
 	if _is amdgpupro-mesa-opengl
 	then
-		for amdgpupro_mesa_opengl_package_name in ${amdgpupro_mesa_opengl_package_name_list}
-		do
-			echo "Install ${amdgpupro_mesa_opengl_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_mesa_opengl_package_name}"
-		done
+		_install_packages "${amdgpupro_mesa_opengl_package_name_list}"
 	fi
 
 	if _is amdgpupro-mesa-va
 	then
-		for amdgpupro_mesa_va_package_name in ${amdgpupro_mesa_va_package_name_list}
-		do
-			echo "Install ${amdgpupro_mesa_va_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_mesa_va_package_name}"
-		done
+		_install_packages "${amdgpupro_mesa_va_package_name_list}"
 	fi
 
 	if _is amdgpupro-mesa-vdpau
 	then
-		for amdgpupro_mesa_vdpau_package_name in ${amdgpupro_mesa_vdpau_package_name_list}
-		do
-			echo "Install ${amdgpupro_mesa_vdpau_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_mesa_vdpau_package_name}"
-		done
+		_install_packages "${amdgpupro_mesa_vdpau_package_name_list}"
 	fi
 
 	if _is amdgpupro-oglp-opengl
 	then
-		for amdgpupro_oglp_opengl_package_name in ${amdgpupro_oglp_opengl_package_name_list}
-		do
-			echo "Install ${amdgpupro_oglp_opengl_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_oglp_opengl_package_name}"
-		done
+		_install_packages "${amdgpupro_oglp_opengl_package_name_list}"
 	fi
 
 	if _is amdgpupro-amdgpu-vulkan
 	then
-		for amdgpupro_amdgpu_vulkan_package_name in ${amdgpupro_amdgpu_vulkan_package_name_list}
-		do
-			echo "Install ${amdgpupro_amdgpu_vulkan_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_amdgpu_vulkan_package_name}"
-		done
+		_install_packages "${amdgpupro_amdgpu_vulkan_package_name_list}"
 	fi
 
 	if _is amdgpupro-amdgpu-pro-vulkan
 	then
-		for amdgpupro_amdgpu_pro_vulkan_package_name in ${amdgpupro_amdgpu_pro_vulkan_package_name_list}
-		do
-			echo "Install ${amdgpupro_amdgpu_pro_vulkan_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdgpupro_amdgpu_pro_vulkan_package_name}"
-		done
+		_install_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
 	fi
 
 	if _is amdvlk-vulkan
 	then
-		for amdvlk_vulkan_package_name in ${amdvlk_vulkan_package_name_list}
-		do
-			echo "Install ${amdvlk_vulkan_package_name} package."
+		_install_amdgpu_package
 
-			apt-get install --yes "${amdvlk_vulkan_package_name}"
-		done
+		_install_packages "${amd_vulkan_package_name_list}"
 	fi
 
 	if _is fglrx-cpu-opencl
