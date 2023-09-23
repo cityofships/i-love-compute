@@ -80,10 +80,10 @@ amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
 
 
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
+mesa_all_vulkan_package_name_list='mesa-vulkan-drivers'
 mesa_all_opengl_package_name_list='libglx-mesa0'
 mesa_all_va_package_name_list='mesa-va-drivers'
 mesa_all_vdpau_package_name_list='mesa-vdpau-drivers'
-mesa_radv_vulkan_package_name_list='mesa-vulkan-drivers'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocm_rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
@@ -105,7 +105,7 @@ _error () {
 
 is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
-is_mesa_radv_vulkan='false'
+is_mesa_all_vulkan='false'
 is_mesa_all_opengl='false'
 is_mesa_all_va='false'
 is_mesa_all_vdpau='false'
@@ -133,7 +133,7 @@ _is () {
 			"${is_mesa_all_opencl}"
 			;;
 		'mesa-all-vulkan')
-			"${is_mesa_radv_vulkan}"
+			"${is_mesa_all_vulkan}"
 			;;
 		'mesa-all-opengl')
 			"${is_mesa_all_opengl}"
@@ -664,11 +664,11 @@ _install () {
 
 	if _is mesa-all-vulkan
 	then
-		for mesa_radv_vulkan_package_name in ${mesa_radv_vulkan_package_name_list}
+		for mesa_all_vulkan_package_name in ${mesa_all_vulkan_package_name_list}
 		do
-			echo "Install ${mesa_radv_vulkan_package_name} package."
+			echo "Install ${mesa_all_vulkan_package_name} package."
 
-			apt-get install --yes "${mesa_radv_vulkan_package_name}"
+			apt-get install --yes "${mesa_all_vulkan_package_name}"
 		done
 	fi
 
@@ -1035,7 +1035,7 @@ case "${action}" in
 					is_mesa_all_opencl='true'
 					;;
 				'mesa-all-vulkan')
-					is_mesa_radv_vulkan='true'
+					is_mesa_all_vulkan='true'
 					;;
 				'mesa-all-opengl')
 					is_mesa_all_opengl='true'
