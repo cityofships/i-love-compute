@@ -90,6 +90,7 @@ is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
 is_fglrx_cpu_opencl='false'
 is_amdgpu_old_orca_opencl='false'
+is_amdgpu_orca_opencl='false'
 is_amdgpu_pal_opencl='false'
 is_rocm_rocr_opencl='false'
 is_rocm_hip='false'
@@ -112,6 +113,9 @@ _is () {
 			;;
 		'amdgpu-old-orca-opencl')
 			"${is_amdgpu_old_orca_opencl}"
+			;;
+		'amdgpu-orca-opencl')
+			"${is_amdgpu_orca_opencl}"
 			;;
 		'amdgpu-pal-opencl')
 			"${is_amdgpu_pal_opencl}"
