@@ -310,18 +310,17 @@ _clean () {
 
 	if [ -d "${workspace_dir}" ]
 	then
-		rm --force --verbose "${workspace_dir}/${fglrx_tarball_file}"
-		rm --force --recursive --verbose "${workspace_dir}/${fglrx_tarball_dir}"
-
+		rm --force --verbose "${workspace_dir}/${amdgpupro_deb_file}"
 		rm --force --verbose "${workspace_dir}/${amdgpupro_old_orca_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_old_orca_tarball_dir}"
 
 		rm --force --verbose "${workspace_dir}/${amdgpupro_pal_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_pal_tarball_dir}"
 
-		rm --force --verbose "${workspace_dir}/${amdgpupro_deb_file}"
-
 		rm --force --verbose "${workspace_dir}/${amdvlk_key_file}"
+
+		rm --force --verbose "${workspace_dir}/${fglrx_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${fglrx_tarball_dir}"
 
 		rmdir --verbose "${workspace_dir}"
 	fi
