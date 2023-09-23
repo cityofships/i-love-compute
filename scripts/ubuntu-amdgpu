@@ -186,6 +186,8 @@ _is () {
 		'fglrx-cpu-opencl')
 			"${is_fglrx_cpu_opencl}"
 			;;
+		*)
+			_error "unknown _is keyword: ${1}"
 	esac
 }
 
@@ -604,7 +606,7 @@ _install () {
 	if _is rocm-rocr-opencl \
 	|| _is amdgpupro-old-orca-opencl \
 	|| _is amdgpupro-pal-opencl \
-	|| _is amdgpupro-mesa-opencl \
+	|| _is amdgpupro-mesa-opengl \
 	|| _is amdgpupro-mesa-va \
 	|| _is amdgpupro-mesa-vdpau
 	then
