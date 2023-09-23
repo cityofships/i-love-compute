@@ -821,8 +821,6 @@ _help () {
 	${tab}${tab}Uninstall all OpenCL drivers for AMD GPUs.
 
 	Names:
-	${tab}all
-	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
 	${tab}mesa-old-clover-opencl
 	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
 	${tab}mesa-all-opencl
@@ -895,14 +893,6 @@ case "${action}" in
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
-				'all')
-					is_mesa_old_clover_opencl='true'
-					is_fglrx_cpu_opencl='true'
-					is_amdgpupro_old_orca_opencl='true'
-					is_amdgpupro_pal_opencl='true'
-					is_rocm_rocr_opencl='true'
-					is_rocm_hip='true'
-					;;
 				'mesa-all-opencl')
 					is_mesa_all_opencl='true'
 					;;
