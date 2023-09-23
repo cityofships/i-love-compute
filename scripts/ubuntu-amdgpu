@@ -51,15 +51,15 @@ fglrx_tarball_dir='fglrx-15.302'
 fglrx_script_file='amd-driver-installer-15.302-x86.x86_64.run'
 fglrx_install_dir='/opt/amd-fglrx'
 
-orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
-orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
-orca_deb_file_list='opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb'
-orca_tarball_dir="$(basename "${orca_tarball_file}" '.tar.xz')"
+amdgpupro_old_orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
+amdgpupro_old_orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
+amdgpupro_old_orca_deb_file_list='opencl-orca-amdgpu-pro-icd_21.20-1271047_amd64.deb'
+amdgpupro_old_orca_tarball_dir="$(basename "${amdgpupro_old_orca_tarball_file}" '.tar.xz')"
 
-pal_tarball_file="amdgpu-pro-20.40-1147286-ubuntu-20.04.tar.xz"
-pal_tarball_sum='9b064a3b02d2a1ec18fdd6c098b70f4a8c6f93e4bfdc4e9a032ca387bdf7223278622c19d5bd55e493555c5f734168c3f2768cb743f9e00dcf5f96cbc399c7b3'
-pal_deb_file_list='opencl-amdgpu-pro-comgr_20.40-1147286_amd64.deb opencl-amdgpu-pro-icd_20.40-1147286_amd64.deb'
-pal_tarball_dir="$(basename "${pal_tarball_file}" '.tar.xz')"
+amdgpupro_pal_tarball_file="amdgpu-pro-20.40-1147286-ubuntu-20.04.tar.xz"
+amdgpupro_pal_tarball_sum='9b064a3b02d2a1ec18fdd6c098b70f4a8c6f93e4bfdc4e9a032ca387bdf7223278622c19d5bd55e493555c5f734168c3f2768cb743f9e00dcf5f96cbc399c7b3'
+amdgpupro_pal_deb_file_list='opencl-amdgpu-pro-comgr_20.40-1147286_amd64.deb opencl-amdgpu-pro-icd_20.40-1147286_amd64.deb'
+amdgpupro_pal_tarball_dir="$(basename "${amdgpupro_pal_tarball_file}" '.tar.xz')"
 
 rocm_version='5.7'
 rocm_distro='jammy'
@@ -177,12 +177,12 @@ _checksum () {
 			file="${amdgpupro_deb_file}"
 			;;
 		'orca')
-			sum="${orca_tarball_sum}"
-			file="${orca_tarball_file}"
+			sum="${amdgpupro_old_orca_tarball_sum}"
+			file="${amdgpupro_old_orca_tarball_file}"
 			;;
 		'pal')
-			sum="${pal_tarball_sum}"
-			file="${pal_tarball_file}"
+			sum="${amdgpupro_pal_tarball_sum}"
+			file="${amdgpupro_pal_tarball_file}"
 			;;
 		'fglrx')
 			sum="${fglrx_tarball_sum}"
@@ -266,12 +266,12 @@ _download () {
 	then
 		if ! _checksum 'orca'
 		then
-			echo "Download ${orca_tarball_file}."
+			echo "Download ${amdgpupro_old_orca_tarball_file}."
 
-			rm -f "${orca_tarball_file}"
+			rm -f "${amdgpupro_old_orca_tarball_file}"
 
 			wget --header="Referer: ${tarball_referer}" \
-				"${tarball_repo}/${orca_tarball_file}"
+				"${tarball_repo}/${amdgpupro_old_orca_tarball_file}"
 
 			_checksum 'orca'
 		fi
@@ -281,12 +281,12 @@ _download () {
 	then
 		if ! _checksum 'pal'
 		then
-			echo "Download ${pal_tarball_file}."
+			echo "Download ${amdgpupro_pal_tarball_file}."
 
-			rm -f "${pal_tarball_file}"
+			rm -f "${amdgpupro_pal_tarball_file}"
 
 			wget --header="Referer: ${tarball_referer}" \
-				"${tarball_repo}/${pal_tarball_file}"
+				"${tarball_repo}/${amdgpupro_pal_tarball_file}"
 
 			_checksum 'pal'
 		fi
@@ -310,21 +310,21 @@ _extract () {
 
 	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl
 	then
-		if ! [ -d "${orca_tarball_dir}" ]
+		if ! [ -d "${amdgpupro_old_orca_tarball_dir}" ]
 		then
-			echo "Extract ${orca_tarball_file}."
+			echo "Extract ${amdgpupro_old_orca_tarball_file}."
 
-			tar --no-same-permissions -xvJf "${orca_tarball_file}"
+			tar --no-same-permissions -xvJf "${amdgpupro_old_orca_tarball_file}"
 		fi
 	fi
 
 	if _is amdgpupro-pal-opencl
 	then
-		if ! [ -d "${pal_tarball_dir}" ]
+		if ! [ -d "${amdgpupro_pal_tarball_dir}" ]
 		then
-			echo "Extract ${pal_tarball_file}."
+			echo "Extract ${amdgpupro_pal_tarball_file}."
 
-			tar --no-same-permissions -xvJf "${pal_tarball_file}"
+			tar --no-same-permissions -xvJf "${amdgpupro_pal_tarball_file}"
 		fi
 	fi
 }
@@ -337,11 +337,11 @@ _clean () {
 		rm --force --verbose "${workspace_dir}/${fglrx_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${fglrx_tarball_dir}"
 
-		rm --force --verbose "${workspace_dir}/${orca_tarball_file}"
-		rm --force --recursive --verbose "${workspace_dir}/${orca_tarball_dir}"
+		rm --force --verbose "${workspace_dir}/${amdgpupro_old_orca_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_old_orca_tarball_dir}"
 
-		rm --force --verbose "${workspace_dir}/${pal_tarball_file}"
-		rm --force --recursive --verbose "${workspace_dir}/${pal_tarball_dir}"
+		rm --force --verbose "${workspace_dir}/${amdgpupro_pal_tarball_file}"
+		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_pal_tarball_dir}"
 
 		rm --force --verbose "${workspace_dir}/${amdgpupro_deb_file}"
 
@@ -396,10 +396,10 @@ _purge () {
 			done
 			;;
 		'amdgpupro-old-orca-opencl')
-			for orca_deb_file in \
-				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | tac)
+			for amdgpupro_old_orca_deb_file in \
+				$(echo "${amdgpupro_old_orca_deb_file_list}" | tr ' ' '\n' | tac)
 			do
-				local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+				local orca_package_name="$(echo "${amdgpupro_old_orca_deb_file}" | cut -f1 -d'_')"
 
 				apt-get remove --yes --purge "${orca_package_name}" || true
 			done
@@ -415,10 +415,10 @@ _purge () {
 			done
 			;;
 		'amdgpupro-pal-opencl')
-			for pal_deb_file in \
-				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | tac)
+			for amdgpupro_pal_deb_file in \
+				$(echo "${amdgpupro_pal_deb_file_list}" | tr ' ' '\n' | tac)
 			do
-				local pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
+				local pal_package_name="$(echo "${amdgpupro_pal_deb_file}" | cut -f1 -d'_')"
 
 				apt-get remove --yes --purge "${pal_package_name}" || true
 			done
@@ -605,16 +605,16 @@ _install () {
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
 
-		local orca_deb_file
-		for orca_deb_file in ${orca_deb_file_list}
+		local amdgpupro_old_orca_deb_file
+		for amdgpupro_old_orca_deb_file in ${amdgpupro_old_orca_deb_file_list}
 		do
-			local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
+			local orca_package_name="$(echo "${amdgpupro_old_orca_deb_file}" | cut -f1 -d'_')"
 
 			if _is amdgpupro-old-orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
-				echo "Install ${orca_deb_file} package."
+				echo "Install ${amdgpupro_old_orca_deb_file} package."
 
-				gdebi --non-interactive "${orca_tarball_dir}/${orca_deb_file}"
+				gdebi --non-interactive "${amdgpupro_old_orca_tarball_dir}/${amdgpupro_old_orca_deb_file}"
 			fi
 
 			if [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
@@ -646,12 +646,12 @@ _install () {
 			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
 			--rename '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
 
-		local pal_deb_file
-		for pal_deb_file in ${pal_deb_file_list}
+		local amdgpupro_pal_deb_file
+		for amdgpupro_pal_deb_file in ${amdgpupro_pal_deb_file_list}
 		do
-			echo "Install ${pal_deb_file} package."
+			echo "Install ${amdgpupro_pal_deb_file} package."
 
-			gdebi --non-interactive "${pal_tarball_dir}/${pal_deb_file}"
+			gdebi --non-interactive "${amdgpupro_pal_tarball_dir}/${amdgpupro_pal_deb_file}"
 		done
 
 		rm --force --verbose '/etc/OpenCL/vendors/amdocl64.icd'
