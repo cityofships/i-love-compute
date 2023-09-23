@@ -586,7 +586,7 @@ _install () {
 			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
-	if _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl
+	if _is amdgpu-old-orca-opencl
 	then
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
