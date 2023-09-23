@@ -365,7 +365,7 @@ _uninstall_packages () {
 	done
 }
 
-_purge () {
+_uninstall_driver () {
 	case "${1}" in
 		'mesa-old-clover-opencl')
 			local mesa_old_clover_opencl_deb_file
@@ -391,6 +391,28 @@ _purge () {
 		'mesa-all-driver')
 			_uninstall_packages "${mesa_all_driver_package_name_list}"
 			;;
+		'amdgpupro-all')
+			# Virtual keyword to uninstall all amdgpu/rocm packages since
+			# they can't be uninstalled separately in an easy way.
+			_uninstall_driver rocm-rocr-opencl
+			_uninstall_driver rocm-hip
+			_uninstall_driver amdgpupro-dkms
+			_uninstall_driver amdgpupro-old-orca-opencl
+			_uninstall_driver amdgpupro-orca-opencl
+			_uninstall_driver amdgpupro-pal-opencl
+			_uninstall_driver amdgpupro-mesa-opengl
+			_uninstall_driver amdgpupro-oglp-opengl
+			_uninstall_driver amdgpupro-amdgpu-vulkan
+			_uninstall_driver amdgpupro-amdgpu-pro-vulkan
+
+			if test -f '/usr/bin/amdgpu-install'
+			then
+				echo 'Yes' | '/usr/bin/amdgpu-install' --uninstall
+			fi
+
+			_uninstall_packages "${amdgpupro_deb_file}"
+
+			;;
 		'rocm-rocr-opencl')
 			_uninstall_packages "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}"
 			;;
@@ -413,6 +435,12 @@ _purge () {
 			;;
 		'amdgpupro-pal-opencl')
 			_uninstall_packages "${amdgpupro_pal_deb_file_list}"
+
+			dpkg-divert \
+				--rename \
+				--remove '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
+
+			rm --force --verbose '/etc/OpenCL/vendors/amdocl-pal64.icd'
 			;;
 		'amdgpupro-mesa-opengl')
 			_uninstall_packages "${amdgpupro_mesa_opengl_package_name_list}"
@@ -467,34 +495,11 @@ _purge () {
 }
 
 _uninstall () {
-	_purge mesa_all_opencl
-	_purge mesa-old-clover-opencl
-	_purge rocm-rocr-opencl
-	_purge rocm-hip
-	_purge amdvlk-vulkan
-	_purge amdgpupro-dkms
-	_purge amdgpupro-old-orca-opencl
-	_purge amdgpupro-orca-opencl
-	_purge amdgpupro-pal-opencl
-	_purge amdgpupro-mesa-opengl
-	_purge amdgpupro-oglp-opengl
-	_purge amdgpupro-amdgpu-vulkan
-	_purge amdgpupro-amdgpu-pro-vulkan
-	_purge fglrx-cpu-opencl
-	# no purge yet for mesa opengl, vulkan, va and vdpau
-
-	dpkg-divert \
-		--rename \
-		--remove '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
-
-	rm --force --verbose '/etc/OpenCL/vendors/amdocl-pal64.icd'
-
-	if test -f '/usr/bin/amdgpu-install'
-	then
-		echo 'Yes' | '/usr/bin/amdgpu-install' --uninstall
-	fi
-
-	_uninstall_packages "${amdgpupro_deb_file}"
+	local driver_name
+	for driver_name in "${driver_list[@]}"
+	do
+		_uninstall_driver "${driver_name}"
+	done
 
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
@@ -564,7 +569,7 @@ _install_amdgpu_package () {
 _install_driver () {
 	case "${1}" in
 		'mesa-old-clover-opencl')
-			_purge mesa-all-opencl
+			_uninstall_driver mesa-all-opencl
 
 			for mesa_old_clover_opencl_deb_file in \
 				$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
@@ -574,7 +579,7 @@ _install_driver () {
 			done
 		;;
 		'mesa-all-opencl')
-			_purge mesa-old-clover-opencl
+			_uninstall_driver mesa-old-clover-opencl
 
 			_install_packages "${mesa_all_opencl_package_name_list}"
 		;;
@@ -607,7 +612,7 @@ _install_driver () {
 			_install_packages "${amdgpupro_dkms_package_name_list}"
 		;;
 		'amdgpupro-old-orca-opencl')
-			_purge amdgpupro-orca-opencl
+			_uninstall_driver amdgpupro-orca-opencl
 
 			# Already correct:
 			# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
@@ -620,7 +625,7 @@ _install_driver () {
 			# /etc/OpenCL/vendors/amdocl-orca64.icd
 		;;
 		'amdgpupro-orca-opencl')
-			_purge amdgpupro-old-orca-opencl
+			_uninstall_driver amdgpupro-old-orca-opencl
 
 			_install_packages "${amdgpupro_orca_opencl_package_name_list}"
 		;;
@@ -738,7 +743,7 @@ _help () {
 	sed -e 's/\\t/\t/g' <<-EOF
 	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs and CPUs.
 
-	Usage: ${script_name} [OPTION] [ACTION] [NAMES]
+	Usage: ${script_name} [OPTION] [ACTION] [DRIVER NAMES]
 
 	Option:
 	\t-h, --help
@@ -752,11 +757,11 @@ _help () {
 	\tclean
 	\t\tClean-up download and extracted files for NAME.
 	\tinstall
-	\t\tInstall NAME (default: clover).
+	\t\tInstall NAME
 	\tuninstall
-	\t\tUninstall all OpenCL drivers for AMD GPUs.
+	\t\tUninstall NAME
 
-	Names:
+	Driver names:
 	\tmesa-old-clover-opencl
 	\t\tMesa old Clover OpenCL for Terascale2+ and GCN4- GPUs (only on Ubuntu 20.04)
 	\tmesa-all-opencl
@@ -798,12 +803,17 @@ _help () {
 	\tfglrx-cpu-opencl
 	\t\tAMD Radeon Crimson fglrx OpenCL for CPUs.
 
+	ROCM/AMDGPU-PRO drivers can't be uninstalled separately,
+	the “amdgpupro-all” virtual driver name uninstalls all of them.
+
 	Examples:
 	\t${script_name} install all
 
 	\t${script_name} install amdgpupro-old-orca-opencl amdgpupro-pal-opencl rocm-rocr-opencl
 
-	\t${script_name} uninstall
+	\t${script_name} uninstall amdvlk-vulkan
+
+	\t${script_name} uninstall amdgpupro-all
 
 	EOF
 
@@ -920,7 +930,43 @@ case "${action}" in
 esac
 
 case "${action}" in
-	'download'|'extract'|'install')
+	'uninstall')
+		while ! [ -z "${1:-}" ]
+		do
+			case "${1}" in
+				'mesa-old-clover-opencl')
+					;;
+				'mesa-all-opencl')
+					;;
+				'mesa-all-vulkan')
+					;;
+				'mesa-all-opengl')
+					;;
+				'mesa-all-va')
+					;;
+				'mesa-all-vdpau')
+					;;
+				'amdgpupro-all')
+					;;
+				'amdvlk-vulkan')
+					;;
+				'fglrx-cpu-opencl')
+					;;
+				'amdgpupro-all')
+					;;
+				*)
+					_error "Unknown driver ${1} (note: all amdgpu/rocm drivers are uninstalled with a single “amdgpupro-all” keyword)."
+					;;
+			esac
+
+			driver_list+=("${1}")
+
+			shift
+		done
+esac
+
+case "${action}" in
+	'download'|'extract'|'install'|'uninstall')
 		if [ "${#driver_list[@]}" = '0' ]
 		then
 			_error 'Missing driver name.'
