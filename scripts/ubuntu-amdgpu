@@ -590,7 +590,7 @@ _install_driver () {
 			_install_packages "${rocm_hip_package_name_list}"
 		;;
 		'amdgpupro-dkms')
-			_install_packags "${amdgpupro_dkms_package_name_list}"
+			_install_packages "${amdgpupro_dkms_package_name_list}"
 		;;
 		'amdgpupro-old-orca-opencl')
 			_purge amdgpupro-orca-opencl
