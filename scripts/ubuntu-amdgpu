@@ -961,11 +961,6 @@ shift
 
 case "${action}" in
 	'download'|'extract'|'clean'|'install')
-		if [ -z "${1:-}" ]
-		then
-			is_mesa_old_clover_opencl='true'
-		fi
-
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
