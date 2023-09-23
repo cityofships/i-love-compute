@@ -88,7 +88,7 @@ _error () {
 
 is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
-is_fglrx_opencl='false'
+is_flgrx_cpu_opencl='false'
 is_amdgpu_orca_opencl='false'
 is_amdgpu_pal_opencl='false'
 is_rocm_rocr_opencl='false'
@@ -107,8 +107,8 @@ _is () {
 		'mesa-all-opencl')
 			"${is_mesa_all_opencl}"
 			;;
-		'fglrx-opencl')
-			"${is_fglrx_opencl}"
+		'flgrx-cpu-opencl')
+			"${is_flgrx_cpu_opencl}"
 			;;
 		'amdgpu-orca-opencl')
 			"${is_amdgpu_orca_opencl}"
@@ -228,7 +228,7 @@ _download () {
 		fi
 	fi
 
-	if _is fglrx-opencl
+	if _is flgrx-cpu-opencl
 	then
 		if ! _checksum 'fglrx'
 		then
@@ -293,7 +293,7 @@ _extract () {
 
 	_download
 
-	if _is fglrx-opencl
+	if _is flgrx-cpu-opencl
 	then
 		if ! [ -d "${fglrx_tarball_dir}" ]
 		then
@@ -369,7 +369,7 @@ _purge () {
 				apt-get remove --yes --purge "${mesa_all_opencl_package_name}" || true
 			done
 			;;
-		'fglrx-opencl')
+		'flgrx-cpu-opencl')
 			rm --force --verbose \
 				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
 			rm --force --verbose \
@@ -475,7 +475,7 @@ _uninstall () {
 	_purge amdgpu-dkms
 	_purge amdgpu-mesa-opengl
 	_purge amdgpu-oglp-opengl
-	_purge fglrx-opencl
+	_purge flgrx-cpu-opencl
 
 	dpkg-divert \
 		--rename \
@@ -545,7 +545,7 @@ _install () {
 		done
 	fi
 
-	if _is fglrx-opencl
+	if _is flgrx-cpu-opencl
 	then
 		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
 
@@ -751,7 +751,7 @@ _help () {
 	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
 	${tab}mesa-old-clover-opencl
 	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
-	${tab}fglrx-opencl
+	${tab}flgrx-cpu-opencl
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
 	${tab}amdgpu-orca-opencl
 	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
@@ -815,7 +815,7 @@ case "${action}" in
 			case "${1}" in
 				'all')
 					is_mesa_old_clover_opencl='true'
-					is_fglrx_opencl='true'
+					is_flgrx_cpu_opencl='true'
 					is_amdgpu_orca_opencl='true'
 					is_amdgpu_pal_opencl='true'
 					is_rocm_rocr_opencl='true'
@@ -827,8 +827,8 @@ case "${action}" in
 				'mesa-old-clover-opencl')
 					is_mesa_old_clover_opencl='true'
 					;;
-				'fglrx-opencl')
-					is_fglrx_opencl='true'
+				'flgrx-cpu-opencl')
+					is_flgrx_cpu_opencl='true'
 					;;
 				'amdgpu-orca-opencl')
 					is_amdgpu_orca_opencl='true'
