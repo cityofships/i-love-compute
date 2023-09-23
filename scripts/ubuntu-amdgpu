@@ -89,8 +89,8 @@ _error () {
 is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
 is_fglrx_opencl='false'
-is_orca_opencl='false'
-is_pal_opencl='false'
+is_amdgpu_orca_opencl='false'
+is_amdgpu_pal_opencl='false'
 is_rocr_opencl='false'
 is_rocm_hip='false'
 is_amdgpu_dkms='false'
@@ -110,11 +110,11 @@ _is () {
 		'fglrx-opencl')
 			"${is_fglrx_opencl}"
 			;;
-		'orca-opencl')
-			"${is_orca_opencl}"
+		'amdgpu-orca-opencl')
+			"${is_amdgpu_orca_opencl}"
 			;;
-		'pal-opencl')
-			"${is_pal_opencl}"
+		'amdgpu-pal-opencl')
+			"${is_amdgpu_pal_opencl}"
 			;;
 		'rocr-opencl')
 			"${is_rocr_opencl}"
@@ -243,7 +243,7 @@ _download () {
 		fi
 	fi
 
-	if _is orca-opencl || _is pal-opencl || _is rocr-opencl || _is rocm-hip
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocr-opencl || _is rocm-hip
 	then
 		if ! _checksum 'amdgpupro'
 		then
@@ -257,7 +257,7 @@ _download () {
 		fi
 	fi
 
-	if _is orca-opencl || _is pal-opencl
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl
 	then
 		if ! _checksum 'orca'
 		then
@@ -272,7 +272,7 @@ _download () {
 		fi
 	fi
 
-	if _is pal-opencl
+	if _is amdgpu-pal-opencl
 	then
 		if ! _checksum 'pal'
 		then
@@ -303,7 +303,7 @@ _extract () {
 		fi
 	fi
 
-	if _is orca-opencl || _is pal-opencl
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl
 	then
 		if ! [ -d "${orca_tarball_dir}" ]
 		then
@@ -313,7 +313,7 @@ _extract () {
 		fi
 	fi
 
-	if _is pal-opencl
+	if _is amdgpu-pal-opencl
 	then
 		if ! [ -d "${pal_tarball_dir}" ]
 		then
@@ -392,7 +392,7 @@ _purge () {
 			rm --force --verbose \
 				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 			;;
-		'orca-opencl')
+		'amdgpu-orca-opencl')
 			for orca_deb_file in \
 				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | tac)
 			do
@@ -404,7 +404,7 @@ _purge () {
 			# Alternate name for opencl-orca-amdgpu-pro-icd package.
 			apt-get remove --yes --purge 'opencl-legacy-amdgpu-pro-icd' || true
 			;;
-		'pal-opencl')
+		'amdgpu-pal-opencl')
 			for pal_deb_file in \
 				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | tac)
 			do
@@ -468,8 +468,8 @@ _purge () {
 _uninstall () {
 	_purge mesa-all-opencl
 	_purge mesa-old-clover-opencl
-	_purge pal-opencl
-	_purge orca-opencl
+	_purge amdgpu-pal-opencl
+	_purge amdgpu-orca-opencl
 	_purge rocr-opencl
 	_purge rocm-hip
 	_purge amdgpu-dkms
@@ -498,7 +498,7 @@ _uninstall () {
 _install () {
 	_extract
 
-	if _is orca-opencl || _is pal-opencl
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl
 	then
 		apt-get update
 
@@ -506,7 +506,7 @@ _install () {
 		apt-get install -y 'gdebi-core'
 	fi
 
-	if _is orca-opencl || _is pal-opencl || _is rocr-opencl
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocr-opencl
 	then
 		echo "Install ${amdgpupro_deb_file} package."
 
@@ -515,7 +515,7 @@ _install () {
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
-	if _is mesa-old-clover-opencl || _is orca-opencl || _is pal-opencl || _is rocr-opencl
+	if _is mesa-old-clover-opencl || _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocr-opencl
 	then
 		apt-get update
 	fi
@@ -574,7 +574,7 @@ _install () {
 			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
-	if _is orca-opencl || _is pal-opencl
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl
 	then
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
@@ -584,7 +584,7 @@ _install () {
 		do
 			local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
 
-			if _is orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
+			if _is amdgpu-orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
 				echo "Install ${orca_deb_file} package."
 
@@ -602,7 +602,7 @@ _install () {
 		# /etc/OpenCL/vendors/amdocl-orca64.icd
 	fi
 
-	if _is pal-opencl
+	if _is amdgpu-pal-opencl
 	then
 		dpkg-divert \
 			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
@@ -753,9 +753,9 @@ _help () {
 	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
 	${tab}fglrx-opencl
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
-	${tab}orca-opencl
+	${tab}amdgpu-orca-opencl
 	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
-	${tab}pal-opencl
+	${tab}amdgpu-pal-opencl
 	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}rocr-opencl
 	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
@@ -775,7 +775,7 @@ _help () {
 	Examples:
 	${tab}${script_name} install all
 
-	${tab}${script_name} install orca-opencl pal-opencl rocr-opencl
+	${tab}${script_name} install amdgpu-orca-opencl amdgpu-pal-opencl rocr-opencl
 
 	${tab}${script_name} uninstall
 
@@ -816,8 +816,8 @@ case "${action}" in
 				'all')
 					is_mesa_old_clover_opencl='true'
 					is_fglrx_opencl='true'
-					is_orca_opencl='true'
-					is_pal_opencl='true'
+					is_amdgpu_orca_opencl='true'
+					is_amdgpu_pal_opencl='true'
 					is_rocr_opencl='true'
 					is_rocm_hip='true'
 					;;
@@ -830,11 +830,11 @@ case "${action}" in
 				'fglrx-opencl')
 					is_fglrx_opencl='true'
 					;;
-				'orca-opencl')
-					is_orca_opencl='true'
+				'amdgpu-orca-opencl')
+					is_amdgpu_orca_opencl='true'
 					;;
-				'pal-opencl')
-					is_pal_opencl='true'
+				'amdgpu-pal-opencl')
+					is_amdgpu_pal_opencl='true'
 					;;
 				'rocr-opencl')
 					is_rocr_opencl='true'
