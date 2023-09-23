@@ -492,8 +492,7 @@ _uninstall () {
 		echo 'Yes' | '/usr/bin/amdgpu-install' --uninstall
 	fi
 
-	amdgpupro_package_name="$(echo "${amdgpupro_deb_file}" | cut -f1 -d'_')"
-	apt-get remove --yes --purge "${amdgpupro_package_name}" || true
+	_uninstall_packages "${amdgpupro_deb_file}"
 
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
