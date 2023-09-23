@@ -75,6 +75,8 @@ rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
 amdgpu_dkms_package_name_list='amdgpu-dkms'
 amdgpu_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
+amdgpu_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
+amdgpu_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -90,6 +92,8 @@ is_rocr_opencl='false'
 is_rocm_hip='false'
 is_amdgpu_dkms='false'
 is_amdgpu_mesa_opengl='false'
+is_amdgpu_mesa_va='false'
+is_amdgpu_mesa_vdpau='false'
 
 _is () {
 	case "${1}" in
@@ -116,6 +120,12 @@ _is () {
 			;;
 		'amdgpu-mesa-opengl')
 			"${is_amdgpu_mesa_opengl}"
+			;;
+		'amdgpu-mesa-va')
+			"${is_amdgpu_mesa_va}"
+			;;
+		'amdgpu-mesa-vdpau')
+			"${is_amdgpu_mesa_vdpau}"
 			;;
 	esac
 }
@@ -414,6 +424,20 @@ _purge () {
 				apt-get remove --yes --purge "${amdgpu_mesa_opengl_package_name}" || true
 			done
 			;;
+		'amdgpu-mesa-va')
+			for amdgpu_mesa_va_package_name in \
+				$(echo "${amdgpu_mesa_va_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpu_mesa_va_package_name}" || true
+			done
+			;;
+		'amdgpu-mesa-vdpau')
+			for amdgpu_mesa_vdpau_package_name in \
+				$(echo "${amdgpu_mesa_vdpau_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpu_mesa_vdpau_package_name}" || true
+			done
+			;;
 	esac
 }
 
@@ -608,6 +632,26 @@ _install () {
 		done
 	fi
 
+	if _is amdgpu-mesa-va
+	then
+		for amdgpu_mesa_va_package_name in ${amdgpu_mesa_va_package_name_list}
+		do
+			echo "Install ${amdgpu_mesa_va_package_name} package."
+
+			apt-get install --yes "${amdgpu_mesa_va_package_name}"
+		done
+	fi
+
+	if _is amdgpu-mesa-vdpau
+	then
+		for amdgpu_mesa_vdpau_package_name in ${amdgpu_mesa_vdpau_package_name_list}
+		do
+			echo "Install ${amdgpu_mesa_vdpau_package_name} package."
+
+			apt-get install --yes "${amdgpu_mesa_vdpau_package_name}"
+		done
+	fi
+
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
 }
@@ -673,6 +717,10 @@ _help () {
 	${tab}${tab}AMD amdgpu DKMS modules and firmwares.
 	${tab}amdgpu-mesa-opengl
 	${tab}${tab}AMD amdgpu Mesa OpenGL.
+	${tab}amdgpu-mesa-va
+	${tab}${tab}AMD amdgpu Mesa VA.
+	${tab}amdgpu-mesa-vdpau
+	${tab}${tab}AMD amdgpu Mesa VDPAU.
 
 	Examples:
 	${tab}${script_name} install all
@@ -746,6 +794,12 @@ case "${action}" in
 					;;
 				'amdgpu-mesa-opengl')
 					is_amdgpu_mesa_opengl='true'
+					;;
+				'amdgpu-mesa-va')
+					is_amdgpu_mesa_va='true'
+					;;
+				'amdgpu-mesa-vdpau')
+					is_amdgpu_mesa_vdpau='true'
 					;;
 				*)
 					_error 'Unkown name.'
