@@ -74,6 +74,7 @@ old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
 amdgpu_dkms_package_name_list='amdgpu-dkms'
+amdgpu_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -88,6 +89,7 @@ is_pal_opencl='false'
 is_rocr_opencl='false'
 is_rocm_hip='false'
 is_amdgpu_dkms='false'
+is_amdgpu_mesa_opengl='false'
 
 _is () {
 	case "${1}" in
@@ -111,6 +113,9 @@ _is () {
 			;;
 		'amdgpu-dkms')
 			"${is_amdgpu_dkms}"
+			;;
+		'amdgpu-mesa-opengl')
+			"${is_amdgpu_mesa_opengl}"
 			;;
 	esac
 }
@@ -402,6 +407,13 @@ _purge () {
 				apt-get remove --yes --purge "${amdgpu_dkms_package_name}" || true
 			done
 			;;
+		'amdgpu-mesa-opengl')
+			for amdgpu_mesa_opengl_package_name in \
+				$(echo "${amdgpu_mesa_opengl_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpu_mesa_opengl_package_name}" || true
+			done
+			;;
 	esac
 }
 
@@ -412,6 +424,7 @@ _uninstall () {
 	_purge rocr-opencl
 	_purge rocm-hip
 	_purge amdgpu-dkms
+	_purge amdgpu-mesa-opengl
 	_purge fglrx-opencl
 
 	dpkg-divert \
@@ -585,6 +598,16 @@ _install () {
 		done
 	fi
 
+	if _is amdgpu-mesa-opengl
+	then
+		for amdgpu_mesa_opengl_package_name in ${amdgpu_mesa_opengl_package_name_list}
+		do
+			echo "Install ${amdgpu_mesa_opengl_package_name} package."
+
+			apt-get install --yes "${amdgpu_mesa_opengl_package_name}"
+		done
+	fi
+
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
 }
@@ -648,6 +671,8 @@ _help () {
 	${tab}${tab}AMD APP ROCm HIP for Radeon Pro GPUs.
 	${tab}amdgpu-dkms
 	${tab}${tab}AMD amdgpu DKMS modules and firmwares.
+	${tab}amdgpu-mesa-opengl
+	${tab}${tab}AMD amdgpu Mesa OpenGL.
 
 	Examples:
 	${tab}${script_name} install all
@@ -718,6 +743,9 @@ case "${action}" in
 					;;
 				'amdgpu-dkms')
 					is_amdgpu_dkms='true'
+					;;
+				'amdgpu-mesa-opengl')
+					is_amdgpu_mesa_opengl='true'
 					;;
 				*)
 					_error 'Unkown name.'
