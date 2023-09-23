@@ -664,8 +664,6 @@ _install () {
 
 	if _is mesa-all-vulkan
 	then
-		_purge mesa-old-clover-opencl
-
 		for mesa_radv_vulkan_package_name in ${mesa_radv_vulkan_package_name_list}
 		do
 			echo "Install ${mesa_radv_vulkan_package_name} package."
@@ -676,8 +674,6 @@ _install () {
 
 	if _is mesa-all-opengl
 	then
-		_purge mesa-old-clover-opencl
-
 		for mesa_all_opengl_package_name in ${mesa_all_opengl_package_name_list}
 		do
 			echo "Install ${mesa_all_opengl_package_name} package."
@@ -688,8 +684,6 @@ _install () {
 
 	if _is mesa-all-va
 	then
-		_purge mesa-old-clover-opencl
-
 		for mesa_all_va_package_name in ${mesa_all_va_package_name_list}
 		do
 			echo "Install ${mesa_all_va_package_name} package."
@@ -700,8 +694,6 @@ _install () {
 
 	if _is mesa-all-vdpau
 	then
-		_purge mesa-old-clover-opencl
-
 		for mesa_all_vdpau_package_name in ${mesa_all_vdpau_package_name_list}
 		do
 			echo "Install ${mesa_all_vdpau_package_name} package."
