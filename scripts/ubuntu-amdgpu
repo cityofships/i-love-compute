@@ -45,10 +45,10 @@ dc1510a5dd0cfbec431d046527dd11bcfc84c82a3fdd6d649781afb93a2af3a9dc28551a29024a5c
 f276430f9f1d70d75692857dc7aa79365d6ef5dc1fd4ad816319e6f375e86f8eb29f49288d4f51d54da0f276712195fc217957c0e742696b338b91959bcd2e6e  mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
 '
 
-rocm_version='5.7'
-rocm_distro='jammy'
+amdgpupro_version='5.7'
+amdgpupro_distro='jammy'
 
-amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${rocm_version}/ubuntu/${rocm_distro}"
+amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${amdgpupro_version}/ubuntu/${amdgpupro_distro}"
 
 amdgpupro_deb_version='5.7.50700-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
