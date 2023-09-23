@@ -860,67 +860,67 @@ _mention () {
 }
 
 _help () {
-	cat <<-EOF
+	sed -e 's/\\t/\t/g' <<-EOF
 	${script_name}: Download, install or uninstall OpenCL drivers for AMD GPUs and CPUs.
 
 	Usage: ${script_name} [OPTION] [ACTION] [NAMES]
 
 	Option:
-	${tab}-h, --help
-	${tab}${tab}Print this help.
+	\t-h, --help
+	\t\tPrint this help.
 
 	Actions:
-	${tab}download
-	${tab}${tab}Download files if needed by NAME.
-	${tab}extract
-	${tab}${tab}Download archives if needed by NAME.
-	${tab}clean
-	${tab}${tab}Clean-up download and extracted files for NAME.
-	${tab}install
-	${tab}${tab}Install NAME (default: clover).
-	${tab}uninstall
-	${tab}${tab}Uninstall all OpenCL drivers for AMD GPUs.
+	\tdownload
+	\t\tDownload files if needed by NAME.
+	\textract
+	\t\tDownload archives if needed by NAME.
+	\tclean
+	\t\tClean-up download and extracted files for NAME.
+	\tinstall
+	\t\tInstall NAME (default: clover).
+	\tuninstall
+	\t\tUninstall all OpenCL drivers for AMD GPUs.
 
 	Names:
-	${tab}mesa-old-clover-opencl
-	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
-	${tab}mesa-all-opencl
-	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
-	${tab}rocm-rocr-opencl
-	${tab}${tab}AMD ROCm ROCr OpenCL for Radeon Pro GPUs.
-	${tab}rocm-hip
-	${tab}${tab}AMD ROCm HIP for Radeon Pro GPUs.
-	${tab}amdgpupro-dkms
-	${tab}${tab}AMD AMDGPU-PRO amdgpu DKMS modules and firmwares.
-	${tab}amdgpupro-old-orca-opencl
-	${tab}${tab}AMD AMDGPU-PRO old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
-	${tab}amdgpupro-orca-opencl
-	${tab}${tab}AMD AMDGPU-PRO Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
-	${tab}amdgpupro-pal-opencl
-	${tab}${tab}AMD AMDGPU-PRO PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
-	${tab}amdgpupro-mesa-opengl
-	${tab}${tab}AMD AMDGPU-PRO amdgpu Mesa OpenGL.
-	${tab}amdgpupro-mesa-va
-	${tab}${tab}AMD AMDGPU-PRO amdgpu Mesa VA.
-	${tab}amdgpupro-mesa-vdpau
-	${tab}${tab}AMD AMDGPU-PRO amdgpu Mesa VDPAU.
-	${tab}amdgpupro-oglp-opengl
-	${tab}${tab}AMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES.
-	${tab}amdgpupro-amdgpu-pro-vulkan
-	${tab}${tab}AMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan.
-	${tab}amdgpupro-amdgpu-vulkan
-	${tab}${tab}AMD AMDGPU-PRO amdgpu amdgpu Vulkan.
-	${tab}amdvlk-vulkan
-	${tab}${tab}AMD amdvlk Vulkan.
-	${tab}fglrx-cpu-opencl
-	${tab}${tab}AMD Radeon Crimson fglrx OpenCL for CPUs.
+	\tmesa-old-clover-opencl
+	\t\tMesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
+	\tmesa-all-opencl
+	\t\tMesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
+	\trocm-rocr-opencl
+	\t\tAMD ROCm ROCr OpenCL for Radeon Pro GPUs.
+	\trocm-hip
+	\t\tAMD ROCm HIP for Radeon Pro GPUs.
+	\tamdgpupro-dkms
+	\t\tAMD AMDGPU-PRO amdgpu DKMS modules and firmwares.
+	\tamdgpupro-old-orca-opencl
+	\t\tAMD AMDGPU-PRO old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
+	\tamdgpupro-orca-opencl
+	\t\tAMD AMDGPU-PRO Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
+	\tamdgpupro-pal-opencl
+	\t\tAMD AMDGPU-PRO PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
+	\tamdgpupro-mesa-opengl
+	\t\tAMD AMDGPU-PRO amdgpu Mesa OpenGL.
+	\tamdgpupro-mesa-va
+	\t\tAMD AMDGPU-PRO amdgpu Mesa VA.
+	\tamdgpupro-mesa-vdpau
+	\t\tAMD AMDGPU-PRO amdgpu Mesa VDPAU.
+	\tamdgpupro-oglp-opengl
+	\t\tAMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES.
+	\tamdgpupro-amdgpu-pro-vulkan
+	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan.
+	\tamdgpupro-amdgpu-vulkan
+	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan.
+	\tamdvlk-vulkan
+	\t\tAMD amdvlk Vulkan.
+	\tfglrx-cpu-opencl
+	\t\tAMD Radeon Crimson fglrx OpenCL for CPUs.
 
 	Examples:
-	${tab}${script_name} install all
+	\t${script_name} install all
 
-	${tab}${script_name} install amdgpupro-old-orca-opencl amdgpupro-pal-opencl rocm-rocr-opencl
+	\t${script_name} install amdgpupro-old-orca-opencl amdgpupro-pal-opencl rocm-rocr-opencl
 
-	${tab}${script_name} uninstall
+	\t${script_name} uninstall
 
 	EOF
 
