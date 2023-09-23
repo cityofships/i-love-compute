@@ -534,6 +534,8 @@ _install () {
 
 	if _is mesa-old-clover-opencl
 	then
+		_purge mesa-all-opencl
+
 		for mesa_old_clover_opencl_deb_file in \
 			$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
 		do
@@ -549,6 +551,8 @@ _install () {
 
 	if _is mesa-all-opencl
 	then
+		_purge mesa-old-clover-opencl
+
 		for mesa_all_opencl_package_name in ${mesa_all_opencl_package_name_list}
 		do
 			echo "Install ${mesa_all_opencl_package_name} package."
