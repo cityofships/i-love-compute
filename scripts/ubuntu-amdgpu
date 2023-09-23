@@ -72,7 +72,7 @@ amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c155
 
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
 rocr_old_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
-rocr_opencl_package_name_list='rocm-opencl-runtime'
+rocm_rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
 amdgpu_dkms_package_name_list='amdgpu-dkms'
 amdgpu_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
@@ -91,7 +91,7 @@ is_mesa_all_opencl='false'
 is_fglrx_opencl='false'
 is_amdgpu_orca_opencl='false'
 is_amdgpu_pal_opencl='false'
-is_rocr_opencl='false'
+is_rocm_rocr_opencl='false'
 is_rocm_hip='false'
 is_amdgpu_dkms='false'
 is_amdgpu_mesa_opengl='false'
@@ -116,8 +116,8 @@ _is () {
 		'amdgpu-pal-opencl')
 			"${is_amdgpu_pal_opencl}"
 			;;
-		'rocr-opencl')
-			"${is_rocr_opencl}"
+		'rocm-rocr-opencl')
+			"${is_rocm_rocr_opencl}"
 			;;
 		'rocm-hip')
 			"${is_rocm_hip}"
@@ -243,7 +243,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocr-opencl || _is rocm-hip
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocm-rocr-opencl || _is rocm-hip
 	then
 		if ! _checksum 'amdgpupro'
 		then
@@ -413,11 +413,11 @@ _purge () {
 				apt-get remove --yes --purge "${pal_package_name}" || true
 			done
 			;;
-		'rocr-opencl')
-			for rocr_opencl_package_name in \
-				$(echo "${rocr_old_opencl_package_name_list}" "${rocr_opencl_package_name_list}" | tr ' ' '\n' | tac)
+		'rocm-rocr-opencl')
+			for rocm_rocr_opencl_package_name in \
+				$(echo "${rocr_old_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${rocr_opencl_package_name}" || true
+				apt-get remove --yes --purge "${rocm_rocr_opencl_package_name}" || true
 			done
 			;;
 		'rocm-hip')
@@ -470,7 +470,7 @@ _uninstall () {
 	_purge mesa-old-clover-opencl
 	_purge amdgpu-pal-opencl
 	_purge amdgpu-orca-opencl
-	_purge rocr-opencl
+	_purge rocm-rocr-opencl
 	_purge rocm-hip
 	_purge amdgpu-dkms
 	_purge amdgpu-mesa-opengl
@@ -506,7 +506,7 @@ _install () {
 		apt-get install -y 'gdebi-core'
 	fi
 
-	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocr-opencl
+	if _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocm-rocr-opencl
 	then
 		echo "Install ${amdgpupro_deb_file} package."
 
@@ -515,7 +515,7 @@ _install () {
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
-	if _is mesa-old-clover-opencl || _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocr-opencl
+	if _is mesa-old-clover-opencl || _is amdgpu-orca-opencl || _is amdgpu-pal-opencl || _is rocm-rocr-opencl
 	then
 		apt-get update
 	fi
@@ -621,16 +621,16 @@ _install () {
 		echo 'libamdocl-pal64.so' > '/etc/OpenCL/vendors/amdocl-pal64.icd'
 	fi
 
-	if _is rocr-opencl
+	if _is rocm-rocr-opencl
 	then
 		# Already correct (icd may be renamed):
 		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
-		for rocr_opencl_package_name in ${rocr_opencl_package_name_list}
+		for rocm_rocr_opencl_package_name in ${rocm_rocr_opencl_package_name_list}
 		do
-			echo "Install ${rocr_opencl_package_name} package."
+			echo "Install ${rocm_rocr_opencl_package_name} package."
 
-			apt-get install --yes "${rocr_opencl_package_name}"
+			apt-get install --yes "${rocm_rocr_opencl_package_name}"
 		done
 
 		# Already correct (icd may be renamed):
@@ -757,7 +757,7 @@ _help () {
 	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
 	${tab}amdgpu-pal-opencl
 	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
-	${tab}rocr-opencl
+	${tab}rocm-rocr-opencl
 	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
 	${tab}rocm-hip
 	${tab}${tab}AMD APP ROCm HIP for Radeon Pro GPUs.
@@ -775,7 +775,7 @@ _help () {
 	Examples:
 	${tab}${script_name} install all
 
-	${tab}${script_name} install amdgpu-orca-opencl amdgpu-pal-opencl rocr-opencl
+	${tab}${script_name} install amdgpu-orca-opencl amdgpu-pal-opencl rocm-rocr-opencl
 
 	${tab}${script_name} uninstall
 
@@ -818,7 +818,7 @@ case "${action}" in
 					is_fglrx_opencl='true'
 					is_amdgpu_orca_opencl='true'
 					is_amdgpu_pal_opencl='true'
-					is_rocr_opencl='true'
+					is_rocm_rocr_opencl='true'
 					is_rocm_hip='true'
 					;;
 				'mesa-all-opencl')
@@ -836,8 +836,8 @@ case "${action}" in
 				'amdgpu-pal-opencl')
 					is_amdgpu_pal_opencl='true'
 					;;
-				'rocr-opencl')
-					is_rocr_opencl='true'
+				'rocm-rocr-opencl')
+					is_rocm_rocr_opencl='true'
 					;;
 				'rocm-hip')
 					is_rocm_hip='true'
