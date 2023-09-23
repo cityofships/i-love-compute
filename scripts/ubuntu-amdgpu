@@ -81,7 +81,7 @@ amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
 
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
 mesa_all_opengl_package_name_list='libglx-mesa0'
-mesa_all_va_package_name_list='mesa_va-drivers'
+mesa_all_va_package_name_list='mesa-va-drivers'
 mesa_all_vdpau_package_name_list='mesa-vdpau-drivers'
 mesa_radv_vulkan_package_name_list='mesa-vulkan-drivers'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
