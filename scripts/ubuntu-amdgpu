@@ -502,16 +502,18 @@ _uninstall () {
 _install () {
 	_extract
 
-	if _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl
+	if _is amdgpu-old-orca-opencl \
+	|| _is amdgpu-pal-opencl \
+	|| _is rocm-rocr-opencl \
+	|| _is amdgpu-mesa-opencl \
+	|| _is amdgpu-mesa-va \
+	|| _is amdgpu-mesa-vdpau
 	then
 		apt-get update
 
 		echo "Download gdebi-core package."
 		apt-get install -y 'gdebi-core'
-	fi
 
-	if _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl || _is rocm-rocr-opencl
-	then
 		echo "Install ${amdgpupro_deb_file} package."
 
 		dpkg -i "${amdgpupro_deb_file}"
@@ -519,10 +521,7 @@ _install () {
 		sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
 	fi
 
-	if _is mesa-old-clover-opencl || _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl || _is rocm-rocr-opencl
-	then
-		apt-get update
-	fi
+	apt-get update
 
 	if _is mesa-old-clover-opencl
 	then
