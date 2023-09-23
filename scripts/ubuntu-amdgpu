@@ -89,8 +89,8 @@ amdgpupro_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
 amdgpupro_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
 amdgpupro_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
 amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
-amdgpupro_amdgpu_vulkan_name_list='vulkan-amdgpu'
-amdgpupro_amdgpu_pro_vulkan_name_list='vulkan-amdgpu-pro'
+amdgpupro_amdgpu_vulkan_package_name_list='vulkan-amdgpu'
+amdgpupro_amdgpu_pro_vulkan_package_name_list='vulkan-amdgpu-pro'
 amdvlk_vulkan_package_name_list='amdvlk'
 
 _error () {
@@ -992,8 +992,8 @@ case "${action}" in
 				'amdgpupro-oglp-opengl')
 					is_amdgpupro_oglp_opengl='true'
 					;;
-				'amdgpupro-amdgpu-pro-vulkan')
-					is_amdgpupro_amdgpu_pro_vulkan='true'
+				'amdgpupro-amdgpu-vulkan')
+					is_amdgpupro_amdgpu_vulkan='true'
 					;;
 				'amdgpupro-amdgpu-pro-vulkan')
 					is_amdgpupro_amdgpu_pro_vulkan='true'
