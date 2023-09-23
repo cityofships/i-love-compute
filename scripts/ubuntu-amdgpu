@@ -401,9 +401,11 @@ _purge () {
 			_uninstall_packages "${amdgpupro_dkms_package_name_list}"
 			;;
 		'amdgpupro-old-orca-opencl')
+			_unhold_packages "${amdgpupro_old_orca_deb_file_list}"
 			_uninstall_packages "${amdgpupro_old_orca_deb_file_list}" 
 
 			# Alternate name for opencl-orca-amdgpu-pro-icd package.
+			_unhold_packages 'opencl-legacy-amdgpu-pro-icd'
 			_uninstall_packages 'opencl-legacy-amdgpu-pro-icd'
 			;;
 		'amdgpupro-orca-opencl')
