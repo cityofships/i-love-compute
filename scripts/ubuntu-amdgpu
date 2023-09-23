@@ -418,123 +418,91 @@ _clean () {
 	fi
 }
 
+_unhold_packages () {
+	local package_name
+	for package_name in $(echo "${@}" | tr ' ' '\n' | tac)
+	do
+		# if package_name is in fact a deb file
+		case "${package_name}" in
+			*'.deb')
+				package_name="$(echo "${package_name}" | cut -f1 -d'_')"
+				;;
+		esac
+
+		apt-mark unhold "${package_name}" || true
+	done
+}
+
+_uninstall_packages () {
+	local package_name
+	for package_name in $(echo "${@}" | tr ' ' '\n' | tac)
+	do
+		# if package_name is in fact a deb file
+		case "${package_name}" in
+			*'.deb')
+				package_name="$(echo "${package_name}" | cut -f1 -d'_')"
+				;;
+		esac
+
+		apt-get remove --yes --purge "${package_name}" || true
+	done
+}
+
 _purge () {
 	case "${1}" in
 		'mesa-old-clover-opencl')
+			local mesa_old_clover_opencl_deb_file
 			for mesa_old_clover_opencl_deb_file in \
 				$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }' | tac)
 			do
-				local mesa_old_clover_opencl_package_name="$(echo "${mesa_old_clover_opencl_deb_file}" | cut -f1 -d'_' )"
-
-				apt-mark unhold "${mesa_old_clover_opencl_package_name}" || true
-
-				apt-get remove --yes --purge "${mesa_old_clover_opencl_package_name}" || true
+				_unhold_packages "${mesa_old_clover_opencl_deb_file}"
+				_uninstall_packages "${mesa_old_clover_opencl_deb_file}"
 			done
 			;;
 		'mesa-all-opencl')
-			for mesa_all_opencl_package_name in \
-				$(echo "${mesa_all_opencl_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${mesa_all_opencl_package_name}" || true
-			done
+			_uninstall_packages "${mesa_all_opencl_package_name_list}"
 			;;
 		'rocm-rocr-opencl')
-			for rocm_rocr_opencl_package_name in \
-				$(echo "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${rocm_rocr_opencl_package_name}" || true
-			done
+			_uninstall_packages "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}"
 			;;
 		'rocm-hip')
-			for rocm_hip_package_name in \
-				$(echo "${rocm_hip_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${rocm_hip_package_name}" || true
-			done
+			_uninstall_packages "${rocm_hip_package_name_list}"
 			;;
 		'amdgpupro-dkms')
-			for amdgpupro_dkms_package_name in \
-				$(echo "${amdgpupro_dkms_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_dkms_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_dkms_package_name_list}"
 			;;
 		'amdgpupro-old-orca-opencl')
-			for amdgpupro_old_orca_deb_file in \
-				$(echo "${amdgpupro_old_orca_deb_file_list}" | tr ' ' '\n' | tac)
-			do
-				local orca_package_name="$(echo "${amdgpupro_old_orca_deb_file}" | cut -f1 -d'_')"
-
-				apt-get remove --yes --purge "${orca_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_old_orca_deb_file_list}" 
 
 			# Alternate name for opencl-orca-amdgpu-pro-icd package.
-			apt-get remove --yes --purge 'opencl-legacy-amdgpu-pro-icd' || true
+			_uninstall_packages 'opencl-legacy-amdgpu-pro-icd'
 			;;
 		'amdgpupro-orca-opencl')
-			for amdgpupro_orca_opencl_package_name in \
-				$(echo "${amdgpupro_orca_opencl_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_orca_opencl_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_orca_opencl_package_name_list}"
 			;;
 		'amdgpupro-pal-opencl')
-			for amdgpupro_pal_deb_file in \
-				$(echo "${amdgpupro_pal_deb_file_list}" | tr ' ' '\n' | tac)
-			do
-				local pal_package_name="$(echo "${amdgpupro_pal_deb_file}" | cut -f1 -d'_')"
-
-				apt-get remove --yes --purge "${pal_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_pal_deb_file_list}"
 			;;
 		'amdgpupro-mesa-opengl')
-			for amdgpupro_mesa_opengl_package_name in \
-				$(echo "${amdgpupro_mesa_opengl_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_mesa_opengl_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_mesa_opengl_package_name_list}"
 			;;
 		'amdgpupro-mesa-va')
-			for amdgpupro_mesa_va_package_name in \
-				$(echo "${amdgpupro_mesa_va_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_mesa_va_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_mesa_va_package_name_list}"
 			;;
 		'amdgpupro-mesa-vdpau')
-			for amdgpupro_mesa_vdpau_package_name in \
-				$(echo "${amdgpupro_mesa_vdpau_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_mesa_vdpau_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_mesa_vdpau_package_name_list}"
 			;;
 		'amdgpupro-oglp-opengl')
-			for amdgpupro_oglp_opengl_package_name in \
-				$(echo "${amdgpupro_oglp_opengl_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_oglp_opengl_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_oglp_opengl_package_name_list}"
 			;;
 		'amdgpupro-amdgpu-vulkan')
-			for amdgpupro_amdgpu_vulkan_package_name in \
-				$(echo "${amdgpupro_amdgpu_vulkan_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_amdgpu_vulkan_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_amdgpu_vulkan_package_name_list}"
 			;;
 		'amdgpupro-amdgpu-pro-vulkan')
-			for amdgpupro_amdgpu_pro_vulkan_package_name in \
-				$(echo "${amdgpupro_amdgpu_pro_vulkan_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_amdgpu_pro_vulkan_package_name}" || true
-			done
+			_uninstall_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
 			;;
 		'amdvlk-vulkan')
-			for amdvlk_vulkan_package_name in \
-				$(echo "${amdvlk_vulkan_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdvlk_vulkan_package_name}" || true
-			done
+			_uninstall_packages "${amdvlk_vulkan_package_name_list}"
 
 			rm --force --verbose "${amdvlk_list_path}"
 			rm --force --verbose "${amdvlk_gpg_path}"
@@ -562,13 +530,12 @@ _purge () {
 			rm --force --verbose \
 				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 			;;
-			# no purge yet for mesa opengl, vulkan, va and vdpau
 	esac
 }
 
 _uninstall () {
+	_purge mesa_all_opencl
 	_purge mesa-old-clover-opencl
-	_purge mesa-all-opencl
 	_purge rocm-rocr-opencl
 	_purge rocm-hip
 	_purge amdvlk-vulkan
