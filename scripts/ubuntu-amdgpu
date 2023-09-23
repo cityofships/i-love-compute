@@ -786,13 +786,13 @@ _install () {
 		done
 	fi
 
-	if _is amdgpupro-amdgpu-vulkan
+	if _is amdgpupro-amdgpu-pro-vulkan
 	then
-		for amdgpupro_amdgpu_vulkan_package_name in ${amdgpupro_amdgpu_vulkan_package_name_list}
+		for amdgpupro_amdgpu_pro_vulkan_package_name in ${amdgpupro_amdgpu_pro_vulkan_package_name_list}
 		do
-			echo "Install ${amdgpupro_amdgpu_vulkan_package_name} package."
+			echo "Install ${amdgpupro_amdgpu_pro_vulkan_package_name} package."
 
-			apt-get install --yes "${amdgpupro_amdgpu_vulkan_package_name}"
+			apt-get install --yes "${amdgpupro_amdgpu_pro_vulkan_package_name}"
 		done
 	fi
 
