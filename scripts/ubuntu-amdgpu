@@ -45,6 +45,7 @@ dc1510a5dd0cfbec431d046527dd11bcfc84c82a3fdd6d649781afb93a2af3a9dc28551a29024a5c
 f276430f9f1d70d75692857dc7aa79365d6ef5dc1fd4ad816319e6f375e86f8eb29f49288d4f51d54da0f276712195fc217957c0e742696b338b91959bcd2e6e  mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
 '
 
+rocm_version='5.7'
 rocm_distro='jammy'
 
 amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${rocm_version}/ubuntu/${rocm_distro}"
@@ -69,7 +70,9 @@ fglrx_tarball_dir='fglrx-15.302'
 fglrx_script_file='amd-driver-installer-15.302-x86.x86_64.run'
 fglrx_install_dir='/opt/amd-fglrx'
 
-rocm_version='5.7'
+amdvlk_key_file='http://repo.radeon.com/amdvlk/apt/debian/amdvlk.gpg.key'
+amdvlk_dep_repo='http://repo.radeon.com/amdvlk/apt/debian'
+
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocm_rocr_opencl_package_name_list='rocm-opencl-runtime'
