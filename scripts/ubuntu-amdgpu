@@ -504,8 +504,10 @@ _purge () {
 		'amdvlk-vulkan')
 			_uninstall_packages "${amdvlk_vulkan_package_name_list}"
 
-			rm --force --verbose "${amdvlk_list_path}"
-			rm --force --verbose "${amdvlk_gpg_path}"
+			rm --force --verbose \
+				"${amdvlk_list_path}"
+			rm --force --verbose \
+				"${amdvlk_gpg_path}"
 			;;
 		'fglrx-cpu-opencl')
 			rm --force --verbose \
