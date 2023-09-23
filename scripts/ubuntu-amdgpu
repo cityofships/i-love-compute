@@ -89,17 +89,17 @@ _error () {
 
 is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
-is_fglrx_cpu_opencl='false'
-is_amdgpupro_old_orca_opencl='false'
-is_amdgpupro_orca_opencl='false'
-is_amdgpupro_pal_opencl='false'
 is_rocm_rocr_opencl='false'
 is_rocm_hip='false'
 is_amdgpupro_dkms='false'
+is_amdgpupro_old_orca_opencl='false'
+is_amdgpupro_orca_opencl='false'
+is_amdgpupro_pal_opencl='false'
 is_amdgpupro_mesa_opengl='false'
 is_amdgpupro_mesa_va='false'
 is_amdgpupro_mesa_vdpau='false'
 is_amdgpupro_oglp_opengl='false'
+is_fglrx_cpu_opencl='false'
 
 _is () {
 	case "${1}" in
@@ -109,8 +109,14 @@ _is () {
 		'mesa-all-opencl')
 			"${is_mesa_all_opencl}"
 			;;
-		'fglrx-cpu-opencl')
-			"${is_fglrx_cpu_opencl}"
+		'rocm-rocr-opencl')
+			"${is_rocm_rocr_opencl}"
+			;;
+		'rocm-hip')
+			"${is_rocm_hip}"
+			;;
+		'amdgpupro-dkms')
+			"${is_amdgpupro_dkms}"
 			;;
 		'amdgpupro-old-orca-opencl')
 			"${is_amdgpupro_old_orca_opencl}"
@@ -120,15 +126,6 @@ _is () {
 			;;
 		'amdgpupro-pal-opencl')
 			"${is_amdgpupro_pal_opencl}"
-			;;
-		'rocm-rocr-opencl')
-			"${is_rocm_rocr_opencl}"
-			;;
-		'rocm-hip')
-			"${is_rocm_hip}"
-			;;
-		'amdgpupro-dkms')
-			"${is_amdgpupro_dkms}"
 			;;
 		'amdgpupro-mesa-opengl')
 			"${is_amdgpupro_mesa_opengl}"
@@ -141,6 +138,9 @@ _is () {
 			;;
 		'amdgpupro-oglp-opengl')
 			"${is_amdgpupro_oglp_opengl}"
+			;;
+		'fglrx-cpu-opencl')
+			"${is_fglrx_cpu_opencl}"
 			;;
 	esac
 }
@@ -172,10 +172,6 @@ _checksum () {
 
 			return
 			;;
-		'fglrx')
-			sum="${fglrx_tarball_sum}"
-			file="${fglrx_tarball_file}"
-			;;
 		'amdgpupro')
 			sum="${amdgpupro_deb_sum}"
 			file="${amdgpupro_deb_file}"
@@ -187,6 +183,10 @@ _checksum () {
 		'pal')
 			sum="${pal_tarball_sum}"
 			file="${pal_tarball_file}"
+			;;
+		'fglrx')
+			sum="${fglrx_tarball_sum}"
+			file="${fglrx_tarball_file}"
 			;;
 	esac
 
@@ -374,28 +374,26 @@ _purge () {
 				apt-get remove --yes --purge "${mesa_all_opencl_package_name}" || true
 			done
 			;;
-		'fglrx-cpu-opencl')
-			rm --force --verbose \
-				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
-			rm --force --verbose \
-				"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
-
-			if [ -d "${fglrx_install_dir}/x86_64-linux-gnu" ]
-			then
-				rmdir --ignore-fail-on-non-empty --verbose \
-					"${fglrx_install_dir}/x86_64-linux-gnu"
-			fi
-
-			if [ -d "${fglrx_install_dir}" ]
-			then
-				rmdir --ignore-fail-on-non-empty --verbose \
-					"${fglrx_install_dir}"
-			fi
-
-			rm --force --verbose \
-				'/etc/ld.so.conf.d/30-amd-fglrx.conf'
-			rm --force --verbose \
-				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
+		'rocm-rocr-opencl')
+			for rocm_rocr_opencl_package_name in \
+				$(echo "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${rocm_rocr_opencl_package_name}" || true
+			done
+			;;
+		'rocm-hip')
+			for rocm_hip_package_name in \
+				$(echo "${rocm_hip_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${rocm_hip_package_name}" || true
+			done
+			;;
+		'amdgpupro-dkms')
+			for amdgpupro_dkms_package_name in \
+				$(echo "${amdgpupro_dkms_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpupro_dkms_package_name}" || true
+			done
 			;;
 		'amdgpupro-old-orca-opencl')
 			for orca_deb_file in \
@@ -423,27 +421,6 @@ _purge () {
 				local pal_package_name="$(echo "${pal_deb_file}" | cut -f1 -d'_')"
 
 				apt-get remove --yes --purge "${pal_package_name}" || true
-			done
-			;;
-		'rocm-rocr-opencl')
-			for rocm_rocr_opencl_package_name in \
-				$(echo "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${rocm_rocr_opencl_package_name}" || true
-			done
-			;;
-		'rocm-hip')
-			for rocm_hip_package_name in \
-				$(echo "${rocm_hip_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${rocm_hip_package_name}" || true
-			done
-			;;
-		'amdgpupro-dkms')
-			for amdgpupro_dkms_package_name in \
-				$(echo "${amdgpupro_dkms_package_name_list}" | tr ' ' '\n' | tac)
-			do
-				apt-get remove --yes --purge "${amdgpupro_dkms_package_name}" || true
 			done
 			;;
 		'amdgpupro-mesa-opengl')
@@ -474,21 +451,44 @@ _purge () {
 				apt-get remove --yes --purge "${amdgpupro_oglp_opengl_package_name}" || true
 			done
 			;;
+		'fglrx-cpu-opencl')
+			rm --force --verbose \
+				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+			rm --force --verbose \
+				"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+
+			if [ -d "${fglrx_install_dir}/x86_64-linux-gnu" ]
+			then
+				rmdir --ignore-fail-on-non-empty --verbose \
+					"${fglrx_install_dir}/x86_64-linux-gnu"
+			fi
+
+			if [ -d "${fglrx_install_dir}" ]
+			then
+				rmdir --ignore-fail-on-non-empty --verbose \
+					"${fglrx_install_dir}"
+			fi
+
+			rm --force --verbose \
+				'/etc/ld.so.conf.d/30-amd-fglrx.conf'
+			rm --force --verbose \
+				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
+			;;
 	esac
 }
 
 _uninstall () {
 	_purge mesa-old-clover-opencl
 	_purge mesa-all-opencl
-	_purge fglrx-cpu-opencl
-	_purge amdgpupro-old-orca-opencl
-	_purge amdgpupro-orca-opencl
-	_purge amdgpupro-pal-opencl
 	_purge rocm-rocr-opencl
 	_purge rocm-hip
 	_purge amdgpupro-dkms
+	_purge amdgpupro-old-orca-opencl
+	_purge amdgpupro-orca-opencl
+	_purge amdgpupro-pal-opencl
 	_purge amdgpupro-mesa-opengl
 	_purge amdgpupro-oglp-opengl
+	_purge fglrx-cpu-opencl
 
 	dpkg-divert \
 		--rename \
@@ -511,9 +511,9 @@ _uninstall () {
 _install () {
 	_extract
 
-	if _is amdgpupro-old-orca-opencl \
+	if _is rocm-rocr-opencl \
+	|| _is amdgpupro-old-orca-opencl \
 	|| _is amdgpupro-pal-opencl \
-	|| _is rocm-rocr-opencl \
 	|| _is amdgpupro-mesa-opencl \
 	|| _is amdgpupro-mesa-va \
 	|| _is amdgpupro-mesa-vdpau
@@ -561,33 +561,41 @@ _install () {
 		done
 	fi
 
-	if _is fglrx-cpu-opencl
+	if _is rocm-rocr-opencl
 	then
-		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
+		# Already correct (icd may be renamed):
+		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
-		if ! [ -d "${fglrx_extract_prefix}" ]
-		then
-			"${fglrx_tarball_dir}/${fglrx_script_file}" --extract "${fglrx_extract_prefix}"
-		fi
+		for rocm_rocr_opencl_package_name in ${rocm_rocr_opencl_package_name_list}
+		do
+			echo "Install ${rocm_rocr_opencl_package_name} package."
 
-		mkdir --parents --verbose "${fglrx_install_dir}"
-		mkdir --parents --verbose "${fglrx_install_dir}/x86_64-linux-gnu"
+			apt-get install --yes "${rocm_rocr_opencl_package_name}"
+		done
 
-		cp --archive --verbose \
-			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
-			"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+		# Already correct (icd may be renamed):
+		# libamdocl64.so
+		# /etc/OpenCL/vendors/amdocl64.icd
+	fi
 
-		cp --archive --verbose \
-			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
-			"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+	if _is rocm-hip
+	then
+		for rocm_hip_package_name in ${rocm_hip_package_name_list}
+		do
+			echo "Install ${rocm_hip_package_name} package."
 
-		sed -e 's/libamdocl12cl64.so/libfglocl12cl64.so/g' \
-			-i "${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+			apt-get install --yes "${rocm_hip_package_name}"
+		done
+	fi
 
-		echo 'libamdocl64-fglrx.so' > '/etc/OpenCL/vendors/amdocl-fglrx64.icd'
+	if _is amdgpupro-dkms
+	then
+		for amdgpupro_dkms_package_name in ${amdgpupro_dkms_package_name_list}
+		do
+			echo "Install ${amdgpupro_dkms_package_name} package."
 
-		echo "${fglrx_install_dir}/x86_64-linux-gnu" \
-			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
+			apt-get install --yes "${amdgpupro_dkms_package_name}"
+		done
 	fi
 
 	if _is amdgpupro-old-orca-opencl
@@ -651,43 +659,6 @@ _install () {
 		echo 'libamdocl-pal64.so' > '/etc/OpenCL/vendors/amdocl-pal64.icd'
 	fi
 
-	if _is rocm-rocr-opencl
-	then
-		# Already correct (icd may be renamed):
-		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
-
-		for rocm_rocr_opencl_package_name in ${rocm_rocr_opencl_package_name_list}
-		do
-			echo "Install ${rocm_rocr_opencl_package_name} package."
-
-			apt-get install --yes "${rocm_rocr_opencl_package_name}"
-		done
-
-		# Already correct (icd may be renamed):
-		# libamdocl64.so
-		# /etc/OpenCL/vendors/amdocl64.icd
-	fi
-
-	if _is rocm-hip
-	then
-		for rocm_hip_package_name in ${rocm_hip_package_name_list}
-		do
-			echo "Install ${rocm_hip_package_name} package."
-
-			apt-get install --yes "${rocm_hip_package_name}"
-		done
-	fi
-
-	if _is amdgpupro-dkms
-	then
-		for amdgpupro_dkms_package_name in ${amdgpupro_dkms_package_name_list}
-		do
-			echo "Install ${amdgpupro_dkms_package_name} package."
-
-			apt-get install --yes "${amdgpupro_dkms_package_name}"
-		done
-	fi
-
 	if _is amdgpupro-mesa-opengl
 	then
 		for amdgpupro_mesa_opengl_package_name in ${amdgpupro_mesa_opengl_package_name_list}
@@ -726,6 +697,35 @@ _install () {
 
 			apt-get install --yes "${amdgpupro_oglp_opengl_package_name}"
 		done
+	fi
+
+	if _is fglrx-cpu-opencl
+	then
+		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
+
+		if ! [ -d "${fglrx_extract_prefix}" ]
+		then
+			"${fglrx_tarball_dir}/${fglrx_script_file}" --extract "${fglrx_extract_prefix}"
+		fi
+
+		mkdir --parents --verbose "${fglrx_install_dir}"
+		mkdir --parents --verbose "${fglrx_install_dir}/x86_64-linux-gnu"
+
+		cp --archive --verbose \
+			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
+			"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+
+		cp --archive --verbose \
+			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
+			"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+
+		sed -e 's/libamdocl12cl64.so/libfglocl12cl64.so/g' \
+			-i "${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+
+		echo 'libamdocl64-fglrx.so' > '/etc/OpenCL/vendors/amdocl-fglrx64.icd'
+
+		echo "${fglrx_install_dir}/x86_64-linux-gnu" \
+			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
 	# Read changes from /etc/ld.so.conf.d folder.
@@ -781,20 +781,18 @@ _help () {
 	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
 	${tab}mesa-all-opencl
 	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
-	${tab}fglrx-cpu-opencl
-	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
-	${tab}amdgpupro-old-orca-opencl
-	${tab}${tab}AMD APP old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
-	${tab}amdgpupro-orca-opencl
-	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
-	${tab}amdgpupro-pal-opencl
-	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}rocm-rocr-opencl
 	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
 	${tab}rocm-hip
 	${tab}${tab}AMD APP ROCm HIP for Radeon Pro GPUs.
 	${tab}amdgpupro-dkms
 	${tab}${tab}AMD amdgpu DKMS modules and firmwares.
+	${tab}amdgpupro-old-orca-opencl
+	${tab}${tab}AMD APP old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
+	${tab}amdgpupro-orca-opencl
+	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
+	${tab}amdgpupro-pal-opencl
+	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}amdgpupro-mesa-opengl
 	${tab}${tab}AMD amdgpu Mesa OpenGL.
 	${tab}amdgpupro-mesa-va
@@ -803,6 +801,8 @@ _help () {
 	${tab}${tab}AMD amdgpu Mesa VDPAU.
 	${tab}amdgpupro-oglp-opengl
 	${tab}${tab}AMD amdgpu OGLP OpenGL and OpenGL ES.
+	${tab}fglrx-cpu-opencl
+	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
 
 	Examples:
 	${tab}${script_name} install all
@@ -859,8 +859,14 @@ case "${action}" in
 				'mesa-old-clover-opencl')
 					is_mesa_old_clover_opencl='true'
 					;;
-				'fglrx-cpu-opencl')
-					is_fglrx_cpu_opencl='true'
+				'rocm-rocr-opencl')
+					is_rocm_rocr_opencl='true'
+					;;
+				'rocm-hip')
+					is_rocm_hip='true'
+					;;
+				'amdgpupro-dkms')
+					is_amdgpupro_dkms='true'
 					;;
 				'amdgpupro-old-orca-opencl')
 					is_amdgpupro_old_orca_opencl='true'
@@ -870,15 +876,6 @@ case "${action}" in
 					;;
 				'amdgpupro-pal-opencl')
 					is_amdgpupro_pal_opencl='true'
-					;;
-				'rocm-rocr-opencl')
-					is_rocm_rocr_opencl='true'
-					;;
-				'rocm-hip')
-					is_rocm_hip='true'
-					;;
-				'amdgpupro-dkms')
-					is_amdgpupro_dkms='true'
 					;;
 				'amdgpupro-mesa-opengl')
 					is_amdgpupro_mesa_opengl='true'
@@ -891,6 +888,9 @@ case "${action}" in
 					;;
 				'amdgpupro-oglp-opengl')
 					is_amdgpupro_oglp_opengl='true'
+					;;
+				'fglrx-cpu-opencl')
+					is_fglrx_cpu_opencl='true'
 					;;
 				*)
 					_error 'Unkown name.'
