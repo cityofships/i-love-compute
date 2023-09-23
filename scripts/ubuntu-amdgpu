@@ -74,12 +74,12 @@ mesa_all_opencl_package_name_list='mesa-opencl-icd'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocm_rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
-amdgpu_dkms_package_name_list='amdgpu-dkms'
-amdgpu_orca_opencl_package_name_list='opencl-legacy-amdgpu-pro-icd'
-amdgpu_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
-amdgpu_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
-amdgpu_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
-amdgpu_oglp_opengl_package_name_list='amdgpu-pro-oglp'
+amdgpupro_dkms_package_name_list='amdgpu-dkms'
+amdgpupro_orca_opencl_package_name_list='opencl-legacy-amdgpu-pro-icd'
+amdgpupro_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
+amdgpupro_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
+amdgpupro_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
+amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -90,16 +90,16 @@ _error () {
 is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
 is_fglrx_cpu_opencl='false'
-is_amdgpu_old_orca_opencl='false'
-is_amdgpu_orca_opencl='false'
-is_amdgpu_pal_opencl='false'
+is_amdgpupro_old_orca_opencl='false'
+is_amdgpupro_orca_opencl='false'
+is_amdgpupro_pal_opencl='false'
 is_rocm_rocr_opencl='false'
 is_rocm_hip='false'
-is_amdgpu_dkms='false'
-is_amdgpu_mesa_opengl='false'
-is_amdgpu_mesa_va='false'
-is_amdgpu_mesa_vdpau='false'
-is_amdgpu_oglp_opengl='false'
+is_amdgpupro_dkms='false'
+is_amdgpupro_mesa_opengl='false'
+is_amdgpupro_mesa_va='false'
+is_amdgpupro_mesa_vdpau='false'
+is_amdgpupro_oglp_opengl='false'
 
 _is () {
 	case "${1}" in
@@ -112,14 +112,14 @@ _is () {
 		'fglrx-cpu-opencl')
 			"${is_fglrx_cpu_opencl}"
 			;;
-		'amdgpu-old-orca-opencl')
-			"${is_amdgpu_old_orca_opencl}"
+		'amdgpupro-old-orca-opencl')
+			"${is_amdgpupro_old_orca_opencl}"
 			;;
-		'amdgpu-orca-opencl')
-			"${is_amdgpu_orca_opencl}"
+		'amdgpupro-orca-opencl')
+			"${is_amdgpupro_orca_opencl}"
 			;;
-		'amdgpu-pal-opencl')
-			"${is_amdgpu_pal_opencl}"
+		'amdgpupro-pal-opencl')
+			"${is_amdgpupro_pal_opencl}"
 			;;
 		'rocm-rocr-opencl')
 			"${is_rocm_rocr_opencl}"
@@ -127,20 +127,20 @@ _is () {
 		'rocm-hip')
 			"${is_rocm_hip}"
 			;;
-		'amdgpu-dkms')
-			"${is_amdgpu_dkms}"
+		'amdgpupro-dkms')
+			"${is_amdgpupro_dkms}"
 			;;
-		'amdgpu-mesa-opengl')
-			"${is_amdgpu_mesa_opengl}"
+		'amdgpupro-mesa-opengl')
+			"${is_amdgpupro_mesa_opengl}"
 			;;
-		'amdgpu-mesa-va')
-			"${is_amdgpu_mesa_va}"
+		'amdgpupro-mesa-va')
+			"${is_amdgpupro_mesa_va}"
 			;;
-		'amdgpu-mesa-vdpau')
-			"${is_amdgpu_mesa_vdpau}"
+		'amdgpupro-mesa-vdpau')
+			"${is_amdgpupro_mesa_vdpau}"
 			;;
-		'amdgpu-oglp-opengl')
-			"${is_amdgpu_oglp_opengl}"
+		'amdgpupro-oglp-opengl')
+			"${is_amdgpupro_oglp_opengl}"
 			;;
 	esac
 }
@@ -248,7 +248,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl || _is rocm-rocr-opencl || _is rocm-hip
+	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl || _is rocm-rocr-opencl || _is rocm-hip
 	then
 		if ! _checksum 'amdgpupro'
 		then
@@ -262,7 +262,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl
+	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl
 	then
 		if ! _checksum 'orca'
 		then
@@ -277,7 +277,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpu-pal-opencl
+	if _is amdgpupro-pal-opencl
 	then
 		if ! _checksum 'pal'
 		then
@@ -308,7 +308,7 @@ _extract () {
 		fi
 	fi
 
-	if _is amdgpu-old-orca-opencl || _is amdgpu-pal-opencl
+	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl
 	then
 		if ! [ -d "${orca_tarball_dir}" ]
 		then
@@ -318,7 +318,7 @@ _extract () {
 		fi
 	fi
 
-	if _is amdgpu-pal-opencl
+	if _is amdgpupro-pal-opencl
 	then
 		if ! [ -d "${pal_tarball_dir}" ]
 		then
@@ -397,7 +397,7 @@ _purge () {
 			rm --force --verbose \
 				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 			;;
-		'amdgpu-old-orca-opencl')
+		'amdgpupro-old-orca-opencl')
 			for orca_deb_file in \
 				$(echo "${orca_deb_file_list}" | tr ' ' '\n' | tac)
 			do
@@ -409,14 +409,14 @@ _purge () {
 			# Alternate name for opencl-orca-amdgpu-pro-icd package.
 			apt-get remove --yes --purge 'opencl-legacy-amdgpu-pro-icd' || true
 			;;
-		'amdgpu-orca-opencl')
-			for amdgpu_orca_opencl_package_name in \
-				$(echo "${amdgpu_orca_opencl_package_name_list}" | tr ' ' '\n' | tac)
+		'amdgpupro-orca-opencl')
+			for amdgpupro_orca_opencl_package_name in \
+				$(echo "${amdgpupro_orca_opencl_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${amdgpu_orca_opencl_package_name}" || true
+				apt-get remove --yes --purge "${amdgpupro_orca_opencl_package_name}" || true
 			done
 			;;
-		'amdgpu-pal-opencl')
+		'amdgpupro-pal-opencl')
 			for pal_deb_file in \
 				$(echo "${pal_deb_file_list}" | tr ' ' '\n' | tac)
 			do
@@ -439,39 +439,39 @@ _purge () {
 				apt-get remove --yes --purge "${rocm_hip_package_name}" || true
 			done
 			;;
-		'amdgpu-dkms')
-			for amdgpu_dkms_package_name in \
-				$(echo "${amdgpu_dkms_package_name_list}" | tr ' ' '\n' | tac)
+		'amdgpupro-dkms')
+			for amdgpupro_dkms_package_name in \
+				$(echo "${amdgpupro_dkms_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${amdgpu_dkms_package_name}" || true
+				apt-get remove --yes --purge "${amdgpupro_dkms_package_name}" || true
 			done
 			;;
-		'amdgpu-mesa-opengl')
-			for amdgpu_mesa_opengl_package_name in \
-				$(echo "${amdgpu_mesa_opengl_package_name_list}" | tr ' ' '\n' | tac)
+		'amdgpupro-mesa-opengl')
+			for amdgpupro_mesa_opengl_package_name in \
+				$(echo "${amdgpupro_mesa_opengl_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${amdgpu_mesa_opengl_package_name}" || true
+				apt-get remove --yes --purge "${amdgpupro_mesa_opengl_package_name}" || true
 			done
 			;;
-		'amdgpu-mesa-va')
-			for amdgpu_mesa_va_package_name in \
-				$(echo "${amdgpu_mesa_va_package_name_list}" | tr ' ' '\n' | tac)
+		'amdgpupro-mesa-va')
+			for amdgpupro_mesa_va_package_name in \
+				$(echo "${amdgpupro_mesa_va_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${amdgpu_mesa_va_package_name}" || true
+				apt-get remove --yes --purge "${amdgpupro_mesa_va_package_name}" || true
 			done
 			;;
-		'amdgpu-mesa-vdpau')
-			for amdgpu_mesa_vdpau_package_name in \
-				$(echo "${amdgpu_mesa_vdpau_package_name_list}" | tr ' ' '\n' | tac)
+		'amdgpupro-mesa-vdpau')
+			for amdgpupro_mesa_vdpau_package_name in \
+				$(echo "${amdgpupro_mesa_vdpau_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${amdgpu_mesa_vdpau_package_name}" || true
+				apt-get remove --yes --purge "${amdgpupro_mesa_vdpau_package_name}" || true
 			done
 			;;
-		'amdgpu-oglp-opengl')
-			for amdgpu_oglp_opengl_package_name in \
-				$(echo "${amdgpu_oglp_opengl_package_name_list}" | tr ' ' '\n' | tac)
+		'amdgpupro-oglp-opengl')
+			for amdgpupro_oglp_opengl_package_name in \
+				$(echo "${amdgpupro_oglp_opengl_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${amdgpu_oglp_opengl_package_name}" || true
+				apt-get remove --yes --purge "${amdgpupro_oglp_opengl_package_name}" || true
 			done
 			;;
 	esac
@@ -481,14 +481,14 @@ _uninstall () {
 	_purge mesa-old-clover-opencl
 	_purge mesa-all-opencl
 	_purge fglrx-cpu-opencl
-	_purge amdgpu-old-orca-opencl
-	_purge amdgpu-orca-opencl
-	_purge amdgpu-pal-opencl
+	_purge amdgpupro-old-orca-opencl
+	_purge amdgpupro-orca-opencl
+	_purge amdgpupro-pal-opencl
 	_purge rocm-rocr-opencl
 	_purge rocm-hip
-	_purge amdgpu-dkms
-	_purge amdgpu-mesa-opengl
-	_purge amdgpu-oglp-opengl
+	_purge amdgpupro-dkms
+	_purge amdgpupro-mesa-opengl
+	_purge amdgpupro-oglp-opengl
 
 	dpkg-divert \
 		--rename \
@@ -511,12 +511,12 @@ _uninstall () {
 _install () {
 	_extract
 
-	if _is amdgpu-old-orca-opencl \
-	|| _is amdgpu-pal-opencl \
+	if _is amdgpupro-old-orca-opencl \
+	|| _is amdgpupro-pal-opencl \
 	|| _is rocm-rocr-opencl \
-	|| _is amdgpu-mesa-opencl \
-	|| _is amdgpu-mesa-va \
-	|| _is amdgpu-mesa-vdpau
+	|| _is amdgpupro-mesa-opencl \
+	|| _is amdgpupro-mesa-va \
+	|| _is amdgpupro-mesa-vdpau
 	then
 		apt-get update
 
@@ -590,9 +590,9 @@ _install () {
 			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
 	fi
 
-	if _is amdgpu-old-orca-opencl
+	if _is amdgpupro-old-orca-opencl
 	then
-		_purge amdgpu-orca-opencl
+		_purge amdgpupro-orca-opencl
 
 		# Already correct:
 		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
@@ -602,7 +602,7 @@ _install () {
 		do
 			local orca_package_name="$(echo "${orca_deb_file}" | cut -f1 -d'_')"
 
-			if _is amdgpu-old-orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
+			if _is amdgpupro-old-orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
 			then
 				echo "Install ${orca_deb_file} package."
 
@@ -620,19 +620,19 @@ _install () {
 		# /etc/OpenCL/vendors/amdocl-orca64.icd
 	fi
 
-	if _is amdgpu-orca-opencl
+	if _is amdgpupro-orca-opencl
 	then
-		_purge amdgpu-old-orca-opencl
+		_purge amdgpupro-old-orca-opencl
 
-		for amdgpu_orca_opencl_package_name in ${amdgpu_orca_opencl_package_name_list}
+		for amdgpupro_orca_opencl_package_name in ${amdgpupro_orca_opencl_package_name_list}
 		do
-			echo "Install ${amdgpu_orca_opencl_package_name} package."
+			echo "Install ${amdgpupro_orca_opencl_package_name} package."
 
-			apt-get install --yes "${amdgpu_orca_opencl_package_name}"
+			apt-get install --yes "${amdgpupro_orca_opencl_package_name}"
 		done
 	fi
 
-	if _is amdgpu-pal-opencl
+	if _is amdgpupro-pal-opencl
 	then
 		dpkg-divert \
 			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
@@ -678,53 +678,53 @@ _install () {
 		done
 	fi
 
-	if _is amdgpu-dkms
+	if _is amdgpupro-dkms
 	then
-		for amdgpu_dkms_package_name in ${amdgpu_dkms_package_name_list}
+		for amdgpupro_dkms_package_name in ${amdgpupro_dkms_package_name_list}
 		do
-			echo "Install ${amdgpu_dkms_package_name} package."
+			echo "Install ${amdgpupro_dkms_package_name} package."
 
-			apt-get install --yes "${amdgpu_dkms_package_name}"
+			apt-get install --yes "${amdgpupro_dkms_package_name}"
 		done
 	fi
 
-	if _is amdgpu-mesa-opengl
+	if _is amdgpupro-mesa-opengl
 	then
-		for amdgpu_mesa_opengl_package_name in ${amdgpu_mesa_opengl_package_name_list}
+		for amdgpupro_mesa_opengl_package_name in ${amdgpupro_mesa_opengl_package_name_list}
 		do
-			echo "Install ${amdgpu_mesa_opengl_package_name} package."
+			echo "Install ${amdgpupro_mesa_opengl_package_name} package."
 
-			apt-get install --yes "${amdgpu_mesa_opengl_package_name}"
+			apt-get install --yes "${amdgpupro_mesa_opengl_package_name}"
 		done
 	fi
 
-	if _is amdgpu-mesa-va
+	if _is amdgpupro-mesa-va
 	then
-		for amdgpu_mesa_va_package_name in ${amdgpu_mesa_va_package_name_list}
+		for amdgpupro_mesa_va_package_name in ${amdgpupro_mesa_va_package_name_list}
 		do
-			echo "Install ${amdgpu_mesa_va_package_name} package."
+			echo "Install ${amdgpupro_mesa_va_package_name} package."
 
-			apt-get install --yes "${amdgpu_mesa_va_package_name}"
+			apt-get install --yes "${amdgpupro_mesa_va_package_name}"
 		done
 	fi
 
-	if _is amdgpu-mesa-vdpau
+	if _is amdgpupro-mesa-vdpau
 	then
-		for amdgpu_mesa_vdpau_package_name in ${amdgpu_mesa_vdpau_package_name_list}
+		for amdgpupro_mesa_vdpau_package_name in ${amdgpupro_mesa_vdpau_package_name_list}
 		do
-			echo "Install ${amdgpu_mesa_vdpau_package_name} package."
+			echo "Install ${amdgpupro_mesa_vdpau_package_name} package."
 
-			apt-get install --yes "${amdgpu_mesa_vdpau_package_name}"
+			apt-get install --yes "${amdgpupro_mesa_vdpau_package_name}"
 		done
 	fi
 
-	if _is amdgpu-oglp-opengl
+	if _is amdgpupro-oglp-opengl
 	then
-		for amdgpu_oglp_opengl_package_name in ${amdgpu_oglp_opengl_package_name_list}
+		for amdgpupro_oglp_opengl_package_name in ${amdgpupro_oglp_opengl_package_name_list}
 		do
-			echo "Install ${amdgpu_oglp_opengl_package_name} package."
+			echo "Install ${amdgpupro_oglp_opengl_package_name} package."
 
-			apt-get install --yes "${amdgpu_oglp_opengl_package_name}"
+			apt-get install --yes "${amdgpupro_oglp_opengl_package_name}"
 		done
 	fi
 
@@ -783,31 +783,31 @@ _help () {
 	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
 	${tab}fglrx-cpu-opencl
 	${tab}${tab}AMD APP fglrx OpenCL from Radeon Crimson for CPUs.
-	${tab}amdgpu-old-orca-opencl
+	${tab}amdgpupro-old-orca-opencl
 	${tab}${tab}AMD APP old Orca OpenCL from AMDGPU-PRO for GCN1-3 GPUs.
-	${tab}amdgpu-orca-opencl
+	${tab}amdgpupro-orca-opencl
 	${tab}${tab}AMD APP Orca OpenCL from AMDGPU-PRO for GCN5 GPUs.
-	${tab}amdgpu-pal-opencl
+	${tab}amdgpupro-pal-opencl
 	${tab}${tab}AMD APP PAL OpenCL from AMDGPU-PRO for GCN4+ GPUs.
 	${tab}rocm-rocr-opencl
 	${tab}${tab}AMD APP ROCm OpenCL for Radeon Pro GPUs.
 	${tab}rocm-hip
 	${tab}${tab}AMD APP ROCm HIP for Radeon Pro GPUs.
-	${tab}amdgpu-dkms
+	${tab}amdgpupro-dkms
 	${tab}${tab}AMD amdgpu DKMS modules and firmwares.
-	${tab}amdgpu-mesa-opengl
+	${tab}amdgpupro-mesa-opengl
 	${tab}${tab}AMD amdgpu Mesa OpenGL.
-	${tab}amdgpu-mesa-va
+	${tab}amdgpupro-mesa-va
 	${tab}${tab}AMD amdgpu Mesa VA.
-	${tab}amdgpu-mesa-vdpau
+	${tab}amdgpupro-mesa-vdpau
 	${tab}${tab}AMD amdgpu Mesa VDPAU.
-	${tab}amdgpu-oglp-opengl
+	${tab}amdgpupro-oglp-opengl
 	${tab}${tab}AMD amdgpu OGLP OpenGL and OpenGL ES.
 
 	Examples:
 	${tab}${script_name} install all
 
-	${tab}${script_name} install amdgpu-old-orca-opencl amdgpu-pal-opencl rocm-rocr-opencl
+	${tab}${script_name} install amdgpupro-old-orca-opencl amdgpupro-pal-opencl rocm-rocr-opencl
 
 	${tab}${script_name} uninstall
 
@@ -848,8 +848,8 @@ case "${action}" in
 				'all')
 					is_mesa_old_clover_opencl='true'
 					is_fglrx_cpu_opencl='true'
-					is_amdgpu_old_orca_opencl='true'
-					is_amdgpu_pal_opencl='true'
+					is_amdgpupro_old_orca_opencl='true'
+					is_amdgpupro_pal_opencl='true'
 					is_rocm_rocr_opencl='true'
 					is_rocm_hip='true'
 					;;
@@ -862,14 +862,14 @@ case "${action}" in
 				'fglrx-cpu-opencl')
 					is_fglrx_cpu_opencl='true'
 					;;
-				'amdgpu-old-orca-opencl')
-					is_amdgpu_old_orca_opencl='true'
+				'amdgpupro-old-orca-opencl')
+					is_amdgpupro_old_orca_opencl='true'
 					;;
-				'amdgpu-orca-opencl')
-					is_amdgpu_orca_opencl='true'
+				'amdgpupro-orca-opencl')
+					is_amdgpupro_orca_opencl='true'
 					;;
-				'amdgpu-pal-opencl')
-					is_amdgpu_pal_opencl='true'
+				'amdgpupro-pal-opencl')
+					is_amdgpupro_pal_opencl='true'
 					;;
 				'rocm-rocr-opencl')
 					is_rocm_rocr_opencl='true'
@@ -877,20 +877,20 @@ case "${action}" in
 				'rocm-hip')
 					is_rocm_hip='true'
 					;;
-				'amdgpu-dkms')
-					is_amdgpu_dkms='true'
+				'amdgpupro-dkms')
+					is_amdgpupro_dkms='true'
 					;;
-				'amdgpu-mesa-opengl')
-					is_amdgpu_mesa_opengl='true'
+				'amdgpupro-mesa-opengl')
+					is_amdgpupro_mesa_opengl='true'
 					;;
-				'amdgpu-mesa-va')
-					is_amdgpu_mesa_va='true'
+				'amdgpupro-mesa-va')
+					is_amdgpupro_mesa_va='true'
 					;;
-				'amdgpu-mesa-vdpau')
-					is_amdgpu_mesa_vdpau='true'
+				'amdgpupro-mesa-vdpau')
+					is_amdgpupro_mesa_vdpau='true'
 					;;
-				'amdgpu-oglp-opengl')
-					is_amdgpu_oglp_opengl='true'
+				'amdgpupro-oglp-opengl')
+					is_amdgpupro_oglp_opengl='true'
 					;;
 				*)
 					_error 'Unkown name.'
