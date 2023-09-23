@@ -80,6 +80,10 @@ amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
 
 
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
+mesa_all_opengl_package_name_list='libglx-mesa0'
+mesa_all_va_package_name_list='mesa_va-drivers'
+mesa_all_vdpau_package_name_list='mesa-vdpau-drivers'
+mesa_radv_vulkan_package_name_list='mesa-vulkan-drivers'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocm_rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
@@ -101,6 +105,10 @@ _error () {
 
 is_mesa_old_clover_opencl='false'
 is_mesa_all_opencl='false'
+is_mesa_radv_vulkan='false'
+is_mesa_all_opengl='false'
+is_mesa_all_va='false'
+is_mesa_all_vdpau='false'
 is_rocm_rocr_opencl='false'
 is_rocm_hip='false'
 is_amdgpupro_dkms='false'
@@ -123,6 +131,18 @@ _is () {
 			;;
 		'mesa-all-opencl')
 			"${is_mesa_all_opencl}"
+			;;
+		'mesa-all-vulkan')
+			"${is_mesa_radv_vulkan}"
+			;;
+		'mesa-all-opengl')
+			"${is_mesa_all_opengl}"
+			;;
+		'mesa-all-va')
+			"${is_mesa_all_va}"
+			;;
+		'mesa-all-vdpau')
+			"${is_mesa_all_vdpau}"
 			;;
 		'rocm-rocr-opencl')
 			"${is_rocm_rocr_opencl}"
@@ -540,6 +560,7 @@ _purge () {
 			rm --force --verbose \
 				'/etc/OpenCL/vendors/amdocl-fglrx64.icd'
 			;;
+			# no purge yet for mesa opengl, vulkan, va and vdpau
 	esac
 }
 
@@ -557,6 +578,7 @@ _uninstall () {
 	_purge amdgpupro-amdgpu-vulkan
 	_purge amdgpupro-amdgpu-pro-vulkan
 	_purge fglrx-cpu-opencl
+	# no purge yet for mesa opengl, vulkan, va and vdpau
 
 	dpkg-divert \
 		--rename \
@@ -635,6 +657,54 @@ _install () {
 			echo "Install ${mesa_all_opencl_package_name} package."
 
 			apt-get install --yes "${mesa_all_opencl_package_name}"
+		done
+	fi
+
+	if _is mesa-all-vulkan
+	then
+		_purge mesa-old-clover-opencl
+
+		for mesa_radv_vulkan_package_name in ${mesa_radv_vulkan_package_name_list}
+		do
+			echo "Install ${mesa_radv_vulkan_package_name} package."
+
+			apt-get install --yes "${mesa_radv_vulkan_package_name}"
+		done
+	fi
+
+	if _is mesa-all-opengl
+	then
+		_purge mesa-old-clover-opencl
+
+		for mesa_all_opengl_package_name in ${mesa_all_opengl_package_name_list}
+		do
+			echo "Install ${mesa_all_opengl_package_name} package."
+
+			apt-get install --yes "${mesa_all_opengl_package_name}"
+		done
+	fi
+
+	if _is mesa-all-va
+	then
+		_purge mesa-old-clover-opencl
+
+		for mesa_all_va_package_name in ${mesa_all_va_package_name_list}
+		do
+			echo "Install ${mesa_all_va_package_name} package."
+
+			apt-get install --yes "${mesa_all_va_package_name}"
+		done
+	fi
+
+	if _is mesa-all-vdpau
+	then
+		_purge mesa-old-clover-opencl
+
+		for mesa_all_vdpau_package_name in ${mesa_all_vdpau_package_name_list}
+		do
+			echo "Install ${mesa_all_vdpau_package_name} package."
+
+			apt-get install --yes "${mesa_all_vdpau_package_name}"
 		done
 	fi
 
@@ -886,6 +956,14 @@ _help () {
 	\t\tMesa old Clover OpenCL for Terascale2+ and GCN4- GPUs (only on Ubuntu 20.04)
 	\tmesa-all-opencl
 	\t\tMesa Clover OpenCL for Terascale2+ and GCN4- and (if available) RustiCL OpenCL for GCN and RDNA GPUs.
+	\tmesa-all-vulkan
+	\t\tMesa RADV Vulkan for GCN and RDNA GPUs.
+	\tmesa-all-opengl
+	\t\tMesa radeon and radeonsi OpenGL for TeraScale, GCN and RDNA GPUs.
+	\tmesa-all-va
+	\t\tMesa radeon and radeonsi VA for TeraScale, GCN and RDNA GPUs.
+	\tmesa-all-vdpau
+	\t\tMesa radeon and radeonsi VDPAU for TeraScale, GCN and RDNA GPUs.
 	\trocm-rocr-opencl
 	\t\tAMD ROCm ROCr OpenCL for Radeon Pro GPUs.
 	\trocm-hip
@@ -956,11 +1034,23 @@ case "${action}" in
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
+				'mesa-old-clover-opencl')
+					is_mesa_old_clover_opencl='true'
+					;;
 				'mesa-all-opencl')
 					is_mesa_all_opencl='true'
 					;;
-				'mesa-old-clover-opencl')
-					is_mesa_old_clover_opencl='true'
+				'mesa-all-vulkan')
+					is_mesa_radv_vulkan='true'
+					;;
+				'mesa-all-opengl')
+					is_mesa_all_opengl='true'
+					;;
+				'mesa-all-va')
+					is_mesa_all_va='true'
+					;;
+				'mesa-all-vdpau')
+					is_mesa_all_vdpau='true'
 					;;
 				'rocm-rocr-opencl')
 					is_rocm_rocr_opencl='true'
