@@ -70,7 +70,7 @@ amdgpupro_deb_version='5.7.50700-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
 amdgpupro_deb_sum='190c5528385ee589130df94c902cd5a7f9f6877bd960d8009f5a55bb1c1552013187fd2c382c42819186ad162be9d838c65ef7e09fead3e1b5b991adc6a8daf4'
 
-mesa_opencl_package_name_list='mesa-opencl-icd'
+mesa_all_opencl_package_name_list='mesa-opencl-icd'
 old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
 rocr_opencl_package_name_list='rocm-opencl-runtime'
 rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
@@ -87,7 +87,7 @@ _error () {
 }
 
 is_mesa_old_clover_opencl='false'
-is_mesa_clover_opencl='false'
+is_mesa_all_opencl='false'
 is_fglrx_opencl='false'
 is_orca_opencl='false'
 is_pal_opencl='false'
@@ -104,8 +104,8 @@ _is () {
 		'mesa-old-clover-opencl')
 			"${is_mesa_old_clover_opencl}"
 			;;
-		'mesa-clover-opencl')
-			"${is_mesa_clover_opencl}"
+		'mesa-all-opencl')
+			"${is_mesa_all_opencl}"
 			;;
 		'fglrx-opencl')
 			"${is_fglrx_opencl}"
@@ -362,11 +362,11 @@ _purge () {
 				apt-get remove --yes --purge "${mesa_old_clover_opencl_package_name}" || true
 			done
 			;;
-		'mesa-clover-opencl')
-			for mesa_clover_opencl_package_name in \
-				$(echo "${mesa_clover_opencl_package_name_list}" | tr ' ' '\n' | tac)
+		'mesa-all-opencl')
+			for mesa_all_opencl_package_name in \
+				$(echo "${mesa_all_opencl_package_name_list}" | tr ' ' '\n' | tac)
 			do
-				apt-get remove --yes --purge "${mesa_clover_opencl_package_name}" || true
+				apt-get remove --yes --purge "${mesa_all_opencl_package_name}" || true
 			done
 			;;
 		'fglrx-opencl')
@@ -466,7 +466,7 @@ _purge () {
 }
 
 _uninstall () {
-	_purge mesa-clover-opencl
+	_purge mesa-all-opencl
 	_purge mesa-old-clover-opencl
 	_purge pal-opencl
 	_purge orca-opencl
@@ -520,13 +520,13 @@ _install () {
 		apt-get update
 	fi
 
-	if _is mesa-clover-opencl
+	if _is mesa-all-opencl
 	then
-		for mesa_clover_opencl_package_name in ${mesa_clover_opencl_package_name_list}
+		for mesa_all_opencl_package_name in ${mesa_all_opencl_package_name_list}
 		do
-			echo "Install ${mesa_clover_opencl_package_name} package."
+			echo "Install ${mesa_all_opencl_package_name} package."
 
-			apt-get install --yes "${mesa_clover_opencl_package_name}"
+			apt-get install --yes "${mesa_all_opencl_package_name}"
 		done
 	fi
 
@@ -747,6 +747,8 @@ _help () {
 	Names:
 	${tab}all
 	${tab}${tab}All OpenCL drivers for AMD GPUs and CPUs.
+	${tab}mesa-all-opencl
+	${tab}${tab}Mesa Clover and RustiCL (if available) OpenCL for GCN+ GPUs.
 	${tab}mesa-old-clover-opencl
 	${tab}${tab}Mesa old Clover OpenCL for Terascale2+ and GCN+ GPUs.
 	${tab}fglrx-opencl
@@ -818,6 +820,9 @@ case "${action}" in
 					is_pal_opencl='true'
 					is_rocr_opencl='true'
 					is_rocm_hip='true'
+					;;
+				'mesa-all-opencl')
+					is_mesa_all_opencl='true'
 					;;
 				'mesa-old-clover-opencl')
 					is_mesa_old_clover_opencl='true'
