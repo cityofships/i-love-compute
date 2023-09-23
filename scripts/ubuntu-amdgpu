@@ -379,6 +379,18 @@ _purge () {
 		'mesa-all-opencl')
 			_uninstall_packages "${mesa_all_opencl_package_name_list}"
 			;;
+		'mesa-all-vulkan')
+			_uninstall_packages "${mesa_all_vulkan_package_name_list}"
+			;;
+		'mesa-all-opengl')
+			_uninstall_packages "${mesa_all_opengl_package_name_list}"
+			;;
+		'mesa-all-va')
+			_uninstall_packages "${mesa_all_va_package_name_list}"
+			;;
+		'mesa-all-driver')
+			_uninstall_packages "${mesa_all_driver_package_name_list}"
+			;;
 		'rocm-rocr-opencl')
 			_uninstall_packages "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}"
 			;;
