@@ -103,94 +103,6 @@ _error () {
 	exit 1
 }
 
-is_mesa_old_clover_opencl='false'
-is_mesa_all_opencl='false'
-is_mesa_all_vulkan='false'
-is_mesa_all_opengl='false'
-is_mesa_all_va='false'
-is_mesa_all_vdpau='false'
-is_rocm_rocr_opencl='false'
-is_rocm_hip='false'
-is_amdgpupro_dkms='false'
-is_amdgpupro_old_orca_opencl='false'
-is_amdgpupro_orca_opencl='false'
-is_amdgpupro_pal_opencl='false'
-is_amdgpupro_mesa_opengl='false'
-is_amdgpupro_mesa_va='false'
-is_amdgpupro_mesa_vdpau='false'
-is_amdgpupro_oglp_opengl='false'
-is_amdgpupro_amdgpu_vulkan='false'
-is_amdgpupro_amdgpu_pro_vulkan='false'
-is_amdvlk_vulkan='false'
-is_fglrx_cpu_opencl='false'
-
-_is () {
-	case "${1}" in
-		'mesa-old-clover-opencl')
-			"${is_mesa_old_clover_opencl}"
-			;;
-		'mesa-all-opencl')
-			"${is_mesa_all_opencl}"
-			;;
-		'mesa-all-vulkan')
-			"${is_mesa_all_vulkan}"
-			;;
-		'mesa-all-opengl')
-			"${is_mesa_all_opengl}"
-			;;
-		'mesa-all-va')
-			"${is_mesa_all_va}"
-			;;
-		'mesa-all-vdpau')
-			"${is_mesa_all_vdpau}"
-			;;
-		'rocm-rocr-opencl')
-			"${is_rocm_rocr_opencl}"
-			;;
-		'rocm-hip')
-			"${is_rocm_hip}"
-			;;
-		'amdgpupro-dkms')
-			"${is_amdgpupro_dkms}"
-			;;
-		'amdgpupro-old-orca-opencl')
-			"${is_amdgpupro_old_orca_opencl}"
-			;;
-		'amdgpupro-orca-opencl')
-			"${is_amdgpupro_orca_opencl}"
-			;;
-		'amdgpupro-pal-opencl')
-			"${is_amdgpupro_pal_opencl}"
-			;;
-		'amdgpupro-mesa-opengl')
-			"${is_amdgpupro_mesa_opengl}"
-			;;
-		'amdgpupro-mesa-va')
-			"${is_amdgpupro_mesa_va}"
-			;;
-		'amdgpupro-mesa-vdpau')
-			"${is_amdgpupro_mesa_vdpau}"
-			;;
-		'amdgpupro-oglp-opengl')
-			"${is_amdgpupro_oglp_opengl}"
-			;;
-		'amdgpupro-amdgpu-vulkan')
-			"${is_amdgpupro_amdgpu_vulkan}"
-			;;
-		'amdgpupro-amdgpu-pro-vulkan')
-			"${is_amdgpupro_amdgpu_pro_vulkan}"
-			;;
-		'amdvlk-vulkan')
-			"${is_amdvlk_vulkan}"
-			;;
-		'fglrx-cpu-opencl')
-			"${is_fglrx_cpu_opencl}"
-			;;
-		*)
-			_error "unknown _is keyword: ${1}"
-	esac
-}
-
 _checksum () {
 	_cd
 
@@ -263,7 +175,7 @@ _cd () {
 _download () {
 	_cd
 
-	if _is mesa-old-clover-opencl
+	if "${require_old_clover_deb}"
 	then
 		if ! _checksum 'old-clover'
 		then
@@ -283,7 +195,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl || _is rocm-rocr-opencl || _is rocm-hip
+	if "${require_amdgpu_repo}"
 	then
 		if ! _checksum 'amdgpupro'
 		then
@@ -297,7 +209,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl
+	if "${require_old_orca_tarball}"
 	then
 		if ! _checksum 'orca'
 		then
@@ -312,7 +224,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdgpupro-pal-opencl
+	if "${require_pal_tarball}"
 	then
 		if ! _checksum 'pal'
 		then
@@ -327,7 +239,7 @@ _download () {
 		fi
 	fi
 
-	if _is amdvlk-vulkan
+	if "${require_amdvlk_repo}"
 	then
 		if ! _checksum 'amdvlk'
 		then
@@ -341,7 +253,7 @@ _download () {
 		fi
 	fi
 
-	if _is fglrx-cpu-opencl
+	if "${require_fglrx_tarball}"
 	then
 		if ! _checksum 'fglrx'
 		then
@@ -362,7 +274,7 @@ _extract () {
 
 	_download
 
-	if _is fglrx-cpu-opencl
+	if "${require_fglrx_tarball}"
 	then
 		if ! [ -d "${fglrx_tarball_dir}" ]
 		then
@@ -372,7 +284,7 @@ _extract () {
 		fi
 	fi
 
-	if _is amdgpupro-old-orca-opencl || _is amdgpupro-pal-opencl
+	if "${require_old_orca_tarball}"
 	then
 		if ! [ -d "${amdgpupro_old_orca_tarball_dir}" ]
 		then
@@ -382,7 +294,7 @@ _extract () {
 		fi
 	fi
 
-	if _is amdgpupro-pal-opencl
+	if "${require_pal_tarball}"
 	then
 		if ! [ -d "${amdgpupro_pal_tarball_dir}" ]
 		then
@@ -620,17 +532,157 @@ _install_gdebi_package () {
 }
 
 _install_amdgpu_package () {
+	apt-get update
+
 	_install_packages "${amdgpupro_deb_file}"
 
 	sed -e 's/^#deb /deb /' -i '/etc/apt/sources.list.d/amdgpu-proprietary.list'
+}
 
-	apt-get update
+_install_driver () {
+	case "${1}" in
+		'mesa-old-clover-opencl')
+			_purge mesa-all-opencl
+
+			for mesa_old_clover_opencl_deb_file in \
+				$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
+			do
+				_install_packages "${mesa_old_clover_opencl_deb_file}"
+				_hold_packages "${mesa_old_clover_opencl_deb_file}"
+			done
+		;;
+		'mesa-all-opencl')
+			_purge mesa-old-clover-opencl
+
+			_install_packages "${mesa_all_opencl_package_name_list}"
+		;;
+		'mesa-all-vulkan')
+			_install_packages "${mesa_all_vulkan_package_name_list}"
+		;;
+		'mesa-all-opengl')
+			_install_packages "${mesa_all_opengl_package_name_list}"
+		;;
+		'mesa-all-va')
+			_install_packages "${mesa_all_va_package_name_list}"
+		;;
+		'mesa-all-vdpau')
+			_install_packages "${mesa_all_vdpau_package_name_list}"
+		;;
+		'rocm-rocr-opencl')
+			# Already correct (icd may be renamed):
+			# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
+
+			_install_packages "${rocm_rocr_opencl_package_name_list}"
+
+			# Already correct (icd may be renamed):
+			# libamdocl64.so
+			# /etc/OpenCL/vendors/amdocl64.icd
+		;;
+		'rocm-hip')
+			_install_packages "${rocm_hip_package_name_list}"
+		;;
+		'amdgpupro-dkms')
+			_install_packags "${amdgpupro_dkms_package_name_list}"
+		;;
+		'amdgpupro-old-orca-opencl')
+			_purge amdgpupro-orca-opencl
+
+			# Already correct:
+			# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
+
+			local amdgpupro_old_orca_deb_file
+			for amdgpupro_old_orca_deb_file in ${amdgpupro_old_orca_deb_file_list}
+			do
+				local orca_package_name="$(echo "${amdgpupro_old_orca_deb_file}" | cut -f1 -d'_')"
+
+				_install_packages "${amdgpupro_old_orca_tarball_dir}/${amdgpupro_old_orca_deb_file}"
+				_hold_packages "${orca_package_name}"
+			done
+
+			# Already correct:
+			# libamdocl-rocm64.so
+			# /etc/OpenCL/vendors/amdocl-orca64.icd
+		;;
+		'amdgpupro-orca-opencl')
+			_purge amdgpupro-old-orca-opencl
+
+			_install_packages "${amdgpupro_orca_opencl_package_name_list}"
+		;;
+		'amdgpupro-pal-opencl')
+			dpkg-divert \
+				--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
+				--rename '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
+
+			local amdgpupro_pal_deb_file
+			for amdgpupro_pal_deb_file in ${amdgpupro_pal_deb_file_list}
+			do
+				_install_packages "${amdgpupro_pal_tarball_dir}/${amdgpupro_pal_deb_file}"
+			done
+
+			rm --force --verbose '/etc/OpenCL/vendors/amdocl64.icd'
+
+			echo 'libamdocl-pal64.so' > '/etc/OpenCL/vendors/amdocl-pal64.icd'
+		;;
+		'amdgpupro-mesa-opengl')
+			_install_packages "${amdgpupro_mesa_opengl_package_name_list}"
+		;;
+		'amdgpupro-mesa-va')
+			_install_packages "${amdgpupro_mesa_va_package_name_list}"
+		;;
+		'amdgpupro-mesa-vdpau')
+			_install_packages "${amdgpupro_mesa_vdpau_package_name_list}"
+		;;
+		'amdgpupro-oglp-opengl')
+			_install_packages "${amdgpupro_oglp_opengl_package_name_list}"
+		;;
+		'amdgpupro-amdgpu-vulkan')
+			_install_packages "${amdgpupro_amdgpu_vulkan_package_name_list}"
+		;;
+		'amdgpupro-amdgpu-pro-vulkan')
+			_install_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
+		;;
+		'amdvlk-vulkan')
+			_install_packages "${amd_vulkan_package_name_list}"
+		;;
+		'fglrx-cpu-opencl')
+			local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
+
+			if ! [ -d "${fglrx_extract_prefix}" ]
+			then
+				"${fglrx_tarball_dir}/${fglrx_script_file}" --extract "${fglrx_extract_prefix}"
+			fi
+
+			mkdir --parents --verbose "${fglrx_install_dir}"
+			mkdir --parents --verbose "${fglrx_install_dir}/x86_64-linux-gnu"
+
+			cp --archive --verbose \
+				"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
+				"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+
+			cp --archive --verbose \
+				"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
+				"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
+
+			sed -e 's/libamdocl12cl64.so/libfglocl12cl64.so/g' \
+				-i "${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
+
+			echo 'libamdocl64-fglrx.so' > '/etc/OpenCL/vendors/amdocl-fglrx64.icd'
+
+			echo "${fglrx_install_dir}/x86_64-linux-gnu" \
+				> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
+		;;
+	esac
 }
 
 _install () {
 	_extract
 
-	if _is amdvlk-vulkan
+	if "${require_amdgpu_repo}"
+	then
+		_install_amdgpu_package
+	fi
+
+	if "${require_amdvlk_repo}"
 	then
 		local amdvlk_source_line="deb [arch=${amdvlk_arch} signed_by=${amdvlk_gpg_path}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
 		echo "${amdvlk_source_line}" > "${amdvlk_list_path}"
@@ -639,210 +691,16 @@ _install () {
 
 	apt-get update
 
-	if _is mesa-old-clover-opencl
-	then
-		_purge mesa-all-opencl
-
-		for mesa_old_clover_opencl_deb_file in \
-			$(echo "${mesa_old_clover_opencl_deb_sum_list}" | grep -v '^$' | awk '{ print $2 }')
-		do
-			_install_packages "${mesa_old_clover_opencl_deb_file}"
-			_hold_packages "${mesa_old_clover_opencl_deb_file}"
-		done
-	fi
-
-	if _is mesa-all-opencl
-	then
-		_purge mesa-old-clover-opencl
-
-		_install_packages "${mesa_all_opencl_package_name_list}"
-	fi
-
-	if _is mesa-all-vulkan
-	then
-		_install_packages "${mesa_all_vulkan_package_name_list}"
-	fi
-
-	if _is mesa-all-opengl
-	then
-		_install_packages "${mesa_all_opengl_package_name_list}"
-	fi
-
-	if _is mesa-all-va
-	then
-		_install_packages "${mesa_all_va_package_name_list}"
-	fi
-
-	if _is mesa-all-vdpau
-	then
-		_install_packages "${mesa_all_vdpau_package_name_list}"
-	fi
-
-	if _is rocm-rocr-opencl
-	then
-		_install_amdgpu_package
-
-		# Already correct (icd may be renamed):
-		# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
-
-		_install_packages "${rocm_rocr_opencl_package_name_list}"
-
-		# Already correct (icd may be renamed):
-		# libamdocl64.so
-		# /etc/OpenCL/vendors/amdocl64.icd
-	fi
-
-	if _is rocm-hip
-	then
-		_install_amdgpu_package
-
-		_install_packages "${rocm_hip_package_name_list}"
-	fi
-
-	if _is amdgpupro-dkms
-	then
-		_install_amdgpu_package
-
-		_install_packags "${amdgpupro_dkms_package_name_list}"
-	fi
-
-	if _is amdgpupro-old-orca-opencl
-	then
-		_purge amdgpupro-orca-opencl
-
-		_install_amdgpu_package
-
-		# Already correct:
-		# /opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-orca64.so
-
-		local amdgpupro_old_orca_deb_file
-		for amdgpupro_old_orca_deb_file in ${amdgpupro_old_orca_deb_file_list}
-		do
-			local orca_package_name="$(echo "${amdgpupro_old_orca_deb_file}" | cut -f1 -d'_')"
-
-			if _is amdgpupro-old-orca-opencl || [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
-			then
-				_install_packages "${amdgpupro_old_orca_tarball_dir}/${amdgpupro_old_orca_deb_file}"
-			fi
-
-			if [ "${orca_package_name}" != 'opencl-orca-amdgpu-pro-icd' ]
-			then
-				_hold_packages "${orca_package_name}"
-			fi
-		done
-
-		# Already correct:
-		# libamdocl-rocm64.so
-		# /etc/OpenCL/vendors/amdocl-orca64.icd
-	fi
-
-	if _is amdgpupro-orca-opencl
-	then
-		_purge amdgpupro-old-orca-opencl
-
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_orca_opencl_package_name_list}"
-	fi
-
-	if _is amdgpupro-pal-opencl
-	then
-		dpkg-divert \
-			--divert '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl-pal64.so' \
-			--rename '/opt/amdgpu-pro/lib/x86_64-linux-gnu/libamdocl64.so' \
-
-		local amdgpupro_pal_deb_file
-		for amdgpupro_pal_deb_file in ${amdgpupro_pal_deb_file_list}
-		do
-			_install_packages "${amdgpupro_pal_tarball_dir}/${amdgpupro_pal_deb_file}"
-		done
-
-		rm --force --verbose '/etc/OpenCL/vendors/amdocl64.icd'
-
-		echo 'libamdocl-pal64.so' > '/etc/OpenCL/vendors/amdocl-pal64.icd'
-	fi
-
-	if _is amdgpupro-mesa-opengl
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_mesa_opengl_package_name_list}"
-	fi
-
-	if _is amdgpupro-mesa-va
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_mesa_va_package_name_list}"
-	fi
-
-	if _is amdgpupro-mesa-vdpau
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_mesa_vdpau_package_name_list}"
-	fi
-
-	if _is amdgpupro-oglp-opengl
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_oglp_opengl_package_name_list}"
-	fi
-
-	if _is amdgpupro-amdgpu-vulkan
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_amdgpu_vulkan_package_name_list}"
-	fi
-
-	if _is amdgpupro-amdgpu-pro-vulkan
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
-	fi
-
-	if _is amdvlk-vulkan
-	then
-		_install_amdgpu_package
-
-		_install_packages "${amd_vulkan_package_name_list}"
-	fi
-
-	if _is fglrx-cpu-opencl
-	then
-		local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
-
-		if ! [ -d "${fglrx_extract_prefix}" ]
-		then
-			"${fglrx_tarball_dir}/${fglrx_script_file}" --extract "${fglrx_extract_prefix}"
-		fi
-
-		mkdir --parents --verbose "${fglrx_install_dir}"
-		mkdir --parents --verbose "${fglrx_install_dir}/x86_64-linux-gnu"
-
-		cp --archive --verbose \
-			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl64.so" \
-			"${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
-
-		cp --archive --verbose \
-			"${fglrx_extract_prefix}/arch/x86_64/usr/lib64/libamdocl12cl64.so" \
-			"${fglrx_install_dir}/x86_64-linux-gnu/libfglocl12cl64.so"
-
-		sed -e 's/libamdocl12cl64.so/libfglocl12cl64.so/g' \
-			-i "${fglrx_install_dir}/x86_64-linux-gnu/libamdocl64-fglrx.so"
-
-		echo 'libamdocl64-fglrx.so' > '/etc/OpenCL/vendors/amdocl-fglrx64.icd'
-
-		echo "${fglrx_install_dir}/x86_64-linux-gnu" \
-			> '/etc/ld.so.conf.d/30-amd-fglrx.conf'
-	fi
+	local driver_name
+	for driver_name in "${driver_list[@]}"
+	do
+		_install_driver "${driver_name}"
+	done
 
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
 }
+
 
 tab=$'\t'
 
@@ -959,75 +817,90 @@ esac
 
 shift
 
+require_old_clover_deb='false'
+require_old_orca_tarball='false'
+require_pal_tarball='false'
+require_amdgpu_repo='false'
+require_amdvlk_repo='false'
+require_fglrx_tarball='false'
+
+declare -a driver_list
+
 case "${action}" in
 	'download'|'extract'|'clean'|'install')
 		while ! [ -z "${1:-}" ]
 		do
 			case "${1}" in
 				'mesa-old-clover-opencl')
-					is_mesa_old_clover_opencl='true'
+					require_old_clover_deb='true'
 					;;
-				'mesa-all-opencl')
-					is_mesa_all_opencl='true'
-					;;
-				'mesa-all-vulkan')
-					is_mesa_all_vulkan='true'
-					;;
-				'mesa-all-opengl')
-					is_mesa_all_opengl='true'
-					;;
-				'mesa-all-va')
-					is_mesa_all_va='true'
-					;;
-				'mesa-all-vdpau')
-					is_mesa_all_vdpau='true'
-					;;
-				'rocm-rocr-opencl')
-					is_rocm_rocr_opencl='true'
-					;;
-				'rocm-hip')
-					is_rocm_hip='true'
-					;;
-				'amdgpupro-dkms')
-					is_amdgpupro_dkms='true'
+				'rocm-'*)
+					require_amdgpu_repo='true'
 					;;
 				'amdgpupro-old-orca-opencl')
-					is_amdgpupro_old_orca_opencl='true'
-					;;
-				'amdgpupro-orca-opencl')
-					is_amdgpupro_orca_opencl='true'
+					require_old_orca_tarball='true'
 					;;
 				'amdgpupro-pal-opencl')
-					is_amdgpupro_pal_opencl='true'
+					require_pal_tarball='true'
 					;;
-				'amdgpupro-mesa-opengl')
-					is_amdgpupro_mesa_opengl='true'
+				'amdgpupro-'*)
+					require_amdgpu_repo='true'
 					;;
-				'amdgpupro-mesa-va')
-					is_amdgpupro_mesa_va='true'
+				'amdvlk-'*)
+					require_amdvlk_repo='true'
 					;;
-				'amdgpupro-mesa-vdpau')
-					is_amdgpupro_mesa_vdpau='true'
-					;;
-				'amdgpupro-oglp-opengl')
-					is_amdgpupro_oglp_opengl='true'
-					;;
-				'amdgpupro-amdgpu-vulkan')
-					is_amdgpupro_amdgpu_vulkan='true'
-					;;
-				'amdgpupro-amdgpu-pro-vulkan')
-					is_amdgpupro_amdgpu_pro_vulkan='true'
-					;;
-				'amdvlk-vulkan')
-					is_amdvlk_vulkan='true'
-					;;
-				'fglrx-cpu-opencl')
-					is_fglrx_cpu_opencl='true'
-					;;
-				*)
-					_error 'Unkown name.'
+				'fglrx-'*)
+					require_fglrx_tarball='true'
 					;;
 			esac
+
+			case "${1}" in
+				'mesa-old-clover-opencl')
+					;;
+				'mesa-all-opencl')
+					;;
+				'mesa-all-vulkan')
+					;;
+				'mesa-all-opengl')
+					;;
+				'mesa-all-va')
+					;;
+				'mesa-all-vdpau')
+					;;
+				'rocm-rocr-opencl')
+					;;
+				'rocm-hip')
+					;;
+				'amdgpupro-dkms')
+					;;
+				'amdgpupro-old-orca-opencl')
+					;;
+				'amdgpupro-orca-opencl')
+					;;
+				'amdgpupro-pal-opencl')
+					;;
+				'amdgpupro-mesa-opengl')
+					;;
+				'amdgpupro-mesa-va')
+					;;
+				'amdgpupro-mesa-vdpau')
+					;;
+				'amdgpupro-oglp-opengl')
+					;;
+				'amdgpupro-amdgpu-vulkan')
+					;;
+				'amdgpupro-amdgpu-pro-vulkan')
+					;;
+				'amdvlk-vulkan')
+					;;
+				'fglrx-cpu-opencl')
+					;;
+				*)
+					_error "Unkown driver ${1}."
+					;;
+			esac
+
+			driver_list+=("${1}")
 
 			shift
 		done
