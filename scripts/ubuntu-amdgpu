@@ -77,6 +77,7 @@ amdgpu_dkms_package_name_list='amdgpu-dkms'
 amdgpu_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
 amdgpu_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
 amdgpu_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
+amdgpu_oglp_opengl_package_name_list='amdgpu-pro-oglp'
 
 _error () {
 	printf 'ERROR: %s\n\n' "${1}" >&2
@@ -94,6 +95,7 @@ is_amdgpu_dkms='false'
 is_amdgpu_mesa_opengl='false'
 is_amdgpu_mesa_va='false'
 is_amdgpu_mesa_vdpau='false'
+is_amdgpu_oglp_opengl='false'
 
 _is () {
 	case "${1}" in
@@ -126,6 +128,9 @@ _is () {
 			;;
 		'amdgpu-mesa-vdpau')
 			"${is_amdgpu_mesa_vdpau}"
+			;;
+		'amdgpu-oglp-opengl')
+			"${is_amdgpu_oglp_opengl}"
 			;;
 	esac
 }
@@ -438,6 +443,13 @@ _purge () {
 				apt-get remove --yes --purge "${amdgpu_mesa_vdpau_package_name}" || true
 			done
 			;;
+		'amdgpu-oglp-opengl')
+			for amdgpu_oglp_opengl_package_name in \
+				$(echo "${amdgpu_oglp_opengl_package_name_list}" | tr ' ' '\n' | tac)
+			do
+				apt-get remove --yes --purge "${amdgpu_oglp_opengl_package_name}" || true
+			done
+			;;
 	esac
 }
 
@@ -449,6 +461,7 @@ _uninstall () {
 	_purge rocm-hip
 	_purge amdgpu-dkms
 	_purge amdgpu-mesa-opengl
+	_purge amdgpu-oglp-opengl
 	_purge fglrx-opencl
 
 	dpkg-divert \
@@ -652,6 +665,16 @@ _install () {
 		done
 	fi
 
+	if _is amdgpu-oglp-opengl
+	then
+		for amdgpu_oglp_opengl_package_name in ${amdgpu_oglp_opengl_package_name_list}
+		do
+			echo "Install ${amdgpu_oglp_opengl_package_name} package."
+
+			apt-get install --yes "${amdgpu_oglp_opengl_package_name}"
+		done
+	fi
+
 	# Read changes from /etc/ld.so.conf.d folder.
 	ldconfig
 }
@@ -721,6 +744,8 @@ _help () {
 	${tab}${tab}AMD amdgpu Mesa VA.
 	${tab}amdgpu-mesa-vdpau
 	${tab}${tab}AMD amdgpu Mesa VDPAU.
+	${tab}amdgpu-oglp-opengl
+	${tab}${tab}AMD amdgpu OGLP OpenGL.
 
 	Examples:
 	${tab}${script_name} install all
@@ -800,6 +825,9 @@ case "${action}" in
 					;;
 				'amdgpu-mesa-vdpau')
 					is_amdgpu_mesa_vdpau='true'
+					;;
+				'amdgpu-oglp-opengl')
+					is_amdgpu_oglp_opengl='true'
 					;;
 				*)
 					_error 'Unkown name.'
