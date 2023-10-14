@@ -532,7 +532,7 @@ _install_packages () {
 	esac
 
 	local package_name
-	for package_name in $(echo "${@}" | tr ' ' '\n' | tac)
+	for package_name in ${@}
 	do
 		echo "Install $(basename "${package_name}") package."
 
