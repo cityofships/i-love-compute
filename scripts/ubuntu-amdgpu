@@ -659,7 +659,7 @@ _install_driver () {
 			_install_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
 		;;
 		'amdvlk-vulkan')
-			_install_packages "${amd_vulkan_package_name_list}"
+			_install_packages "${amdvlk_vulkan_package_name_list}"
 		;;
 		'fglrx-cpu-opencl')
 			local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
