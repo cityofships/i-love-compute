@@ -333,7 +333,8 @@ _build_embree () {
 	local embree_ispc_support='OFF'
 
 	# Set to INTERNAL if TBB is not compatible or not available on your system.
-	local embree_tasking_system='TBB'
+	# local embree_tasking_system='TBB'
+	local embree_tasking_system='INTERNAL'
 
 	_cmake_setup \
 		-D'USE_CPU_ARCH'="${cpu_arch}" \

@@ -69,6 +69,11 @@ packages=(
 		# Validated commit, no release tag tried yet.
 		'commit:c0a1262d4d797d3fd19177a7c7149f4507c44aa3'
 		'sse2neon'
+#	'TBB'
+#		'oneTBB-2019_U8'
+#		'https://github.com/oneapi-src/oneTBB/archive/2019_U8.tar.gz'
+#		'2019_U8.tar.gz'
+#		'tbb'
 	'Embree'
 		'embree'
 		'https://github.com/embree/embree.git'
@@ -180,6 +185,18 @@ _build_sse2neon () {
 	cp -av 'sse2neon.h' "${install_dir}/include/sse2neon.h"
 }
 
+_build_tbb () {
+	return
+	_apply_patches \
+		'tbb/tbb-2019-u8-cmake.patch'
+
+	_cmake_setup \
+		-D'CMAKE_C_FLAGS'='-O2 -D_FORTIFY_SOURCE=2 -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables -fstack-clash-protection -flto -fno-fat-lto-objects -Wno-changes-meaning' \
+		-D'CMAKE_CXX_FLAGD'='-O2 -D_FORTIFY_SOURCE=2 -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables -fstack-clash-protection -flto -fno-fat-lto-objects -Wno-changes-meaning'
+
+	_cmake_compile_install
+}
+
 _build_embree () {
 	_apply_patches \
 		'luxmark3/luxmark3-embree-build-aarch64-with-sse2neon.patch'
@@ -201,7 +218,8 @@ _build_embree () {
 	local embree_ispc_support='OFF'
 
 	# Set to INTERNAL if TBB is not compatible or not available on your system.
-	local embree_tasking_system='TBB'
+	# local embree_tasking_system='TBB'
+	local embree_tasking_system='INTERNAL'
 
 	_cmake_setup \
 		-D'USE_CPU_ARCH'="${cpu_arch}" \
