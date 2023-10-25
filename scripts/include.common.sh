@@ -243,6 +243,7 @@ _apply_patches () {
 			do
 				patch_fullpath="${patch_dir}/${patch_file}"
 				patch -p1 < "${patch_fullpath}"
+				git add .
 				git commit -am "patch: ${patch_file}"
 			done
 			;;
