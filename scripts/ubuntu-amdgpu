@@ -918,7 +918,7 @@ case "${action}" in
 				'fglrx-cpu-opencl')
 					;;
 				*)
-					_error "Unkown driver ${1}."
+					_error "Unknown driver ${1}."
 					;;
 			esac
 
