@@ -85,8 +85,8 @@ mesa_all_opengl_package_name_list='libglx-mesa0'
 mesa_all_va_package_name_list='mesa-va-drivers'
 mesa_all_vdpau_package_name_list='mesa-vdpau-drivers'
 rocm_old_rocr_opencl_package_name_list='ocl-icd-libopencl1-amdgpu-pro'
-rocm_rocr_opencl_package_name_list='rocm-opencl-runtime'
-rocm_hip_package_name_list='rocm-hip-runtime rocminfo'
+amdgpupro_rocr_opencl_package_name_list='rocm-opencl-runtime'
+amdgpupro_rocm_hip_package_name_list='amdgpupro-rocm-hip-runtime rocminfo'
 amdgpupro_dkms_package_name_list='amdgpu-dkms'
 amdgpupro_orca_opencl_package_name_list='opencl-legacy-amdgpu-pro-icd'
 amdgpupro_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
@@ -394,9 +394,9 @@ _uninstall_driver () {
 		'amdgpupro-all')
 			# Virtual keyword to uninstall all amdgpu/rocm packages since
 			# they can't be uninstalled separately in an easy way.
-			_uninstall_driver rocm-rocr-opencl
-			_uninstall_driver rocm-hip
 			_uninstall_driver amdgpupro-dkms
+			_uninstall_driver amdgpupro-rocr-opencl
+			_uninstall_driver amdgpupro-rocm-hip
 			_uninstall_driver amdgpupro-old-orca-opencl
 			_uninstall_driver amdgpupro-orca-opencl
 			_uninstall_driver amdgpupro-pal-opencl
@@ -413,11 +413,11 @@ _uninstall_driver () {
 			_uninstall_packages "${amdgpupro_deb_file}"
 
 			;;
-		'rocm-rocr-opencl')
-			_uninstall_packages "${rocm_old_rocr_opencl_package_name_list}" "${rocm_rocr_opencl_package_name_list}"
+		'amdgpupro-rocr-opencl')
+			_uninstall_packages "${rocm_old_rocr_opencl_package_name_list}" "${amdgpupro_rocr_opencl_package_name_list}"
 			;;
-		'rocm-hip')
-			_uninstall_packages "${rocm_hip_package_name_list}"
+		'amdgpupro-rocm-hip')
+			_uninstall_packages "${amdgpupro_rocm_hip_package_name_list}"
 			;;
 		'amdgpupro-dkms')
 			_uninstall_packages "${amdgpupro_dkms_package_name_list}"
@@ -595,21 +595,21 @@ _install_driver () {
 		'mesa-all-vdpau')
 			_install_packages "${mesa_all_vdpau_package_name_list}"
 		;;
-		'rocm-rocr-opencl')
+		'amdgpupro-dkms')
+			_install_packages "${amdgpupro_dkms_package_name_list}"
+		;;
+		'amdgpupro-rocr-opencl')
 			# Already correct (icd may be renamed):
 			# /opt/rocm-4.5.1/opencl/lib/libamdocl64.so
 
-			_install_packages "${rocm_rocr_opencl_package_name_list}"
+			_install_packages "${amdgpupro_rocr_opencl_package_name_list}"
 
 			# Already correct (icd may be renamed):
 			# libamdocl64.so
 			# /etc/OpenCL/vendors/amdocl64.icd
 		;;
-		'rocm-hip')
-			_install_packages "${rocm_hip_package_name_list}"
-		;;
-		'amdgpupro-dkms')
-			_install_packages "${amdgpupro_dkms_package_name_list}"
+		'amdgpupro-rocm-hip')
+			_install_packages "${amdgpupro_rocm_hip_package_name_list}"
 		;;
 		'amdgpupro-old-orca-opencl')
 			_uninstall_driver amdgpupro-orca-opencl
@@ -774,12 +774,12 @@ _help () {
 	\t\tMesa radeon and radeonsi VA for TeraScale, GCN and RDNA GPUs.
 	\tmesa-all-vdpau
 	\t\tMesa radeon and radeonsi VDPAU for TeraScale, GCN and RDNA GPUs.
-	\trocm-rocr-opencl
-	\t\tAMD ROCm ROCr OpenCL for Radeon Pro GPUs.
-	\trocm-hip
-	\t\tAMD ROCm HIP for Radeon Pro GPUs.
 	\tamdgpupro-dkms
 	\t\tAMD AMDGPU-PRO amdgpu DKMS modules and firmwares for GCN and RDNA GPUs.
+	\tamdgpupro-rocr-opencl
+	\t\tAMD AMDGPU-PRO ROCr OpenCL for Radeon Pro GPUs.
+	\tamdgpupro-rocm-hip
+	\t\tAMD AMDGPU-PRO ROCm HIP for Radeon Pro GPUs.
 	\tamdgpupro-old-orca-opencl
 	\t\tAMD AMDGPU-PRO old Orca OpenCL for GCN3- GPUs.
 	\tamdgpupro-orca-opencl
@@ -809,7 +809,7 @@ _help () {
 	Examples:
 	\t${script_name} install all
 
-	\t${script_name} install amdgpupro-old-orca-opencl amdgpupro-pal-opencl rocm-rocr-opencl
+	\t${script_name} install amdgpupro-old-orca-opencl amdgpupro-pal-opencl amdgpupro-rocr-opencl
 
 	\t${script_name} uninstall amdvlk-vulkan
 
@@ -889,11 +889,11 @@ case "${action}" in
 					;;
 				'mesa-all-vdpau')
 					;;
-				'rocm-rocr-opencl')
-					;;
-				'rocm-hip')
-					;;
 				'amdgpupro-dkms')
+					;;
+				'amdgpupro-rocr-opencl')
+					;;
+				'amdgpupro-rocm-hip')
 					;;
 				'amdgpupro-old-orca-opencl')
 					;;
