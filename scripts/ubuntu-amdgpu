@@ -93,8 +93,8 @@ amdgpupro_mesa_opengl_package_name_list='libgl1-amdgpu-mesa-glx'
 amdgpupro_mesa_va_package_name_list='mesa-amdgpu-va-drivers'
 amdgpupro_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
 amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
-amdgpupro_amdgpu_vulkan_package_name_list='vulkan-amdgpu'
-amdgpupro_amdgpu_pro_vulkan_package_name_list='vulkan-amdgpu-pro'
+amdgpupro_amdvlk_vulkan_package_name_list='vulkan-amdgpu'
+amdgpupro_amdvlk_pro_vulkan_package_name_list='vulkan-amdgpu-pro'
 amdvlk_vulkan_package_name_list='amdvlk'
 
 _error () {
@@ -402,8 +402,8 @@ _uninstall_driver () {
 			_uninstall_driver amdgpupro-pal-opencl
 			_uninstall_driver amdgpupro-mesa-opengl
 			_uninstall_driver amdgpupro-oglp-opengl
-			_uninstall_driver amdgpupro-amdgpu-vulkan
-			_uninstall_driver amdgpupro-amdgpu-pro-vulkan
+			_uninstall_driver amdgpupro-amdvlk-vulkan
+			_uninstall_driver amdgpupro-amdvlk-pro-vulkan
 
 			if test -f '/usr/bin/amdgpu-install'
 			then
@@ -454,11 +454,11 @@ _uninstall_driver () {
 		'amdgpupro-oglp-opengl')
 			_uninstall_packages "${amdgpupro_oglp_opengl_package_name_list}"
 			;;
-		'amdgpupro-amdgpu-vulkan')
-			_uninstall_packages "${amdgpupro_amdgpu_vulkan_package_name_list}"
+		'amdgpupro-amdvlk-vulkan')
+			_uninstall_packages "${amdgpupro_amdvlk_vulkan_package_name_list}"
 			;;
-		'amdgpupro-amdgpu-pro-vulkan')
-			_uninstall_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
+		'amdgpupro-amdvlk-pro-vulkan')
+			_uninstall_packages "${amdgpupro_amdvlk_pro_vulkan_package_name_list}"
 			;;
 		'amdvlk-vulkan')
 			_uninstall_packages "${amdvlk_vulkan_package_name_list}"
@@ -652,11 +652,11 @@ _install_driver () {
 		'amdgpupro-oglp-opengl')
 			_install_packages "${amdgpupro_oglp_opengl_package_name_list}"
 		;;
-		'amdgpupro-amdgpu-vulkan')
-			_install_packages "${amdgpupro_amdgpu_vulkan_package_name_list}"
+		'amdgpupro-amdvlk-vulkan')
+			_install_packages "${amdgpupro_amdvlk_vulkan_package_name_list}"
 		;;
-		'amdgpupro-amdgpu-pro-vulkan')
-			_install_packages "${amdgpupro_amdgpu_pro_vulkan_package_name_list}"
+		'amdgpupro-amdvlk-pro-vulkan')
+			_install_packages "${amdgpupro_amdvlk_pro_vulkan_package_name_list}"
 		;;
 		'amdvlk-vulkan')
 			_install_packages "${amdvlk_vulkan_package_name_list}"
@@ -794,9 +794,9 @@ _help () {
 	\t\tAMD AMDGPU-PRO amdgpu Mesa VDPAU for GCN and RDNA GPUs.
 	\tamdgpupro-oglp-opengl
 	\t\tAMD AMDGPU-PRO amdgpu OGLP OpenGL and OpenGL ES for GCN and RDNA GPUs.
-	\tamdgpupro-amdgpu-pro-vulkan
+	\tamdgpupro-amdvlk-pro-vulkan
 	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan for GCN and RDNA GPUs.
-	\tamdgpupro-amdgpu-vulkan
+	\tamdgpupro-amdvlk-vulkan
 	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan for GCN and RDNA GPUs.
 	\tamdvlk-vulkan
 	\t\tAMD amdvlk Vulkan for GCN GCN3+ and RDNA GPUs.
@@ -909,9 +909,9 @@ case "${action}" in
 					;;
 				'amdgpupro-oglp-opengl')
 					;;
-				'amdgpupro-amdgpu-vulkan')
+				'amdgpupro-amdvlk-vulkan')
 					;;
-				'amdgpupro-amdgpu-pro-vulkan')
+				'amdgpupro-amdvlk-pro-vulkan')
 					;;
 				'amdvlk-vulkan')
 					;;
