@@ -34,6 +34,10 @@ _build_mold () {
 	_build_generic_cmake
 }
 
+_set_custom_run_env () {
+	export MOLD='mold'
+}
+
 _help_custom_run () {
 	cat <<-EOF
 

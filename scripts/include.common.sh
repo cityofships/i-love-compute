@@ -254,16 +254,15 @@ _mold () {
 	if [ -n "${without_mold:-}" ]
 	then
 		"${@}"
-		return
-	fi
-
-	if ! command -v 'mold' >/dev/null
+	elif [ -z "${MOLD:-}" ]
 	then
 		"${@}"
-		return
+	elif ! command -v "${MOLD}" >/dev/null
+	then
+		"${@}"
+	else
+		"${MOLD}" --run "${@}"
 	fi
-
-	mold --run "${@}"
 }
 
 _meson_setup_wrapper () {
