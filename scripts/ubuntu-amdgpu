@@ -78,7 +78,6 @@ amdvlk_key_sum='508f853506692f636380953bacd7625022bf4d536c5824383b9f7a12a61ce287
 amdvlk_gpg_path='/usr/share/keyrings/amdvlk-archive-keyring.gpg'
 amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
 
-
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
 mesa_all_vulkan_package_name_list='mesa-vulkan-drivers'
 mesa_all_opengl_package_name_list='libglx-mesa0'
