@@ -849,9 +849,9 @@ _help () {
 
 	Driver names:
 	\tmesa-old-clover-opencl
-	\t\tMesa old Clover OpenCL for Terascale2+ and GCN4- GPUs (only on Ubuntu 20.04)
+	\t\tMesa old Clover OpenCL for TeraScale2, TeraScale 3, GCN1, GCN2, GCN3, and GCN4 GPUs (only on Ubuntu 20.04)
 	\tmesa-all-opencl
-	\t\tMesa Clover OpenCL for Terascale2+ and GCN4- and (if available) RustiCL OpenCL for GCN and RDNA GPUs.
+	\t\tMesa Clover OpenCL for TeraScale2, TeraScale 3, GCN1, GCN2, GCN3 and GCN4 and (if available) RustiCL OpenCL for GCN and RDNA GPUs.
 	\tmesa-all-vulkan
 	\t\tMesa RADV Vulkan for GCN and RDNA GPUs.
 	\tmesa-all-opengl
@@ -867,11 +867,11 @@ _help () {
 	\tamdgpupro-rocm-hip
 	\t\tAMD AMDGPU-PRO ROCm HIP for Radeon Pro GPUs.
 	\tamdgpupro-old-orca-opencl
-	\t\tAMD AMDGPU-PRO old Orca OpenCL for GCN3- GPUs.
+	\t\tAMD AMDGPU-PRO old Orca OpenCL for GCN1, GCN2 and GCN3 GPUs.
 	\tamdgpupro-orca-opencl
 	\t\tAMD AMDGPU-PRO Orca OpenCL for GCN5 GPUs.
 	\tamdgpupro-pal-opencl
-	\t\tAMD AMDGPU-PRO PAL OpenCL for GCN4+ GPUs.
+	\t\tAMD AMDGPU-PRO PAL OpenCL for GCN4 and GCN5 GPUs.
 	\tamdgpupro-mesa-opengl
 	\t\tAMD AMDGPU-PRO amdgpu Mesa OpenGL for GCN and RDNA GPUs.
 	\tamdgpupro-mesa-va
@@ -893,8 +893,11 @@ _help () {
 	\tfglrx-cpu-opencl
 	\t\tAMD Radeon Crimson fglrx OpenCL for CPUs.
 
-	ROCM/AMDGPU-PRO drivers can't be uninstalled separately,
+	The ROCm/AMDGPU-PRO drivers can't be uninstalled separately,
 	the “amdgpupro-all” virtual driver name uninstalls all of them.
+
+	The various admvlk drivers are mutually exclusive, installing
+	one replaces any existing one.
 
 	Examples:
 	\t${script_name} install all
