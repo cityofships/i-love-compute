@@ -73,6 +73,11 @@ amdvlk_gcn3_vulkan_deb_file="amdvlk_${amdvlk_gcn3_vulkan_version}_amd64.deb"
 amdvlk_gcn3_vulkan_deb_sum='4d1d7467bff0a5c00c18efc8f469c542c49db4d0f187d9bcc22216967f2766f7cd74125838594c0ea12820db3df212c376cbef12b051f17425ae207a42002001'
 amdvlk_gcn3_vulkan_deb_url="https://github.com/GPUOpen-Drivers/AMDVLK/releases/download/v-${amdvlk_gcn3_vulkan_version}/${amdvlk_gcn3_vulkan_deb_file}"
 
+amdvlk_gcn5_vulkan_version='2023.Q3.3'
+amdvlk_gcn5_vulkan_deb_file="amdvlk_${amdvlk_gcn5_vulkan_version}_amd64.deb"
+amdvlk_gcn5_vulkan_deb_sum='265ba8bc2e5688a6d2d280e8065bcee5879109da62384c21fff19602f5d309001ef06df22628874de79a2629e438ae3d12d5ee80832430c2ca5a31889e9e4e6a'
+amdvlk_gcn5_vulkan_deb_url="https://github.com/GPUOpen-Drivers/AMDVLK/releases/download/v-${amdvlk_gcn5_vulkan_version}/${amdvlk_gcn5_vulkan_deb_file}"
+
 #amdvlk_deb_repo='http://repo.radeon.com/amdvlk/apt/debian'
 #amdvlk_distro='bionic'
 #amdvlk_channel='main'
@@ -104,6 +109,7 @@ amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
 amdgpupro_amdvlk_vulkan_package_name_list='vulkan-amdgpu'
 amdgpupro_amdvlk_pro_vulkan_package_name_list='vulkan-amdgpu-pro'
 amdvlk_gcn3_vulkan_package_name_list='amdvlk'
+amdvlk_gcn5_vulkan_package_name_list='amdvlk'
 amdvlk_vulkan_package_name_list='amdvlk'
 
 _error () {
@@ -154,6 +160,10 @@ _checksum () {
 		'amdvlk-gcn3')
 			sum="${amdvlk_gcn3_vulkan_deb_sum}"
 			file="${amdvlk_gcn3_vulkan_deb_file}"
+			;;
+		'amdvlk-gcn5')
+			sum="${amdvlk_gcn5_vulkan_deb_sum}"
+			file="${amdvlk_gcn5_vulkan_deb_file}"
 			;;
 		'amdvlk')
 			#sum="${amdvlk_key_sum}"
@@ -269,6 +279,20 @@ _download () {
 		fi
 	fi
 
+	if "${require_amdvlk_gcn5_deb}"
+	then
+		if ! _checksum 'amdvlk-gcn5'
+		then
+			echo "Download ${amdvlk_gcn5_vulkan_deb_file}."
+
+			rm -f "${amdvlk_gcn5_vulkan_deb_file}"
+
+			wget "${amdvlk_gcn5_vulkan_deb_url}"
+
+			_checksum 'amdvlk-gcn5'
+		fi
+	fi
+
 	#if "${require_amdvlk_repo}"
 	#then
 	#	if ! _checksum 'amdvlk'
@@ -362,6 +386,8 @@ _clean () {
 		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_pal_tarball_dir}"
 
 		rm --force --verbose "${workspace_dir}/${amdvlk_gcn3_vulkan_deb_file}"
+
+		rm --force --verbose "${workspace_dir}/${amdvlk_gcn5_vulkan_deb_file}"
 
 		#rm --force --verbose "${workspace_dir}/${amdvlk_key_file}"
 		rm --force --verbose "${workspace_dir}/${amdvlk_vulkan_deb_file}"
@@ -509,6 +535,9 @@ _uninstall_driver () {
 			;;
 		'amdvlk-gcn3-vulkan')
 			_uninstall_packages "${amdvlk_gcn3_vulkan_package_name_list}"
+			;;
+		'amdvlk-gcn5-vulkan')
+			_uninstall_packages "${amdvlk_gcn5_vulkan_package_name_list}"
 			;;
 		'amdvlk-vulkan')
 			_uninstall_packages "${amdvlk_vulkan_package_name_list}"
@@ -711,6 +740,9 @@ _install_driver () {
 		'amdvlk-gcn3-vulkan')
 			_install_packages "${amdvlk_gcn3_vulkan_deb_file}"
 		;;
+		'amdvlk-gcn5-vulkan')
+			_install_packages "${amdvlk_gcn5_vulkan_deb_file}"
+		;;
 		'amdvlk-vulkan')
 			#_install_packages "${amdvlk_vulkan_package_name_list}"
 			_install_packages "${amdvlk_vulkan_deb_file}"
@@ -854,6 +886,8 @@ _help () {
 	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan for GCN and RDNA GPUs.
 	\tamdvlk-gcn3-vulkan
 	\t\tAMD amdvlk Vulkan for GCN1, GCN2, GCN3 GPUs.
+	\tamdvlk-gcn5-vulkan
+	\t\tAMD amdvlk Vulkan for GCN4, GCN5, and GCN5.1 GPUs.
 	\tamdvlk-vulkan
 	\t\tAMD amdvlk Vulkan for RDNA GPUs.
 	\tfglrx-cpu-opencl
@@ -900,6 +934,7 @@ require_old_orca_tarball='false'
 require_pal_tarball='false'
 require_amdgpu_repo='false'
 require_amdvlk_gcn3_deb='false'
+require_amdvlk_gcn5_deb='false'
 #require_amdvlk_repo='false'
 #require_amdvlk_repo='false'
 require_amdvlk_deb='false'
@@ -929,6 +964,9 @@ case "${action}" in
 					;;
 				'amdvlk-gcn3-vulkan')
 					require_amdvlk_gcn3_deb='true'
+					;;
+				'amdvlk-gcn5-vulkan')
+					require_amdvlk_gcn5_deb='true'
 					;;
 				'amdvlk-vulkan')
 					#require_amdvlk_repo='true'
@@ -978,6 +1016,8 @@ case "${action}" in
 					;;
 				'amdvlk-gcn3-vulkan')
 					;;
+				'amdvlk-gcn5-vulkan')
+					;;
 				'amdvlk-vulkan')
 					;;
 				'fglrx-cpu-opencl')
@@ -1014,6 +1054,8 @@ case "${action}" in
 				'amdgpupro-all')
 					;;
 				'amdvlk-gcn3-vulkan')
+					;;
+				'amdvlk-gcn5-vulkan')
 					;;
 				'amdvlk-vulkan')
 					;;
