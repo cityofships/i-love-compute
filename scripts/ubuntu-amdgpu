@@ -45,12 +45,12 @@ dc1510a5dd0cfbec431d046527dd11bcfc84c82a3fdd6d649781afb93a2af3a9dc28551a29024a5c
 f276430f9f1d70d75692857dc7aa79365d6ef5dc1fd4ad816319e6f375e86f8eb29f49288d4f51d54da0f276712195fc217957c0e742696b338b91959bcd2e6e  mesa-opencl-icd_20.0.4-2ubuntu1_amd64.deb
 '
 
-amdgpupro_version='5.7.1'
+amdgpupro_version='5.7.2'
 amdgpupro_distro='jammy'
 amdgpupro_deb_repo="https://repo.radeon.com/amdgpu-install/${amdgpupro_version}/ubuntu/${amdgpupro_distro}"
-amdgpupro_deb_version='5.7.50701-1'
+amdgpupro_deb_version='5.7.50702-1'
 amdgpupro_deb_file="amdgpu-install_${amdgpupro_deb_version}_all.deb"
-amdgpupro_deb_sum='6ebd7af1787208b2dda49d278879c4384e4ce9237935c08a6e9ed96f290ec31adcdc5ff54c9e5e07133b3a3a3496140fd90c52aadc22ea47b2eda62e089e4fd0'
+amdgpupro_deb_sum='0bcb87140c69a86470b8101dae11e1ab18357eeec6ddb87d7ba440a3bbde6dc405ace41b0bdb033ea2921531d54e36a782fe65022024491fefb9cea6f0ec8db4'
 
 amdgpupro_old_orca_tarball_file="amdgpu-pro-21.20-1271047-ubuntu-20.04.tar.xz"
 amdgpupro_old_orca_tarball_sum='530673e00c8e243e73e9322386f949c72d09c7f8f75f9760a4fad379d30a79c4562e79fc5eec9825adc1b8a396b23bda209182b7b457c2bce81c5c45500fb19b'
