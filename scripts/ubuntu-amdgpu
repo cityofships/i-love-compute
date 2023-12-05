@@ -68,15 +68,20 @@ fglrx_tarball_dir='fglrx-15.302'
 fglrx_script_file='amd-driver-installer-15.302-x86.x86_64.run'
 fglrx_install_dir='/opt/amd-fglrx'
 
-amdvlk_deb_repo='http://repo.radeon.com/amdvlk/apt/debian'
-amdvlk_distro='bionic'
-amdvlk_channel='main'
-amdvlk_arch='amd64,i386'
-amdvlk_key_file='amdvlk.gpg.key'
-amdvlk_key_url="${amdvlk_deb_repo}/${amdvlk_key_file}"
-amdvlk_key_sum='508f853506692f636380953bacd7625022bf4d536c5824383b9f7a12a61ce2877cfa923c8cadfa054795ade83580f3c5fbf50564c2aada9a23d197ecfddd6c90'
-amdvlk_gpg_path='/usr/share/keyrings/amdvlk-archive-keyring.gpg'
-amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
+#amdvlk_deb_repo='http://repo.radeon.com/amdvlk/apt/debian'
+#amdvlk_distro='bionic'
+#amdvlk_channel='main'
+#amdvlk_arch='amd64,i386'
+#amdvlk_key_file='amdvlk.gpg.key'
+#amdvlk_key_url="${amdvlk_deb_repo}/${amdvlk_key_file}"
+#amdvlk_key_sum='508f853506692f636380953bacd7625022bf4d536c5824383b9f7a12a61ce2877cfa923c8cadfa054795ade83580f3c5fbf50564c2aada9a23d197ecfddd6c90'
+#amdvlk_gpg_path='/usr/share/keyrings/amdvlk-archive-keyring.gpg'
+#amdvlk_list_path='/etc/apt/sources.list.d/amdvlk.list'
+
+amdvlk_vulkan_version='2023.Q4.2'
+amdvlk_vulkan_deb_file="amdvlk_${amdvlk_vulkan_version}_amd64.deb"
+amdvlk_vulkan_deb_sum='59e57ac223c56b4b4c879f5eb674688fec26faa017daa584386931d4a632cf99345a2140ef958d8281989594c5326d07f50f2b89119da6d1116f96a174aba0ca'
+amdvlk_vulkan_deb_url="https://github.com/GPUOpen-Drivers/AMDVLK/releases/download/v-${amdvlk_vulkan_version}/${amdvlk_vulkan_deb_file}"
 
 mesa_all_opencl_package_name_list='mesa-opencl-icd'
 mesa_all_vulkan_package_name_list='mesa-vulkan-drivers'
@@ -142,8 +147,11 @@ _checksum () {
 			file="${amdgpupro_pal_tarball_file}"
 			;;
 		'amdvlk')
-			sum="${amdvlk_key_sum}"
-			file="${amdvlk_key_file}"
+			#sum="${amdvlk_key_sum}"
+			#file="${amdvlk_key_file}"
+
+			sum="${amdvlk_vulkan_deb_sum}"
+			file="${amdvlk_vulkan_deb_file}"
 			;;
 		'fglrx')
 			sum="${fglrx_tarball_sum}"
@@ -238,15 +246,29 @@ _download () {
 		fi
 	fi
 
-	if "${require_amdvlk_repo}"
+	#if "${require_amdvlk_repo}"
+	#then
+	#	if ! _checksum 'amdvlk'
+	#	then
+	#		echo "Download ${amdvlk_key_file}."
+
+	#		rm -f "${amdvlk_key_file}"
+
+	#		wget "${amdvlk_key_url}"
+
+	#		_checksum 'amdvlk'
+	#	fi
+	#fi
+
+	if "${require_amdvlk_deb}"
 	then
 		if ! _checksum 'amdvlk'
 		then
-			echo "Download ${amdvlk_key_file}."
+			echo "Download ${amdvlk_vulkan_deb_file}."
 
-			rm -f "${amdvlk_key_file}"
+			rm -f "${amdvlk_vulkan_deb_file}"
 
-			wget "${amdvlk_key_url}"
+			wget "${amdvlk_vulkan_deb_url}"
 
 			_checksum 'amdvlk'
 		fi
@@ -316,7 +338,8 @@ _clean () {
 		rm --force --verbose "${workspace_dir}/${amdgpupro_pal_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_pal_tarball_dir}"
 
-		rm --force --verbose "${workspace_dir}/${amdvlk_key_file}"
+		#rm --force --verbose "${workspace_dir}/${amdvlk_key_file}"
+		rm --force --verbose "${workspace_dir}/${amdvlk_vulkan_deb_file}"
 
 		rm --force --verbose "${workspace_dir}/${fglrx_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${fglrx_tarball_dir}"
@@ -462,10 +485,10 @@ _uninstall_driver () {
 		'amdvlk-vulkan')
 			_uninstall_packages "${amdvlk_vulkan_package_name_list}"
 
-			rm --force --verbose \
-				"${amdvlk_list_path}"
-			rm --force --verbose \
-				"${amdvlk_gpg_path}"
+			#rm --force --verbose \
+			#	"${amdvlk_list_path}"
+			#rm --force --verbose \
+			#	"${amdvlk_gpg_path}"
 			;;
 		'fglrx-cpu-opencl')
 			rm --force --verbose \
@@ -658,7 +681,8 @@ _install_driver () {
 			_install_packages "${amdgpupro_amdvlk_pro_vulkan_package_name_list}"
 		;;
 		'amdvlk-vulkan')
-			_install_packages "${amdvlk_vulkan_package_name_list}"
+			#_install_packages "${amdvlk_vulkan_package_name_list}"
+			_install_packages "${amdvlk_vulkan_deb_file}"
 		;;
 		'fglrx-cpu-opencl')
 			local fglrx_extract_prefix="${fglrx_tarball_dir}/prefix"
@@ -698,12 +722,12 @@ _install () {
 		_install_amdgpu_package
 	fi
 
-	if "${require_amdvlk_repo}"
-	then
-		local amdvlk_source_line="deb [arch=${amdvlk_arch} signed_by=${amdvlk_gpg_path}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
-		echo "${amdvlk_source_line}" > "${amdvlk_list_path}"
-		gpg --dearmor < "${amdvlk_key_file}" > "${amdvlk_gpg_path}"
-	fi
+	#if "${require_amdvlk_repo}"
+	#then
+	#	local amdvlk_source_line="deb [arch=${amdvlk_arch} signed_by=${amdvlk_gpg_path}] ${amdvlk_deb_repo} ${amdvlk_distro} ${amdvlk_channel}"
+	#	echo "${amdvlk_source_line}" > "${amdvlk_list_path}"
+	#	gpg --dearmor < "${amdvlk_key_file}" > "${amdvlk_gpg_path}"
+	#fi
 
 	apt-get update
 
@@ -842,7 +866,8 @@ require_old_clover_deb='false'
 require_old_orca_tarball='false'
 require_pal_tarball='false'
 require_amdgpu_repo='false'
-require_amdvlk_repo='false'
+#require_amdvlk_repo='false'
+require_amdvlk_deb='false'
 require_fglrx_tarball='false'
 
 declare -a driver_list=()
@@ -868,7 +893,8 @@ case "${action}" in
 					require_amdgpu_repo='true'
 					;;
 				'amdvlk-'*)
-					require_amdvlk_repo='true'
+					#require_amdvlk_repo='true'
+					require_amdvlk_deb='true'
 					;;
 				'fglrx-'*)
 					require_fglrx_tarball='true'
