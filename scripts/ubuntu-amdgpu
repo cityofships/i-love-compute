@@ -68,6 +68,11 @@ fglrx_tarball_dir='fglrx-15.302'
 fglrx_script_file='amd-driver-installer-15.302-x86.x86_64.run'
 fglrx_install_dir='/opt/amd-fglrx'
 
+amdvlk_gcn3_vulkan_version='2021.Q2.5'
+amdvlk_gcn3_vulkan_deb_file="amdvlk_${amdvlk_gcn3_vulkan_version}_amd64.deb"
+amdvlk_gcn3_vulkan_deb_sum='4d1d7467bff0a5c00c18efc8f469c542c49db4d0f187d9bcc22216967f2766f7cd74125838594c0ea12820db3df212c376cbef12b051f17425ae207a42002001'
+amdvlk_gcn3_vulkan_deb_url="https://github.com/GPUOpen-Drivers/AMDVLK/releases/download/v-${amdvlk_gcn3_vulkan_version}/${amdvlk_gcn3_vulkan_deb_file}"
+
 #amdvlk_deb_repo='http://repo.radeon.com/amdvlk/apt/debian'
 #amdvlk_distro='bionic'
 #amdvlk_channel='main'
@@ -83,7 +88,6 @@ amdvlk_vulkan_deb_file="amdvlk_${amdvlk_vulkan_version}_amd64.deb"
 amdvlk_vulkan_deb_sum='59e57ac223c56b4b4c879f5eb674688fec26faa017daa584386931d4a632cf99345a2140ef958d8281989594c5326d07f50f2b89119da6d1116f96a174aba0ca'
 amdvlk_vulkan_deb_url="https://github.com/GPUOpen-Drivers/AMDVLK/releases/download/v-${amdvlk_vulkan_version}/${amdvlk_vulkan_deb_file}"
 
-mesa_all_opencl_package_name_list='mesa-opencl-icd'
 mesa_all_vulkan_package_name_list='mesa-vulkan-drivers'
 mesa_all_opengl_package_name_list='libglx-mesa0'
 mesa_all_va_package_name_list='mesa-va-drivers'
@@ -99,6 +103,7 @@ amdgpupro_mesa_vdpau_package_name_list='mesa-amdgpu-vdpau-drivers'
 amdgpupro_oglp_opengl_package_name_list='amdgpu-pro-oglp'
 amdgpupro_amdvlk_vulkan_package_name_list='vulkan-amdgpu'
 amdgpupro_amdvlk_pro_vulkan_package_name_list='vulkan-amdgpu-pro'
+amdvlk_gcn3_vulkan_package_name_list='amdvlk'
 amdvlk_vulkan_package_name_list='amdvlk'
 
 _error () {
@@ -145,6 +150,10 @@ _checksum () {
 		'pal')
 			sum="${amdgpupro_pal_tarball_sum}"
 			file="${amdgpupro_pal_tarball_file}"
+			;;
+		'amdvlk-gcn3')
+			sum="${amdvlk_gcn3_vulkan_deb_sum}"
+			file="${amdvlk_gcn3_vulkan_deb_file}"
 			;;
 		'amdvlk')
 			#sum="${amdvlk_key_sum}"
@@ -246,6 +255,20 @@ _download () {
 		fi
 	fi
 
+	if "${require_amdvlk_gcn3_deb}"
+	then
+		if ! _checksum 'amdvlk-gcn3'
+		then
+			echo "Download ${amdvlk_gcn3_vulkan_deb_file}."
+
+			rm -f "${amdvlk_gcn3_vulkan_deb_file}"
+
+			wget "${amdvlk_gcn3_vulkan_deb_url}"
+
+			_checksum 'amdvlk-gcn3'
+		fi
+	fi
+
 	#if "${require_amdvlk_repo}"
 	#then
 	#	if ! _checksum 'amdvlk'
@@ -337,6 +360,8 @@ _clean () {
 
 		rm --force --verbose "${workspace_dir}/${amdgpupro_pal_tarball_file}"
 		rm --force --recursive --verbose "${workspace_dir}/${amdgpupro_pal_tarball_dir}"
+
+		rm --force --verbose "${workspace_dir}/${amdvlk_gcn3_vulkan_deb_file}"
 
 		#rm --force --verbose "${workspace_dir}/${amdvlk_key_file}"
 		rm --force --verbose "${workspace_dir}/${amdvlk_vulkan_deb_file}"
@@ -481,6 +506,9 @@ _uninstall_driver () {
 			;;
 		'amdgpupro-amdvlk-pro-vulkan')
 			_uninstall_packages "${amdgpupro_amdvlk_pro_vulkan_package_name_list}"
+			;;
+		'amdvlk-gcn3-vulkan')
+			_uninstall_packages "${amdvlk_gcn3_vulkan_package_name_list}"
 			;;
 		'amdvlk-vulkan')
 			_uninstall_packages "${amdvlk_vulkan_package_name_list}"
@@ -680,6 +708,9 @@ _install_driver () {
 		'amdgpupro-amdvlk-pro-vulkan')
 			_install_packages "${amdgpupro_amdvlk_pro_vulkan_package_name_list}"
 		;;
+		'amdvlk-gcn3-vulkan')
+			_install_packages "${amdvlk_gcn3_vulkan_deb_file}"
+		;;
 		'amdvlk-vulkan')
 			#_install_packages "${amdvlk_vulkan_package_name_list}"
 			_install_packages "${amdvlk_vulkan_deb_file}"
@@ -821,8 +852,10 @@ _help () {
 	\t\tAMD AMDGPU-PRO amdgpu amdgpu-pro Vulkan for GCN and RDNA GPUs.
 	\tamdgpupro-amdvlk-vulkan
 	\t\tAMD AMDGPU-PRO amdgpu amdgpu Vulkan for GCN and RDNA GPUs.
+	\tamdvlk-gcn3-vulkan
+	\t\tAMD amdvlk Vulkan for GCN1, GCN2, GCN3 GPUs.
 	\tamdvlk-vulkan
-	\t\tAMD amdvlk Vulkan for GCN GCN3+ and RDNA GPUs.
+	\t\tAMD amdvlk Vulkan for RDNA GPUs.
 	\tfglrx-cpu-opencl
 	\t\tAMD Radeon Crimson fglrx OpenCL for CPUs.
 
@@ -866,6 +899,8 @@ require_old_clover_deb='false'
 require_old_orca_tarball='false'
 require_pal_tarball='false'
 require_amdgpu_repo='false'
+require_amdvlk_gcn3_deb='false'
+#require_amdvlk_repo='false'
 #require_amdvlk_repo='false'
 require_amdvlk_deb='false'
 require_fglrx_tarball='false'
@@ -892,7 +927,10 @@ case "${action}" in
 				'amdgpupro-'*)
 					require_amdgpu_repo='true'
 					;;
-				'amdvlk-'*)
+				'amdvlk-gcn3-vulkan')
+					require_amdvlk_gcn3_deb='true'
+					;;
+				'amdvlk-vulkan')
 					#require_amdvlk_repo='true'
 					require_amdvlk_deb='true'
 					;;
@@ -938,6 +976,8 @@ case "${action}" in
 					;;
 				'amdgpupro-amdvlk-pro-vulkan')
 					;;
+				'amdvlk-gcn3-vulkan')
+					;;
 				'amdvlk-vulkan')
 					;;
 				'fglrx-cpu-opencl')
@@ -972,6 +1012,8 @@ case "${action}" in
 				'mesa-all-vdpau')
 					;;
 				'amdgpupro-all')
+					;;
+				'amdvlk-gcn3-vulkan')
 					;;
 				'amdvlk-vulkan')
 					;;
