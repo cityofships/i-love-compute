@@ -25,51 +25,32 @@ packages=(
 	#	build slug
 	'LLVM project'
 		'llvm-project'
-		'https://github.com/llvm/llvm-project.git'
-		'release/15.x'
+		'https://github.com/CHIP-SPV/llvm-project.git'
+		'chipStar-llvm-17'
 		'-'
 	'LLVM'
 		'llvm-project/llvm'
 		'-'
 		'-'
 		'llvm'
-	'Clang'
-		'llvm-project/clang'
+	'SPIRV LLVM Translator'
+		'llvm-project/llvm/projects/SPIRV-LLVM-Translator'
+		'https://github.com/CHIP-SPV/SPIRV-LLVM-Translator.git'
+		'chipStar-llvm-17'
 		'-'
-		'-'
-		'clang'
 	'SPIRV Headers'
-		'SPIRV-Headers'
+		'lvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers'
 		'https://github.com/KhronosGroup/SPIRV-Headers.git'
 		'-'
 		'-'
-	'SPIRV LLVM Translator'
-		'SPIRV-LLVM-Translator'
-		'https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git'
-		'llvm_release_150'
+	'chipStar'
+		'chipstar'
+		'https://github.com/CHIP-SPV/chipStar.git'
 		'-'
-	'CHIP-SPV'
-		'chip-spv'
-		'https://github.com/CHIP-SPV/chip-spv.git'
-		'-'
-		'chip_spv'
+		'chipstar'
 )
 
 _build_llvm () {
-	local llvm_spirv_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator"
-	if ! [ -e "${llvm_spirv_embedded_folder}" ]
-	then
-		ln -s "${workspace_dir}/SPIRV-LLVM-Translator" \
-			"${llvm_spirv_embedded_folder}"
-	fi
-
-	local spirv_headers_embedded_folder="${workspace_dir}/llvm-project/llvm/projects/SPIRV-LLVM-Translator/SPIRV-Headers"
-	if ! [ -e "${spirv_headers_embedded_folder}" ]
-	then
-		ln -s "${workspace_dir}/SPIRV-Headers" \
-			"${spirv_headers_embedded_folder}"
-	fi
-
 	# Use -D'LLVM_ENABLE_PROJECTS'='clang' or:
 	# The dependency target "clang" of target "check-all" does not exist
 	# The dependency target "clang" of target "check-llvm-spirv" does not exist.
@@ -79,7 +60,8 @@ _build_llvm () {
 	# RTTI is disabled by default by LLVM, but Clover requires it to be enabled:
 	# > ERROR: Problem encountered: The Clover OpenCL state tracker requires rtti
 	_cmake_setup \
-		-D'LLVM_ENABLE_PROJECTS'='clang' \
+		-D'LLVM_ENABLE_PROJECTS'='clang;openmp' \
+		-D'LLVM_TARGETS_TO_BUILD'='Native' \
 		-D'LLVM_ENABLE_ASSERTIONS'='OFF' \
 		-D'LLVM_ENABLE_RTTI'='ON' \
 		-D'LLVM_BUILD_TESTS'='OFF' \
@@ -89,18 +71,7 @@ _build_llvm () {
 	_cmake_compile_install
 }
 
-_build_clang () {
-	# Explicit build type is now mandatory,
-	# See https://github.com/llvm/llvm-project/commit/350bdf9227cebceb7b7a283f90f504555bf6c496
-	# It is currently built only for building llvm-spirv.
-	_cmake_setup \
-		-D'LLVM_ENABLE_ASSERTIONS'='ON' \
-		-D'LLVM_ENABLE_RTTI'='ON'
-
-	_cmake_compile_install
-}
-
-_build_chip_spv () {
+_build_chipstar () {
 <<\EOF
 CMake Error at cmake/FindLLVM.cmake:72 (message):
   Can't find llvm-config at /usr/bin.  Please provide CMake argument
