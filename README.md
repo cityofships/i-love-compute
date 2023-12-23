@@ -46,7 +46,6 @@ Looking for:
 - AMD CDNA 2.0,
 - AMD RDNA 1.0 (Navi),
 - AMD CDNA 1.0,
-- AMD hardware with supported HIP on ROCm,
 - Via hardware (Chrome 520 and later),
 - Nvidia hardware that is not Tesla or Kepler,  
   especially those driven by nvc0 and not nv50.
@@ -56,6 +55,7 @@ Looking for:
 
 Already sourced:
 
+- AMD RDNA 3.0 (radeonsi; discrete: PCIe),
 - AMD RDNA 2.0 (radeonsi; integrated),
 - AMD GCN 5.0 (radeonsi; discrete: PCIe),
 - AMD GCN 5.0 (radeonsi; integrated),
@@ -185,7 +185,7 @@ A lot of patches are applied to both LuxCore, LuxMark and SLG4 to make them more
 - Port LuxMark 3 to Qt5.
 - Fix crashes on missing OpenCL platform.
 - Fix crashes on platform missing OpenCL devices.
-- Fix crashes on Opencl compilation errors.
+- Fix crashes on OpenCL compilation errors.
 - Fix for a division by zero that breaks ROCm and Clover when using `-cl-fast-relaxed-math`.
 - Fix urls to [luxcorerender.org](https://luxcorerender.org).
 - Print log to `stderr`, not only within the application.
@@ -301,13 +301,13 @@ Orca requires an X11 server being up and running.
   closed, complete, GCN5 (verified), probably RDNA (not verified).
     * Last version for PAL (`2020-09-29`, discontinued): [AMDGPU-PRO 20.40-1147286](https://www.amd.com/en/support/kb/release-notes/rn-amdgpu-unified-linux-20-40) (verified), removed in favor of ROCr in Radeon Software AMDGPU-PRO without ROCr being actually an alternative.
   - ROCr,  
-  open, assumed to be complete, few GCN, RDNA, CDNA, may break the whole system with some hardware (verified), replaced PAL in Radeon Software AMDGPU-PRO without being an alternative, neither in purpose, neither in hardware support, neither in implementation, neither in fulfilment.
+  open, assumed to be complete, few GCN, RDNA, CDNA, may break the whole system with some hardware (verified), replaced PAL in Radeon Software AMDGPU-PRO without being an alternative, neither in purpose, neither in hardware support, neither in implementation, neither in fullfilment.
   - fglrx AMD APP,  
   closed and requires old kernel, complete, old GPUs, the only option for TeraScale,  
   people are still [using it in 2020](https://gitlab.com/illwieckz/i-love-compute/-/issues/1#note_451460689).  
     * Last version for GCN (`2015-12-18`, discontinued): [AMD Radeon Software Crimson 15.12-15.302-151217a-297685e](https://www.amd.com/fr/support/graphics/amd-radeon-r9-series/amd-radeon-r9-300-series/amd-radeon-r9-390x) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified for GCN 1.0 and GCN 2.0).
     * Last version for TeraScale 2 to 3 (`2015-09-15`discontinued): [AMD Catalyst 15.9-15.201.1151](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-5000-series/ati-radeon-hd-5970) (fglrx, see _Linux x86_64_), requires Ubuntu 14.04 and 3.19 kernel (verified).
-    * Last version for TeraScale1 (`2013-01-21`, discontinued): [AMD Catalyst 13.1](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-4000-series/ati-radeon-hd-4890), requires Ubuntu 12.04 (not verified), only option for TeraScale 1 like Radeon HD 4890 PCIe and Radeon HD 4670 AGP (not verified).
+    * Last version for TeraScale 1 (`2013-01-21`, discontinued): [AMD Catalyst 13.1](https://www.amd.com/fr/support/graphics/amd-radeon-hd/ati-radeon-hd-4000-series/ati-radeon-hd-4890), requires Ubuntu 12.04 (not verified), only option for TeraScale 1 like Radeon HD 4890 PCIe and Radeon HD 4670 AGP (not verified).
   - mesa3d-comp-bridge,  
     open on closed code, unmaintained, was meant to run Mesa Clover over Mesa APP OpenCL compiler.
   - pocl with HSA,  
@@ -377,8 +377,8 @@ Orca requires an X11 server being up and running.
   - https://gitlab.freedesktop.org/mesa/mesa/-/issues/7420
 - Mesa/rusticl iris tracker:
   - https://gitlab.freedesktop.org/mesa/mesa/-/issues/6311
-- CHIP-SPV
-  - https://github.com/CHIP-SPV/chip-spv
+- chipStar
+  - https://github.com/CHIP-SPV/chipStar
 - AMD ROCr:
   - https://github.com/RadeonOpenCompute/ROCm
 - AMDGPU-PRO:
