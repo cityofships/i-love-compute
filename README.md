@@ -139,15 +139,15 @@ A script to download, build and run PoCL (Portable Computing Language) and run s
 - By default `POCL_DEVICES` is set to `pthread vulkan`, the user can only run an OpenCL application with PoCL on pthread or vulkan by doing `POCL_DEVICES=pthread ./user-pocl run [COMMAND]` or `POCL_DEVICES=vulkan ./user-pocl run [COMMAND]`.
 
 
-### [`user-chip-spv`](scripts/user-chip-spv)
+### [`user-chipstar`](scripts/user-chipstar)
 
-A script to download, build and run CHIP-SPV (a platform to run HIP over OpenCL) and run software using it.
+A script to download, build and run chipStar (a platform to run HIP over OpenCL) and run software using it.
 
-CHIP-SPV is an integration of HIPCL and HIPLZ supporting OpenCL and Level Zero backends.
+chipStar (previously named CHIP-SPV) is an integration of HIPCL and HIPLZ supporting OpenCL and Level Zero backends.
 
-- The user can download build and instal CHIP-SPV by doing `./user-chip-spv build`.
-- The installation is done as user in `workspace/user-chip-spv` and provided software is not made available in default environment.
-- The user can run `COMMAND` with built CHIP-SPV by doing `./user-chip-spv run [COMMAND]`.
+- The user can download build and instal chipStar by doing `./user-chipstar build`.
+- The installation is done as user in `workspace/user-chipstar` and provided software is not made available in default environment.
+- The user can run `COMMAND` with built chipStar by doing `./user-chipstar run [COMMAND]`.
 
 
 ### [`user-amdoclfix`](scripts/user-amdoclfix)
