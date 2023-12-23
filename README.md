@@ -49,8 +49,6 @@ Looking for:
 - Via hardware (Chrome 520 and later),
 - Nvidia hardware that is not Tesla or Kepler,  
   especially those driven by nvc0 and not nv50.
-- Intel hardware that is not Gen7 (Haswell),  
-  especially those driven by iris and not crocus.
 - Non-integrated Intel hardware like Intel Xe.
 
 Already sourced:
@@ -67,6 +65,7 @@ Already sourced:
 - AMD TeraScale 3 (r600; discrete: PCIe),
 - AMD TeraScale 2 (r600; discrete: PCIe, PCI),
 - AMD TeraScale 1 (r600; discrete: PCIe, AGP, PCI),
+- Intel Gen9 GT2 (iris, integrated);
 - Intel Gen7 GT2 (crocus; integrated),
 - Nvidia Kepler (nv50; discrete: PCIe; onboard),
 - Nvidia Tesla 2.0 (nv50; discrete: PCIe),
