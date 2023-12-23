@@ -44,7 +44,7 @@ packages=(
 		'-'
 		'-'
 	'chipStar'
-		'chipstar'
+		'chipStar'
 		'https://github.com/CHIP-SPV/chipStar.git'
 		'-'
 		'chipstar'
