@@ -42,14 +42,17 @@ For hardware donation, send mail to _Thomas Debesse_ `<dev (ad) illwieckz.net>` 
 
 Looking for:
 
-- AMD discrete RDNA2.0 (Big Navi),
-- AMD CDNA 2.0,
-- AMD RDNA 1.0 (Navi),
-- AMD CDNA 1.0,
+- AMD CDNA 3 (Aqua Vanjaram),
+- AMD discrete RDNA2.0 (Navi 21, 22, 23, 24),
+- AMD CDNA 2.0 (Aldebaran),
+- AMD RDNA 1.0 (Navii 10, 14),
+- AMD CDNA 1.0 (Arcturus),
+- AMD GCN 5.1 (Vega 20),
 - Via hardware (Chrome 520 and later),
-- Nvidia hardware that is not Tesla or Kepler,  
-  especially those driven by nvc0 and not nv50.
-- Non-integrated Intel hardware like Intel Xe.
+- Nvidia hardware with GSP,
+- Nvidia hardware using nvc0,
+- Intel Arc,
+- Intel Xe.
 
 Already sourced:
 
@@ -65,7 +68,7 @@ Already sourced:
 - AMD TeraScale 3 (r600; discrete: PCIe),
 - AMD TeraScale 2 (r600; discrete: PCIe, PCI),
 - AMD TeraScale 1 (r600; discrete: PCIe, AGP, PCI),
-- Intel Gen9 GT2 (iris, integrated);
+- Intel Gen9 GT2 (iris; integrated);
 - Intel Gen7 GT2 (crocus; integrated),
 - Nvidia Kepler (nv50; discrete: PCIe; onboard),
 - Nvidia Tesla 2.0 (nv50; discrete: PCIe),
