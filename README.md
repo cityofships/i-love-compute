@@ -60,6 +60,7 @@ Already sourced:
 - AMD GCN 5.0 (radeonsi; discrete: PCIe),
 - AMD GCN 5.0 (radeonsi; integrated),
 - AMD GCN 4.0 (radeonsi; discrete: PCIe),
+- AMD GCN 3.0 (radeonsi; discrete: PCIe),
 - AMD GCN 3.0 (radeonsi; integrated),
 - AMD GCN 2.0 (radeonsi; discrete: PCIe),
 - AMD GCN 1.0 (radeonsi; discrete: PCIe),
