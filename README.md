@@ -78,7 +78,7 @@ Already sourced:
 Scripts
 -------
 
-The scripts provide a builtin help accessible with `-h` or `--help` option.
+The scripts provide a built-in help accessible with `-h` or `--help` option.
 
 The user can do combinations: `./user-mesa run ./user-clvk run clinfo --list` to run clinfo with built clvk over built Mesa Vulkan, or `./user-mesa run ./user-luxmark3 run luxmark --mode=PAUSE` to run LuxMark 3.1 over Mesa Clover.
 
